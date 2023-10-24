@@ -1,0 +1,1 @@
+# FluSight Laboratory Confirmed Influenza Hospital Admisssions Forecasts
