@@ -1,0 +1,281 @@
+---
+title: "FluSight 2021-2022 & 2022-2023 supplemental backfill analysis"
+author: "CDC FluSight Team"
+output: html_document
+date: "2023-11-29"
+---
+
+```{r, setup}
+library(RSocrata)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(stringr)
+
+select = dplyr::select
+filter = dplyr::filter
+
+#CDC UserID goes here
+userid="nqr2"
+
+#update path to where cloned GitHub repository lives
+githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
+flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
+source(paste0(manuscript_repo,"/functions2022-2023.R"))
+
+flu21_target_end_dates <- c("2022-02-26", "2022-03-05", "2022-03-12", "2022-03-19", "2022-03-26", "2022-04-02","2022-04-09", "2022-04-16", 
+                            "2022-04-23", "2022-04-30", "2022-05-07", "2022-05-14", "2022-05-21", "2022-05-28", "2022-06-04", "2022-06-11", 
+                            "2022-06-18", "2022-06-25", "2022-07-02", "2022-07-09", "2022-07-16")
+flu23_target_end_dates <- c("2022-10-22", "2022-10-29", "2022-11-05", "2022-11-12", "2022-11-19", "2022-11-26", "2022-12-03", "2022-12-10",
+                            "2022-12-17", "2022-12-24", "2022-12-31", "2023-01-07", "2023-01-14", "2023-01-21", "2023-01-28", "2023-02-04", 
+                            "2023-02-11", "2023-02-18", "2023-02-25", "2023-03-04", "2023-03-11", "2023-03-18", "2023-03-25", "2023-04-01",
+                            "2023-04-08", "2023-04-15", "2023-04-22", "2023-04-29", "2023-05-06", "2023-05-13", "2023-05-20", "2023-05-27" ,
+                            "2023-06-03", "2023-06-10")
+
+```
+
+This RMD analyizes and outputs figures for the backfill analysis 
+
+```{r, observed data}
+obs_data21 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-Archived_9-12-2022.csv")) %>%
+  mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
+         location_name = ifelse(location == 'US', 'National', location_name)) %>%
+  select(-date) %>%
+  filter(wk_end_date %in% as.Date(unique(flu21_target_end_dates)), location != 78 )
+
+
+obs_data21 <- obs_data21 %>%
+  rename(value_inc = value,
+         target_end_date = wk_end_date) %>%
+  filter(target_end_date < Sys.Date())
+
+obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations.csv")) %>%
+  mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
+         location_name = ifelse(location == 'US', 'National', location_name)) %>%
+  select(-date) %>%
+  filter(wk_end_date %in% as.Date(unique(flu23_target_end_dates)), location != 78)
+
+
+obs_data23 <- obs_data23 %>%
+  dplyr::rename(value_inc = value,
+                target_end_date = wk_end_date) %>%
+  filter(target_end_date < Sys.Date())
+
+```
+
+##### Backfill epicurve
+
+```{r, backfill}
+#Data are pulled via the api for both Tuesday and Mondays. Monday pulls are in a function sourced from functions2022-2023
+#Tuesday data pull
+tues_start <- as.Date("2023-01-17")
+tues_end <- as.Date("2023-06-13")
+
+tuesdates <- seq(from = tues_start, to = tues_end, by = 7)
+
+jsonpath <- read.socrata(url = "https://healthdata.gov/resource/qqte-vkut.json")
+
+tues_set <- data.frame(state = character(), date = as.Date(character()), value = integer(), report_date = character(), epiweek = character(), epiyear = character())
+d <- tues_start
+
+#loop to pull in api data and aggregate it weekly
+while (d <= last(tuesdates)){
+   d = as.Date(d, origin = "1970-01-01")
+   #if there are multiple updates on the same day, we want to pull in the later update rather than an earlier update
+  filename = case_when(length(jsonpath[str_detect(string = jsonpath$update_date, pattern = as.character(d)), 12]) > 1 ~
+                         jsonpath[str_detect(string = jsonpath$update_date, pattern = as.character(d)), 12][2],
+                           TRUE ~  jsonpath[str_detect(string = jsonpath$update_date, pattern = as.character(d)), 12][1])
+
+    #print(d)
+    df = read.csv(filename) %>% mutate(date = as.Date(date, tryFormats = c("%Y-%m-%d", "%m/%d/%Y", "%Y/%m/%d")) -1)
+    df1 = df %>% filter(as.Date(date, tryFormats = c("%Y-%m-%d", "%m/%d/%Y", "%Y/%m/%d")) > as.Date(d-10), date < as.Date(d - 2), state != "AS", state != "VI") %>%
+      select(state, date, previous_day_admission_influenza_confirmed) %>%
+      mutate(date = as.Date(date, tryFormats = c("%Y-%m-%d", "%m/%d/%Y", "%Y/%m/%d")), report_date = (as.Date((get_next_saturday(d) - 7), "%Y-%m-%d")), epiweek = epiweek(date), epiyear = epiyear(date), .keep = "all") %>%
+      rename(value = previous_day_admission_influenza_confirmed) %>% select(state, date, value, report_date, epiweek, epiyear)
+    tues_set = rbind(tues_set, df1)
+    d <- d + 7
+}
+
+#pulling 2021-22 data for backfill and summarizing nationally 
+finalset21 <- backfilldata_func(startdate = "2022-01-31", enddate = "2022-07-18")
+forecastdata21 <- nation_summary_func(finalset21)
+
+#renaming and creating some new variables to make comparison easier 
+truthtransmute21 <-  obs_data21  %>% transmute(location_name = case_when(location_name == "National" ~ "US", TRUE ~ location_name),
+                                             wk_end_date = as.Date(target_end_date), value = as.numeric(as.character(value_inc)),
+                                           report_date  = as.Date("2022-09-12")) %>%
+  filter(wk_end_date >= "2022-01-01")
+
+#add the transmuted data to the original truth data 
+truthaddon21 <- truthtransmute21 %>% filter(location_name == "US") %>% 
+  rename(truthdate = report_date, date = wk_end_date, truthvalue = value) %>% 
+  group_by(truthdate, date) %>% ungroup()
+
+
+fullset21 <- forecastdata21 %>% filter(state == "US") %>% left_join(., truthaddon21, by = c("state" = "location_name", "report_date" = "date" ))
+
+finalset23 <- backfilldata_func("2022-10-17","2023-01-09")
+finalset23 <- rbind(finalset23, tues_set)
+forecastdata23 <- nation_summary_func(finalset23)
+truthtransmute23 <-  obs_data23  %>% transmute(location_name = case_when(location_name == "National" ~ "US", TRUE ~ location_name),
+                                             wk_end_date = as.Date(target_end_date), value = as.numeric(as.character(value_inc)),
+                                           report_date  = as.Date("2023-05-20")) %>%
+  filter(wk_end_date >= "2022-10-22")
+
+truthaddon23 <- truthtransmute23 %>% filter(location_name == "US") %>% 
+  rename(truthdate = report_date, date = wk_end_date, truthvalue = value) %>% 
+  group_by(truthdate, date) %>% ungroup()
+
+
+fullset23 <- forecastdata23 %>% filter(state == "US") %>% left_join(., truthaddon23, by = c("state" = "location_name", "report_date" = "date" ))
+
+fullset <- rbind(mutate(fullset21, season = "A) 2021-2022"), mutate(fullset23, season = "B) 2022-2023"))
+
+
+wklyplt <- 
+  ggplot(fullset, aes(x = report_date)) +
+  geom_line(aes(y = value, color = "Weekly Reported Hospitalizations"))+
+  geom_line(aes(y = truthvalue, color = "Final Hospitalizations"))+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  geom_vline(aes(xintercept = as.Date("2022-02-21")), linetype = "dashed")+
+  labs(y = "Weekly hospitalizations",  x = NULL) +
+  scale_color_manual(name = NULL, values = c("Weekly Reported Hospitalizations" = "#6baed6", "Final Hospitalizations" = "#d6936b"))+
+  theme_bw() +
+  theme(legend.position="bottom")+
+  facet_grid(cols = vars(season), scales = "free_x")
+
+wklyplt
+# 
+# ggsave(plot = wklyplt, paste0(manuscript_repo,"/Output/backfill_epicurv_mon_tue.png"), height = 6, width = 8, dpi = 300)
+```
+
+##### Backfill Differences
+
+```{r, Backfill Differences}
+
+diffdf21 <- diff_df_function(truthtransmute21, forecastdata21) %>% mutate(season = "A) 2021-2022")
+diffdf23 <- diff_df_function(truthtransmute23, forecastdata23) %>% mutate(season = "B) 2022-2023")
+
+diffdf <- rbind(diffdf21, diffdf23)
+
+dffsummary <- diffdf %>% filter (location_name != "Virgin Islands") %>% group_by(season, location_name) %>% 
+  summarise(meanpercdiff = mean(final_perc_change, na.rm= TRUE), 
+            perclow = min(final_perc_change, na.rm = TRUE),
+            perchigh = max(final_perc_change, na.rm =  TRUE), 
+            perciqr = IQR(final_perc_change, na.rm = TRUE),
+            perc_median = median(final_perc_change, na.rm = TRUE),
+            meanabsolute = mean(absolutediff, na.rm = TRUE), 
+            absolow = min(absolutediff, na.rm = TRUE), 
+            absohigh = max(absolutediff, na.rm = TRUE), 
+            absoiqr = IQR(absolutediff, na.rm = TRUE), 
+            median = median(absolutediff, na.rm = TRUE)) %>% ungroup
+write.csv(dffsummary, paste0(manuscript_repo,"/Output/backfill_difference_summary.csv"), row.names = FALSE)
+
+
+
+
+statediffs21 <- diffdf %>% filter(state != "US", season == "A) 2021-2022", !is.na(absolutediff))
+statediffs23 <- diffdf %>% filter(state != "US", season == "B) 2022-2023", !is.na(absolutediff))
+
+
+```
+
+## Backfill Analysis
+
+### 2021-2022
+
+To assess potential impacts of changes in reported values on forecast performance, we compared reported incident hospitalizations \[REF HHS-Protect\] at the time they would have been used for forecasts to the values used in evaluating forecasts (Supplemental Figures S2-S4). Revisions to published data changed between seasons. During the 2021-22 season, most data updates occurred within one month of when the data were initially published, and 12 out of the 18 weeks that were analyzed did not have updates two weeks after initial publication. In 2022-23, prior to the week ending December 19, most data updates occurred within one month of when the data were initially published, similar to 2021-22. Subsequently, data were updated more frequently over a longer period. For both seasons, across all subnational forecast jurisdictions, a majority (`r round((nrow(filter(statediffs21, abs(statediffs21$absolutediff) < 10))/nrow(statediffs21))*100, 2)`% in 21-22 and `r round((nrow(filter(statediffs23, abs(statediffs23$absolutediff) < 10))/nrow(statediffs23))*100, 2)`% in 22-23) of final values changed by less than 10 hospitalizations or did not change compared to corresponding initial reports. In 2021-22, a higher percent of updates had final values lower than initial reports, `r round((nrow(filter(statediffs21, absolutediff <0))/nrow(statediffs21))*100, 2)`%, compared to `r round((nrow(filter(statediffs23, absolutediff <0))/nrow(statediffs23))*100, 2)` in 2022-23. Conversely, 2022-23 had a higher percent of updates with no change (`r round((nrow(filter(statediffs23,  absolutediff ==0))/nrow(statediffs23))*100, 2)`%) than the 2021-22 season (`r round((nrow(filter(statediffs21,  absolutediff ==0))/nrow(statediffs21))*100, 2)`%. Both seasons had similar percent of updates with  final values higher than initial reports (`r round((nrow(filter(statediffs23, absolutediff >0))/nrow(statediffs23))*100, 2)`%)  `r round((nrow(filter(statediffs21, absolutediff >0))/nrow(statediffs21))*100, 2)`%, for 2022-23 and 2021-22 respectively). 
+
+
+
+For the U.S., the median percent and numeric difference across all forecast weeks were lower in 2021-22, ranges for both were wider with a median percent difference of`r round(select(filter(dffsummary, location_name == "US", season == "A) 2021-2022"), perc_median)*100, 2)`% (range: `r round(select(filter(dffsummary, location_name == "US", season == "A) 2021-2022"), perclow)*100, 2)`% to `r round(select(filter(dffsummary, location_name == "US", season == "A) 2021-2022"), perchigh)*100, 2)`%), and the median numeric difference of `r select(filter(dffsummary, location_name == "US", season == "A) 2021-2022"), median)` (range: `r select(filter(dffsummary, location_name == "US", season == "A) 2021-2022"), absolow)`, `r select(filter(dffsummary, location_name == "US", season == "A) 2021-2022"), absohigh)`). For 2022-23,  the median percent difference across all forecast weeks was `r round(select(filter(dffsummary, location_name == "US", season == "B) 2022-2023"), perc_median)*100, 2)`% (range: `r round(select(filter(dffsummary, location_name == "US", season == "B) 2022-2023"), perclow)*100, 2)`% to `r round(select(filter(dffsummary, location_name == "US", season == "B) 2022-2023"), perchigh)*100, 2)`%), and the median numeric difference was `r select(filter(dffsummary, location_name == "US", season == "B) 2022-2023"), median)` (range: `r select(filter(dffsummary, location_name == "US", season == "B) 2022-2023"), absolow)`, `r filter(dffsummary, location_name == "US", season == "B) 2022-2023") %>% pull(absohigh) %>% {format(., big.mark = ",")}`).
+
+
+Jurisdiction-specific median percent differences had a larger range in 2021-22 from `r round(select(head(arrange(filter(dffsummary, location_name !="US", season == "A) 2021-2022"), perc_median), n = 1), perc_median)*100, 2)`% in `r select(head(arrange(filter(dffsummary, location_name !="US", season == "A) 2021-2022"), perc_median), n = 1), location_name)` to `r round(select(tail(arrange(filter(dffsummary, location_name !="US", season == "A) 2021-2022"), perc_median), n = 1), perc_median)*100, 2)`% in `r select(tail(arrange(filter(dffsummary, location_name !="US", season == "A) 2021-2022"), perc_median), n = 1), location_name)` whereas, percent differences ranged from `r round(select(head(arrange(filter(dffsummary, location_name !="US", season == "B) 2022-2023"), perc_median), n = 1), perc_median)*100, 2)`% in `r select(head(arrange(filter(dffsummary, location_name !="US", season == "B) 2022-2023"), perc_median), n = 1), location_name)` to `r round(select(tail(arrange(filter(dffsummary, location_name !="US", season == "B) 2022-2023"), perc_median), n = 1), perc_median)*100, 2)`% in `r select(tail(arrange(filter(dffsummary, location_name !="US", season == "B) 2022-2023"), perc_median), n = 1), location_name)` for 2022-23. Across states, DC, and Puerto Rico, and for both seasons, the median numeric difference between initial report and final report was `r median(statediffs21$absolutediff, na.rm = TRUE)`. Supplemental figures S2-S4 for additional information on the distribution of differences between final reported values used for evaluation and the initial reported values. Supplemental figures S2-S4 for additional information on the distribution of differences between final reported values used for evaluation and the initial reported values.
+
+
+##### Absolute Difference
+
+```{r, abs difference}
+
+absoplt <- diffdf %>% filter(location_name != "US") %>% 
+  ggplot(aes(x = absolutediff, y = location_name))+
+  geom_boxplot(color = "#d6936b", outlier.color = "black")+
+  scale_y_discrete( limits = rev) +
+  labs(x = "Difference", y = "", title = "Absolute Changes")+
+  theme_bw()+
+  facet_grid(cols = vars(season))
+
+absoplt
+
+ # ggsave(plot = absoplt,  paste0(manuscript_repo,"/Output/Numeric_difference_all.png"), width = 6, height = 8, dpi = 300)
+
+```
+
+##### Relative Differences
+
+```{r, relative diff}
+
+percplt <- diffdf %>% filter(location_name != "US") %>% #can take out != National
+  ggplot(aes(x = final_perc_change*100, y = location_name))+
+  geom_boxplot(color = "#6baed6", outlier.color = "black")+
+  scale_y_discrete( limits = rev) +
+  labs(x = "Percent Difference", y = "", title = "Relative Changes")+
+  theme_bw()+
+facet_grid(cols = vars(season))
+percplt
+
+# ggsave(plot = percplt, paste0(manuscript_repo,"/Output/Percent_difference_all.png"), width = 6, height = 8, dpi = 300)
+
+```
+
+##### Backfill matrix plot
+
+```{r, stairstep plt}
+
+
+weeklydat21 <- hosp_data_read_func(from = as.Date("2022-01-31"), to = as.Date("2022-07-18"))
+weeklydat23 <- hosp_data_read_func(from = as.Date("2022-10-10"), to = as.Date("2023-01-09"))
+weeklydat23a <- hosp_data_read_func(from = as.Date("2022-10-11"), to = as.Date("2023-06-13"), tuesday = TRUE) %>% filter(report_date >= "2023-01-17")
+
+
+weeklydat23 <- rbind(weeklydat23, weeklydat23a)
+
+####check start date
+stairstep_function <- function(weeklydat, fromdate, todate){
+matrixset <-  weeklydat %>% group_by(report_date, epiweek) %>%
+  summarise(value = sum(value, na.rm = TRUE), date = as.Date(max(date)), asof = as.Date(date + 2)) %>%
+  ungroup() %>% #filter(date > as.Date("2022-01-29"), date < as.Date("2022-06-21")) %>%
+  select(-epiweek)
+
+
+log10limlow <- min(log10(matrixset$value))
+log10limhigh <- max(log10(matrixset$value))
+
+stairplt <- 
+matrixset %>% 
+  ggplot(aes(y = date,x= report_date))+
+  geom_tile(aes( fill = log10(value)))+
+  theme_bw()+
+  geom_label(aes(label = scales::comma(value)), label.padding = unit(.09, "lines"), size = 2.5)+
+  scale_fill_gradient(name = NULL,low = "#6baed6", high = "#d6936b", limits = c(log10limlow, log10limhigh)) +
+  scale_y_date(date_breaks = "1 week", date_labels = "%b %d", expand = c(0.01,0.01))+
+  scale_x_date(date_breaks = "1 week", date_labels = "%b %d", expand = c(0.01,0.01))+
+  labs(x = "Week Reported", y = "Initial Admission Week")+
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 45, hjust = 1))
+return(stairplt)
+}
+
+stairplt21 <- stairstep_function(weeklydat21)
+stairplt23 <- stairstep_function(weeklydat23)
+
+stairplt21
+stairplt23
+
+
+# ggsave(plot = stairplt21,  paste0(manuscript_repo,"/Output/stairstep21.png"), width = 8, height = 6, dpi = 300)
+# ggsave(plot = stairplt23,  paste0(manuscript_repo,"/Output/stairstep23.png"), width = 12, height = 8, dpi = 300)
+
+```
