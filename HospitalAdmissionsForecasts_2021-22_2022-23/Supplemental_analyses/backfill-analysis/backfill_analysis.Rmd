@@ -35,7 +35,7 @@ flu23_target_end_dates <- c("2022-10-22", "2022-10-29", "2022-11-05", "2022-11-1
 
 ```
 
-This RMD analyizes and outputs figures for the backfill analysis 
+This RMD analyzes data and outputs figures for the backfill analysis 
 
 ```{r, observed data}
 obs_data21 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-Archived_9-12-2022.csv")) %>%
