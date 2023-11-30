@@ -39,7 +39,7 @@ library(RSocrata)
 #userid="nqr2"
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/shaws/Documents/GitHub")
+githubpath = paste0("C:/Users/", userid, "/Desktop/GitHub")
 
 '%!in%' <- Negate('%in%') #previously %notin% possible #update
 
