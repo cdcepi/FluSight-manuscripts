@@ -1,4 +1,4 @@
-source(paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/Plotting functions.R"), local = knitr::knit_global())
+#source(paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/Plotting functions.R"), local = knitr::knit_global())
 
 model_display_names <- c(
   "CEID-Walk" = "CEID-Walk",

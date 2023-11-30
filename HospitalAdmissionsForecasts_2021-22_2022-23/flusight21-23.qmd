@@ -25,18 +25,21 @@ library(MMWRweek)
 library(DT)
 library(plotly)
 library(gridExtra)
+#devtools::install_github("reichlab/zoltr")
+#https://github.com/reichlab/covidHubUtils
+#remotes::install_github("reichlab/covidHubUtils")
 library(covidHubUtils)
 library(ggridges)
 library(viridis)
 library(cowplot)
-library(scales)
+#library(scales)
 library(RSocrata)
 
 #CDC UserID goes here
-userid="nqr2"
+#userid="nqr2"
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+githubpath = paste0("C:/Users/shaws/Documents/GitHub")
 
 '%!in%' <- Negate('%in%') #previously %notin% possible #update
 
@@ -176,7 +179,7 @@ location.names21 = obs_data21 %>% select(location, location_name) %>% unique()
 all_dat21 = left_join(all_dat21,location.names21, by = c("location"))
   
 
-obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations.csv")) %>%
+obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-2023-06-23.csv")) %>%
   mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
          location_name = ifelse(location == 'US', 'National', location_name)) %>%
   select(-date) %>%
@@ -289,8 +292,9 @@ inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), muta
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
     kableExtra::footnote( general_title = "") #%>% 
-    kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/table1_all.pdf"))
-    
+    #kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/table1_all.pdf"))
+  #need below installed to run save_kable  
+  #webshot::install_phantomjs()
     
     
     
@@ -373,11 +377,9 @@ bimodal_rank21 <- ave_rank_percent21 %>% mutate(pct_top_bottom = pct_top25 + pct
 bimodal_rank23 <- ave_rank_percent23 %>% mutate(pct_top_bottom = pct_top25 + pct_bottom25) %>% filter(pct_top_bottom >=75)
 
 
- scores_order <- inc.rankings_all
- levels_order <- scores_order$model
 
 figure2 <- inc_scores_overall %>% 
-  ggplot(aes(y = factor(model, levels = levels_order), x=rev_rank, fill = factor(after_stat(quantile)))) +
+  ggplot(aes(y = model, x=rev_rank, fill = factor(after_stat(quantile)))) +
   stat_density_ridges(
     geom = "density_ridges_gradient", calc_ecdf = TRUE,
     quantiles = 4, quantile_lines = TRUE, color = "gray30"
@@ -441,7 +443,7 @@ figure3 <- ggplot(scores,
   theme(axis.ticks.y = element_blank())
 figure3
 
-#ggsave(paste0(manuscript_repo,"/Output/figure3.png"), plot = figure3, width = 12, height= 8)
+ggsave(paste0(manuscript_repo,"/Output/figure3.png"), plot = figure3, width = 12, height= 8)
 
 
 modelrankings21 <- inc.rankings_location21 %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
@@ -503,7 +505,7 @@ wis_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
 figure4a <-  ggplot(abs_flusight, aes(x = target_end_date,
                                      y = log_WIS, group = model,
                                      col = model)) +
-  geom_line(size = 1) + geom_point(size = 2) +
+  geom_line(linewidth = 1) + geom_point(size = 2) +
   scale_color_manual(values = c("#d6936b", "#6baed6")) +
   geom_line(data = abs_not_flusight, aes(x = target_end_date, y = log_WIS, group = model), color = adjustcolor("grey50", .35)) +
   labs(y = "Absolute WIS",
@@ -521,6 +523,112 @@ figure4a
 
 ggsave(paste0(manuscript_repo,"/Output/figure4a.png"), plot = figure4a, width = 8, height = 5)
 ```
+
+##### Coverage Tables
+
+```{r, Coverage tables}
+
+locationcount <- length(unique(WIS_Season$location_name))# - 1
+
+coverage95_summary <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
+   filter(target == "1 wk ahead inc flu hosp") %>% 
+  group_by(forecast_date, season) %>% 
+  summarise(model = model,
+            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+            coverage95 = sum(coverage.95)/locationcount) %>% ungroup() %>% unique()
+
+coverage95_summary_4 <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
+  filter(target == "4 wk ahead inc flu hosp") %>% 
+  group_by(forecast_date, season) %>% 
+  summarise(model = model,
+            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+            coverage95 = sum(coverage.95)/locationcount) %>% ungroup() %>%  unique()
+coverage50_summary_4 <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
+  filter(target == "4 wk ahead inc flu hosp") %>% 
+  group_by(forecast_date, season) %>% 
+  summarise(model = model,
+            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+            coverage50 = sum(coverage.50)/locationcount) %>% unique()
+
+
+coverage50_summary <- WIS_Season %>% filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
+  filter(target == "1 wk ahead inc flu hosp") %>% 
+  group_by(forecast_date, season) %>% 
+  summarise(model = model,
+            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+            coverage50 = sum(coverage.50)/locationcount) %>% ungroup() %>% unique()
+
+## 4 week ahead 50 and 95% coverage summaries
+# coverage95_summary_4 %>% filter(season == "2021-2022") %>% {summary(.$coverage95)}
+# coverage95_summary_4 %>% filter(season == "2022-2023") %>% {summary(.$coverage95)}
+# coverage50_summary_4 %>% filter(season == "2021-2022") %>% {summary(.$coverage50)}
+# coverage50_summary_4 %>% filter(season == "2022-2023") %>% {summary(.$coverage50)}
+
+
+## one week ahead 50 and 95% coverage summaries
+# coverage95_summary %>% filter(season == "2021-2022") %>% {summary(.$coverage95)}
+# coverage95_summary %>% filter(season == "2022-2023") %>% {summary(.$coverage95)}
+# coverage50_summary %>% filter(season == "2021-2022") %>% {summary(.$coverage50)}
+# coverage50_summary %>% filter(season == "2022-2023") %>% {summary(.$coverage50)}
+
+coverage95_summary_all <- WIS_Season %>%  filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
+  filter(target == "1 wk ahead inc flu hosp") %>% 
+  group_by(model, forecast_date, season) %>% 
+  summarise(model = model,
+            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+            coverage95 = sum(coverage.95)/locationcount) %>% unique() %>% 
+  group_by(model) %>% summarise(model = model,
+                                avg = mean(coverage95)) %>% unique()
+
+
+coverage50_summary_all <- WIS_Season %>% filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
+  filter(target == "1 wk ahead inc flu hosp") %>% 
+  group_by(model, forecast_date, season) %>% 
+  summarise(model = model,
+            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+            coverage50 = sum(coverage.50)/locationcount)
+
+
+coverage95_summary_all2 <- WIS_Season %>%  filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
+  filter(target == "2 wk ahead inc flu hosp") %>% 
+  group_by(model, forecast_date, season) %>% 
+  summarise(model = model,
+            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+            coverage95 = sum(coverage.95)/locationcount) %>% unique() %>% 
+  group_by(model) %>% summarise(model = model,
+                                  avg = mean(coverage95)) %>% unique()
+
+weekly_breakdown <- WIS_Season %>% group_by(model, season) %>% summarise(
+  model = model,
+  One_week_Cov = mean(coverage.95[target == "1 wk ahead inc flu hosp"])*100,
+  Two_week_Cov = mean(coverage.95[target == "2 wk ahead inc flu hosp"])*100,
+  Three_week_Cov = mean(coverage.95[target == "3 wk ahead inc flu hosp"])*100,
+  Four_week_Cov = mean(coverage.95[target == "4 wk ahead inc flu hosp"])*100
+) %>% unique()
+
+
+
+cov95_breakdown21 <- cov95_function(WIS_Season21, Scores_tab21)
+
+cov95_breakdown23 <- cov95_function(WIS_Season23, Scores_tab23)
+
+cov95_breakdownall <- rbind(mutate(cov95_breakdown21, season = "2021-2022"), mutate(cov95_breakdown23, season = "2022-2023"))
+
+cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, round, digits = 2) %>% select(-season) %>%  
+  knitr::kable(align = c("lcccccccccc"), caption = "Table 2", col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
+  kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
+  kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
+  kableExtra::kable_classic()  %>% 
+   kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
+
+# length(unique(coverage95_states$target_end_date[coverage95_states$target == "1 wk ahead inc flu hosp"]))
+# length(unique(coverage95_states$target_end_date))
+# length(unique(WIS_Season$forecast_date))
+# unique(WIS_Season$target_end_date[WIS_Season$target == "1 wk ahead inc flu hosp"])
+# unique(WIS_Season$target_end_date[WIS_Season$target == "4 wk ahead inc flu hosp"])
+
+```
+
 ##### Absolute WIS by week table
 
 ```{r, Abs WIS by wk}
@@ -577,7 +685,7 @@ abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 
   knitr::kable(align = c("lccccc"), caption = "Table 3", col.names = c("Model", "Relative WIS", "1 Wk ABS WIS", "2 Wk ABS WIS", "3 Wk ABS WIS", "4 Wk ABS WIS")) %>% 
   kableExtra::footnote(general = "Table 3", general_title = "")%>% 
   kableExtra::pack_rows(index = table(abs_breakdown_WIS$season)) %>% 
-  kableExtra::kable_classic() # %>% 
+  kableExtra::kable_classic() %>% 
    kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table3.pdf"))
 
 fs_wis_min_date21 <- abs_states %>% filter(season == "2021-2022", model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
@@ -678,110 +786,6 @@ coverage50_not_flusight <- coverage50_states %>%
 
 ```
 
-##### Coverage Tables
-
-```{r, Coverage tables}
-
-locationcount <- length(unique(WIS_Season$location_name))# - 1
-
-coverage95_summary <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
-   filter(target == "1 wk ahead inc flu hosp") %>% 
-  group_by(forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% ungroup() %>% unique()
-
-coverage95_summary_4 <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "4 wk ahead inc flu hosp") %>% 
-  group_by(forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% ungroup() %>%  unique()
-coverage50_summary_4 <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "4 wk ahead inc flu hosp") %>% 
-  group_by(forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage50 = sum(coverage.50)/locationcount) %>% unique()
-
-
-coverage50_summary <- WIS_Season %>% filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "1 wk ahead inc flu hosp") %>% 
-  group_by(forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage50 = sum(coverage.50)/locationcount) %>% ungroup() %>% unique()
-
-## 4 week ahead 50 and 95% coverage summaries
-# coverage95_summary_4 %>% filter(season == "2021-2022") %>% {summary(.$coverage95)}
-# coverage95_summary_4 %>% filter(season == "2022-2023") %>% {summary(.$coverage95)}
-# coverage50_summary_4 %>% filter(season == "2021-2022") %>% {summary(.$coverage50)}
-# coverage50_summary_4 %>% filter(season == "2022-2023") %>% {summary(.$coverage50)}
-
-
-## one week ahead 50 and 95% coverage summaries
-# coverage95_summary %>% filter(season == "2021-2022") %>% {summary(.$coverage95)}
-# coverage95_summary %>% filter(season == "2022-2023") %>% {summary(.$coverage95)}
-# coverage50_summary %>% filter(season == "2021-2022") %>% {summary(.$coverage50)}
-# coverage50_summary %>% filter(season == "2022-2023") %>% {summary(.$coverage50)}
-
-coverage95_summary_all <- WIS_Season %>%  filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "1 wk ahead inc flu hosp") %>% 
-  group_by(model, forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% unique() %>% 
-  group_by(model) %>% summarise(model = model,
-                                avg = mean(coverage95)) %>% unique()
-
-
-coverage50_summary_all <- WIS_Season %>% filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "1 wk ahead inc flu hosp") %>% 
-  group_by(model, forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage50 = sum(coverage.50)/locationcount)
-
-
-coverage95_summary_all2 <- WIS_Season %>%  filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "2 wk ahead inc flu hosp") %>% 
-  group_by(model, forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% unique() %>% 
-  group_by(model) %>% summarise(model = model,
-                                  avg = mean(coverage95)) %>% unique()
-
-weekly_breakdown <- WIS_Season %>% group_by(model, season) %>% summarise(
-  model = model,
-  One_week_Cov = mean(coverage.95[target == "1 wk ahead inc flu hosp"])*100,
-  Two_week_Cov = mean(coverage.95[target == "2 wk ahead inc flu hosp"])*100,
-  Three_week_Cov = mean(coverage.95[target == "3 wk ahead inc flu hosp"])*100,
-  Four_week_Cov = mean(coverage.95[target == "4 wk ahead inc flu hosp"])*100
-) %>% unique()
-
-
-
-cov95_breakdown21 <- cov95_function(WIS_Season21, Scores_tab21)
-
-cov95_breakdown23 <- cov95_function(WIS_Season23, Scores_tab23)
-
-cov95_breakdownall <- rbind(mutate(cov95_breakdown21, season = "2021-2022"), mutate(cov95_breakdown23, season = "2022-2023"))
-
-cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, round, digits = 2) %>% select(-season) %>%  
-  knitr::kable(align = c("lcccccccccc"), caption = "Table 2", col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
-  kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
-  kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
-  kableExtra::kable_classic() # %>% 
-   kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
-
-# length(unique(coverage95_states$target_end_date[coverage95_states$target == "1 wk ahead inc flu hosp"]))
-# length(unique(coverage95_states$target_end_date))
-# length(unique(WIS_Season$forecast_date))
-# unique(WIS_Season$target_end_date[WIS_Season$target == "1 wk ahead inc flu hosp"])
-# unique(WIS_Season$target_end_date[WIS_Season$target == "4 wk ahead inc flu hosp"])
-
-```
 
 ## Coverage
 
