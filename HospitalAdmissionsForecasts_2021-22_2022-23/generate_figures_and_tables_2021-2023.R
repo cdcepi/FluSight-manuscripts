@@ -12,8 +12,12 @@ library(viridis)
 library(cowplot)
 library(scales)
 library(RSocrata)
+#CDC UserID goes here
+userid="nqr2"
 
-userid="rpe5"
+#update path to where cloned GitHub repository lives
+githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+
 
 '%!in%' <- Negate('%in%') #previously %notin% possible #update
 
@@ -38,21 +42,23 @@ weeks.to.eval23 =
   as.character()
 
 
-dashboard_r_code <- paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code")
-flusight_forecast_data <-paste0("C:/Users/",userid,"/Desktop/GitHub/Flusight-forecast-data")
-dashboard_r_code_weekly_data <- paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/Weekly Data/")
+manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
+flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
 
-suppressMessages(invisible(source(paste0(dashboard_r_code_weekly_data,"Model names and colors.R"))))
-source(paste0(dashboard_r_code,"/functions2022-2023.R"))
+suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
+source(paste0(manuscript_repo,"/functions2022-2023.R"))
 
 select = dplyr::select
 filter = dplyr::filter
 
-##################### Inc Rankings
+##################### Inc Rankings/ Table 1
+
+inc.rankings_all21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all21.csv"))
+inc.rankings_all23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all23.csv"))
 
 inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel.WIS.skill)
 
-logtable1 <- read.csv(paste0(dashboard_r_code,"/2022-23/supplemental_log-transformed/logtable1.csv")) 
+logtable1 <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/logtable1.csv")) 
 
 inc.rankings_all %>% left_join(., logtable1, join_by("model" == "Model", "season" == "Season")) %>% 
   rename(Model = model,
@@ -80,10 +86,16 @@ inc.rankings_all %>% left_join(., logtable1, join_by("model" == "Model", "season
   ) %>% 
   kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
   kableExtra::footnote( general_title = "") #%>% 
-#kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(dashboard_r_code,"/2022-23/table1_all.pdf"))
+#kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/table1.pdf"))
 
 
+#### 
 
+WIS_Season21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season21.csv"))
+WIS_Season23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season23.csv"))
+
+inc.rankings_location21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location21.csv"))
+inc.rankings_location23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location23.csv"))
 
 WIS_Season21 <- WIS_Season21 %>% filter(model %in% inc.rankings_all21$model)
 inc.rankings_location21 <- make_WIS_ranking_location(WIS_Season21)
@@ -96,42 +108,44 @@ inc.rankings_location23$below <- ifelse(inc.rankings_location23$relative_WIS < 1
 
 ############### Forecasts and Observed
 
+#### Alex Need to output all_dat and obs_dat #######
+
 fig21 <- forecastsandobservedplt(all_dat21, obs_data21, "a")
 
 
 fig23 <- forecastsandobservedplt(all_dat23, obs_data23, "b")
 
 ############## Absolute WIS by Model
+abs_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+abs_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_not_flusight.csv"))%>% mutate(target_end_date = as.Date(target_end_date))
 
 wis_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead", 
                             `4 wk ahead inc flu hosp` = "4 Week Ahead", 
                             `2021-2022` = "2021-2022", 
-                            `2022-2023` = "2022-2023"#, 
-                            #abs_WIS = "Panel A", 
-                            #log_WIS = "Panel B"
-))
+                            `2022-2023` = "2022-2023"))
 
 
-g <- ggplot(abs_flusight, aes(x = target_end_date,
-                              y = abs_WIS, group = model,
-                              col = model)) +
-  geom_line(size = 1) + geom_point(size = 2) +
-  scale_color_manual(values = c("#d6936b", "#6baed6")) +
-  geom_line(data = abs_not_flusight, aes(x = target_end_date, y = abs_WIS, group = model), color = adjustcolor("grey50", .35)) +
-  labs(y = "Absolute WIS",
-       x = "Forecast Target End Date",
-       color = "Model",
-       title = "Absolute WIS by Model") +
-  theme_bw()+
-  scale_x_date(breaks = seq.Date(from = min(abs_flusight$target_end_date), to= max(abs_flusight$target_end_date), by = "2 weeks"), date_labels = "%d %b") +
-  theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
-  facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
+# figure4_absWIS <- ggplot(abs_flusight, aes(x = target_end_date,
+#                               y = abs_WIS, group = model,
+#                               col = model)) +
+#   geom_line(size = 1) + geom_point(size = 2) +
+#   scale_color_manual(values = c("#d6936b", "#6baed6")) +
+#   geom_line(data = abs_not_flusight, aes(x = target_end_date, y = abs_WIS, group = model), color = adjustcolor("grey50", .35)) +
+#   labs(y = "Absolute WIS",
+#        x = "Forecast Target End Date",
+#        color = "Model",
+#        title = "Absolute WIS by Model") +
+#   theme_bw()+
+#   scale_x_date(breaks = seq.Date(from = min(abs_flusight$target_end_date), to= max(abs_flusight$target_end_date), by = "2 weeks"), date_labels = "%d %b") +
+#   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
+#   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
+# 
+# 
+# figure4_absWIS
 
 
-g
-
-
-lg <-  ggplot(abs_flusight, aes(x = target_end_date,
+## Figure 4a Absolute (log) WIS by model
+figure4a <-  ggplot(abs_flusight, aes(x = target_end_date,
                                 y = log_WIS, group = model,
                                 col = model)) +
   geom_line(size = 1) + geom_point(size = 2) +
@@ -148,14 +162,19 @@ lg <-  ggplot(abs_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 
-lg
+figure4a
 
 ########## Coverage and Scores
 
 Scores_tab21 <- scores_tab_function(inc.rankings_location21,inc.rankings_all21, WIS_Season21)
 Scores_tab23 <- scores_tab_function(inc.rankings_location23, inc.rankings_all23, WIS_Season23)
 
-########## 95% Coverage by Models
+########## 95% Coverage by Models Figure 4b
+
+coverage95_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+coverage95_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_not_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+
+#### Alex Need to output coverage95_notflusight ##########
 
 coverage_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead", 
                                  `4 wk ahead inc flu hosp` = "4 Week Ahead", 
@@ -167,7 +186,7 @@ coverage_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
 
 
 
-z <- ggplot(coverage95_flusight, aes(x = target_end_date, 
+figure4b <- ggplot(coverage95_flusight, aes(x = target_end_date, 
                                      y = coverage95, group = model,
                                      col = model)) +
   geom_line(linewidth = 1) + geom_point(size = 2) +
@@ -182,9 +201,12 @@ z <- ggplot(coverage95_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
 
-z
+figure4b
 
-############ Coverage Tables
+############ Coverage Tables Table 2
+#This relies on a lot of code above / not self contained sections
+
+WIS_Season <- rbind(mutate(WIS_Season21, season = "2021-2022"), mutate(WIS_Season23, season = "2022-2023"))
 
 locationcount <- length(unique(WIS_Season$location_name))# - 1
 
@@ -264,28 +286,26 @@ cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, r
   kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
   kableExtra::kable_classic() # %>% 
 
-########### Absolute WIS by Week
+
+
+########### Absolute WIS by Week / Table 3
+
+abs_breakdown_WIS <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_breakdown_WIS.csv"))
+
+#### Alex need to output abs_states
 
 abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 2) %>%  
   knitr::kable(align = c("lccccc"), caption = "Table 3", col.names = c("Model", "Relative WIS", "1 Wk ABS WIS", "2 Wk ABS WIS", "3 Wk ABS WIS", "4 Wk ABS WIS")) %>% 
   kableExtra::footnote(general = "Table 3", general_title = "")%>% 
   kableExtra::pack_rows(index = table(abs_breakdown_WIS$season)) %>% 
   kableExtra::kable_classic() # %>% 
-# kableExtra::save_kable(file = paste0(dashboard_r_code,"/2022-23/","table3.pdf"))
+# kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/","table3.pdf"))
 
-fs_wis_min_date21 <- abs_states %>% filter(season == "2021-2022", model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
-fs_wis_max_date21 <- abs_states %>% filter(season == "2021-2022",model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
 
-fs_wis_min4_date21 <- abs_states %>% filter(season == "2021-2022", model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
-fs_wis_max4_date21 <- abs_states %>% filter(season == "2021-2022",model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
-
-fs_wis_min_date23 <- abs_states %>% filter(season == "2022-2023", model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
-fs_wis_max_date23 <- abs_states %>% filter(season == "2022-2023",model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
-
-fs_wis_min4_date23 <- abs_states %>% filter(season == "2022-2023", model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
-fs_wis_max4_date23 <- abs_states %>% filter(season == "2022-2023",model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
 
 ############ Model Ranks
+
+inc_scores_overall <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc_scores_overall.csv"))
 
 n_unique_predict<- inc_scores_overall %>% filter(season == "2022-2023") %>% 
   group_by(target_end_date, location_name, target, season) %>%
@@ -310,10 +330,14 @@ ave_rank_percent23 <- average_rank_percent %>% filter(season == "2022-2023") %>%
 bimodal_rank21 <- ave_rank_percent21 %>% mutate(pct_top_bottom = pct_top25 + pct_bottom25) %>% filter(pct_top_bottom >=75)
 bimodal_rank23 <- ave_rank_percent23 %>% mutate(pct_top_bottom = pct_top25 + pct_bottom25) %>% filter(pct_top_bottom >=75)
 
+
+inc.rankings_all <- rbind(inc.rankings_all21, inc.rankings_all23)
+
 scores_order <- inc.rankings_all
 levels_order <- unique(scores_order$model)
 
-p2 <- inc_scores_overall %>% 
+#### Alex, I got this to work in flusight qmd, no clue why it's unordered now. ####
+figure2 <- inc_scores_overall %>% 
   ggplot(aes(y = factor(model, levels = levels_order), x=rev_rank, fill = factor(after_stat(quantile)))) +
   stat_density_ridges(
     geom = "density_ridges_gradient", calc_ecdf = TRUE,
@@ -325,15 +349,17 @@ p2 <- inc_scores_overall %>%
   theme_bw()+
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")) )+
   theme(strip.text = element_text(size = 10))
-p2
+figure2
 
-##### Relative WIS by Location
+##### Relative WIS by Location Figure 3
+inc.rankings_location <- rbind(mutate(inc.rankings_location21, season = "2021-2022"), mutate(inc.rankings_location23, season = "2022-2023"))
+inc.rankings_all_nice <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all_nice.csv"))
 
 scores <- inc.rankings_location %>% filter(is.finite(relative_WIS)) %>% left_join(., y = inc.rankings_all_nice[,c("model","season", "modelorder")], by = c("model", "season"))
 scores_order <- inc.rankings_all_nice
 levels_order <- scores_order$modelorder
 
-fig_wis_loc <- ggplot(scores, 
+figure3 <- ggplot(scores, 
                       aes(x = factor(modelorder, levels = levels_order), y=location_name, 
                           fill= scales::oob_squish(relative_WIS, range = c(- 2.584963, 2.584963)), 
                           group = season)) +
@@ -354,58 +380,57 @@ fig_wis_loc <- ggplot(scores,
   scale_x_discrete(labels = function(x) substring(x, 1, nchar(x)-10))+
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")))+
   theme(axis.ticks.y = element_blank())
-fig_wis_loc
+figure3
+
+### Alex, check if we actually need this code #####
+# modelrankings21 <- inc.rankings_location21 %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
+# 
+# modelrankings23 <- inc.rankings_location23 %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
+# 
+# scores_tab_nice21 <- Scores_tab21 %>% mutate(across(where(is.numeric),~round(.x, 2)))
+# 
+# scores_tab_nice23 <- arrange(filter(Scores_tab23,  model != "Flusight-ensemble", below_baseline_pct > 50), desc(below_baseline_pct)) %>% mutate(across(where(is.numeric),~round(.x, 2)))
 
 
-ggsave(paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/WIS_scores_Location_all.jpg"), plot = fig_wis_loc, width = 12, height= 8)
-
-
-modelrankings21 <- inc.rankings_location21 %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
-
-modelrankings23 <- inc.rankings_location23 %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
-
-scores_tab_nice21 <- Scores_tab21 %>% mutate(across(where(is.numeric),~round(.x, 2)))
-
-scores_tab_nice23 <- arrange(filter(Scores_tab23,  model != "Flusight-ensemble", below_baseline_pct > 50), desc(below_baseline_pct)) %>% mutate(across(where(is.numeric),~round(.x, 2)))
-
+#### Not in manuscript! 
 ##### WIS avg by week
 
-plot.scores <- WIS_Season %>% filter(target == "4 wk ahead inc flu hosp") %>% 
-  group_by(model, target_end_date, season) %>% 
-  summarise(model = model,
-            target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
-            Avg_WIS = mean(WIS)) %>%
-  unique()
+# plot.scores <- WIS_Season %>% filter(target == "4 wk ahead inc flu hosp") %>% 
+#   group_by(model, target_end_date, season) %>% 
+#   summarise(model = model,
+#             target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
+#             Avg_WIS = mean(WIS)) %>%
+#   unique()
+# 
+# AVG <- plot.scores %>% group_by(target_end_date, season) %>% 
+#   summarise(target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
+#             Avg_WIS = mean(Avg_WIS)) %>% 
+#   mutate(model = rep("Average Score of All Models"), .before = target_end_date) %>% 
+#   unique()     
+# 
+# plot.scores <- as.data.frame(rbind(plot.scores, AVG)) %>% 
+#   filter(model %in% c("Average Score of All Models", "Flusight-baseline", "Flusight-ensemble"))
+# 
+# x <- ggplot(plot.scores, aes(x = target_end_date, 
+#                              y = Avg_WIS, group = model,
+#                              col = model)) +
+#   geom_line() + geom_point() +
+#   labs(y = "Average WIS",
+#        x = "",
+#        color = "Model",
+#        title = "Average 4-Week Ahead Weighted Interval Scores by Model") +
+#   scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
+#   scale_color_manual(values = c( "#d66bae", "#6baed6", "#aed66b"))+
+#   theme_minimal()+
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+#   facet_grid(cols = vars(season), scales = "free_x")
+# x
 
-AVG <- plot.scores %>% group_by(target_end_date, season) %>% 
-  summarise(target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
-            Avg_WIS = mean(Avg_WIS)) %>% 
-  mutate(model = rep("Average Score of All Models"), .before = target_end_date) %>% 
-  unique()     
+##### Relative WIS Distribution Figure S 1
 
-plot.scores <- as.data.frame(rbind(plot.scores, AVG)) %>% 
-  filter(model %in% c("Average Score of All Models", "Flusight-baseline", "Flusight-ensemble"))
+model_order <- merge(inc.rankings_all_nice[,c("model", "rel.WIS.skill")], inc.rankings_location, by = "model", all.y = TRUE) %>% arrange(rel.WIS.skill)
 
-x <- ggplot(plot.scores, aes(x = target_end_date, 
-                             y = Avg_WIS, group = model,
-                             col = model)) +
-  geom_line() + geom_point() +
-  labs(y = "Average WIS",
-       x = "",
-       color = "Model",
-       title = "Average 4-Week Ahead Weighted Interval Scores by Model") +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
-  scale_color_manual(values = c( "#d66bae", "#6baed6", "#aed66b"))+
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_grid(cols = vars(season), scales = "free_x")
-x
-
-##### Relative WIS Distribution
-
-model_order <- merge(inc.rankings_all_nice[,1:3], inc.rankings_location, by = "model", all.y = TRUE) %>% arrange(rel.WIS.skill)
-
-u <- model_order %>% 
+figures1 <- model_order %>% 
   ggplot( aes(x = fct_inorder(model), y = relative_WIS))+
   geom_boxplot()+
   theme_bw() +
@@ -415,9 +440,11 @@ u <- model_order %>%
   labs(x = "Model", y = "Relative WIS")+
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022", `2022-2023` = "B) 2022-2023")))
 
-u
+figures1
 
 ###### Backfill Epicurve
+
+#### Alex need to rename these to match manuscript 
 
 wklyplt <- 
   ggplot(fullset, aes(x = report_date)) +
