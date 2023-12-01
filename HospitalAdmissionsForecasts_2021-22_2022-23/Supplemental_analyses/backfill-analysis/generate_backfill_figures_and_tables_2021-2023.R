@@ -1,3 +1,10 @@
+###PLEASE READ###
+
+# This file can be used to generate the figures and tables found in the backfill supplemental section of the manuscript using the data output by the data_for_backfill_figures_2021-2023.R script.
+# The data have been output to the Data for Backfill Figures folder, so it is not necessary to run data_for_backfill_figures_2021-2023.R prior to using this script.
+# Each section contains the vizualization code related to the figure of the same name.
+
+
 ###### Backfill Epicurve: Figure S2
 
 

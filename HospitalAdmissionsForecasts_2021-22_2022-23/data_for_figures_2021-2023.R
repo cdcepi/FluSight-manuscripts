@@ -1,3 +1,12 @@
+###PLEASE READ###
+
+# This file can be used to generate all relevent data used in the generate_figures_and_tables_2021-2023.R script.
+# The data have been output to the Data_for_Figures folder, so it is not necessary to run this script prior to using the generate_figures_and_tables_2021-2023.R script.
+# All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below.
+# Each subsequent section contains the data manipulation code related to the figure of the same name.
+
+
+
 ######### Setup
 
 library(tidyverse)

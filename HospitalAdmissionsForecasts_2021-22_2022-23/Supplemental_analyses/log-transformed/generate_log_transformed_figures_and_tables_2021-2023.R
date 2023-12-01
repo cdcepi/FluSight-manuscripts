@@ -1,3 +1,12 @@
+###PLEASE READ###
+
+# This file can be used to generate the figures and tables found in the log-transformed supplemental section of the manuscript using the data output by the data_for_log_transformed_figures_2021-2023.R script. 
+# The data have been output to the Data for Log-Transformed Figures folder, so it is not necessary to run data_for_log_transformed_figures_2021-2023.R prior to using this script. 
+# All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below. 
+# Each subsequent section contains the vizualization code related to the figure of the same name.
+
+
+
 ### Setup
 
 library(tidyverse)
