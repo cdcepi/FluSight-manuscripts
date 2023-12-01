@@ -166,7 +166,9 @@ location.names23 = obs_data23 %>% select(location, location_name) %>% unique()
 all_dat23 = left_join(all_dat23,location.names23, by = c("location"))
 
 # write.csv(all_dat21, paste0(manuscript_repo, "/Data_for_Figures/all_dat21.csv"))
+# write_parquet(x = all_dat21, sink = paste0(manuscript_repo, "/Data_for_Figures/all_dat21.parquet"))
 # write.csv(all_dat23, paste0(manuscript_repo, "/Data_for_Figures/all_dat23.csv"))
+write_parquet(x = all_dat23, sink = paste0(manuscript_repo, "/Data_for_Figures/all_dat23.parquet"))
 # write.csv(obs_data21, paste0(manuscript_repo, "/Data_for_Figures/obs_data21.csv"))
 # write.csv(obs_data23, paste0(manuscript_repo, "/Data_for_Figures/obs_data23.csv"))
 
