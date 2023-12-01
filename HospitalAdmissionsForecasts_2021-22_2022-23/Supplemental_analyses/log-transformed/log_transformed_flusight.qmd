@@ -31,7 +31,7 @@ library(cowplot)
 library(scales)
 library(RSocrata)
 
-userid="nqr2"
+userid="rpe5"
 
 '%!in%' <- Negate('%in%') #previously %notin% possible #update
 
@@ -60,7 +60,7 @@ githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
 flusight_forecast_data <-paste0("C:/Users/",userid,"/Desktop/GitHub/Flusight-forecast-data")
 
-suppressMessages(invisible(source(paste0(manuscript_repo,"Model names and colors.R"))))
+suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
 
 select = dplyr::select
