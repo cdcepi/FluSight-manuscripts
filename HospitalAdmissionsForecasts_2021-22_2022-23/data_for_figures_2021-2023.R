@@ -2,17 +2,7 @@
 
 library(tidyverse)
 library(arrow)
-# library(epiDisplay)
-# library(MMWRweek)
-# library(DT)
-# library(plotly)
-# library(gridExtra)
-# library(covidHubUtils)
-# library(ggridges)
-# library(viridis)
-# library(cowplot)
-# library(scales)
-# library(RSocrata)
+
 
 userid="shaws"
 
