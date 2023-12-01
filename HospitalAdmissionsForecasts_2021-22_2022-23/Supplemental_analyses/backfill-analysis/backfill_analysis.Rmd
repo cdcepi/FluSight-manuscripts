@@ -16,10 +16,10 @@ select = dplyr::select
 filter = dplyr::filter
 
 #CDC UserID goes here
-userid="rpe5"
+userid="shaws"
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+githubpath = paste0("C:/Users/",userid,"/Documents/GitHub")
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
 flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
@@ -133,7 +133,7 @@ fullset23 <- forecastdata23 %>% filter(state == "US") %>% left_join(., truthaddo
 fullset <- rbind(mutate(fullset21, season = "A) 2021-2022"), mutate(fullset23, season = "B) 2022-2023"))
 
 
-wklyplt <- 
+figures2 <- 
   ggplot(fullset, aes(x = report_date)) +
   geom_line(aes(y = value, color = "Weekly Reported Hospitalizations"))+
   geom_line(aes(y = truthvalue, color = "Final Hospitalizations"))+
@@ -145,12 +145,12 @@ wklyplt <-
   theme(legend.position="bottom")+
   facet_grid(cols = vars(season), scales = "free_x")
 
-wklyplt
-# 
-# ggsave(plot = wklyplt, paste0(manuscript_repo,"/Output/backfill_epicurv_mon_tue.png"), height = 6, width = 8, dpi = 300)
+figures2
+ 
+# ggsave(plot = figures2, paste0(manuscript_repo,"/Output/figures2.png"), height = 6, width = 8, dpi = 300)
 ```
 
-##### Backfill Differences: Figure S3
+##### Backfill Differences 
 
 ```{r, Backfill Differences}
 
@@ -170,7 +170,7 @@ dffsummary <- diffdf %>% filter (location_name != "Virgin Islands") %>% group_by
             absohigh = max(absolutediff, na.rm = TRUE), 
             absoiqr = IQR(absolutediff, na.rm = TRUE), 
             median = median(absolutediff, na.rm = TRUE)) %>% ungroup
-write.csv(dffsummary, paste0(manuscript_repo,"/Output/backfill_difference_summary.csv"), row.names = FALSE)
+#write.csv(dffsummary, paste0(manuscript_repo,"/Output/backfill_difference_summary.csv"), row.names = FALSE)
 
 
 
@@ -195,11 +195,11 @@ For the U.S., the median percent and numeric difference across all forecast week
 Jurisdiction-specific median percent differences had a larger range in 2021-22 from `r round(select(head(arrange(filter(dffsummary, location_name !="US", season == "A) 2021-2022"), perc_median), n = 1), perc_median)*100, 2)`% in `r select(head(arrange(filter(dffsummary, location_name !="US", season == "A) 2021-2022"), perc_median), n = 1), location_name)` to `r round(select(tail(arrange(filter(dffsummary, location_name !="US", season == "A) 2021-2022"), perc_median), n = 1), perc_median)*100, 2)`% in `r select(tail(arrange(filter(dffsummary, location_name !="US", season == "A) 2021-2022"), perc_median), n = 1), location_name)` whereas, percent differences ranged from `r round(select(head(arrange(filter(dffsummary, location_name !="US", season == "B) 2022-2023"), perc_median), n = 1), perc_median)*100, 2)`% in `r select(head(arrange(filter(dffsummary, location_name !="US", season == "B) 2022-2023"), perc_median), n = 1), location_name)` to `r round(select(tail(arrange(filter(dffsummary, location_name !="US", season == "B) 2022-2023"), perc_median), n = 1), perc_median)*100, 2)`% in `r select(tail(arrange(filter(dffsummary, location_name !="US", season == "B) 2022-2023"), perc_median), n = 1), location_name)` for 2022-23. Across states, DC, and Puerto Rico, and for both seasons, the median numeric difference between initial report and final report was `r median(statediffs21$absolutediff, na.rm = TRUE)`. Supplemental figures S2-S4 for additional information on the distribution of differences between final reported values used for evaluation and the initial reported values. Supplemental figures S2-S4 for additional information on the distribution of differences between final reported values used for evaluation and the initial reported values.
 
 
-##### Absolute Difference
+##### Absolute Difference Figure S3 
 
 ```{r, abs difference}
 
-absoplt <- diffdf %>% filter(location_name != "US") %>% 
+figures3a <- diffdf %>% filter(location_name != "US") %>% 
   ggplot(aes(x = absolutediff, y = location_name))+
   geom_boxplot(color = "#d6936b", outlier.color = "black")+
   scale_y_discrete( limits = rev) +
@@ -207,9 +207,9 @@ absoplt <- diffdf %>% filter(location_name != "US") %>%
   theme_bw()+
   facet_grid(cols = vars(season))
 
-absoplt
+figures3a
 
- # ggsave(plot = absoplt,  paste0(manuscript_repo,"/Output/Numeric_difference_all.png"), width = 6, height = 8, dpi = 300)
+  # ggsave(plot = figures3a,  paste0(manuscript_repo,"/Output/figures3a.png"), width = 6, height = 8, dpi = 300)
 
 ```
 
@@ -217,16 +217,16 @@ absoplt
 
 ```{r, relative diff}
 
-percplt <- diffdf %>% filter(location_name != "US") %>% #can take out != National
+figures3b <- diffdf %>% filter(location_name != "US") %>% #can take out != National
   ggplot(aes(x = final_perc_change*100, y = location_name))+
   geom_boxplot(color = "#6baed6", outlier.color = "black")+
   scale_y_discrete( limits = rev) +
   labs(x = "Percent Difference", y = "", title = "Relative Changes")+
   theme_bw()+
 facet_grid(cols = vars(season))
-percplt
+figures3b
 
-# ggsave(plot = percplt, paste0(manuscript_repo,"/Output/Percent_difference_all.png"), width = 6, height = 8, dpi = 300)
+ # ggsave(plot = figures3b, paste0(manuscript_repo,"/Output/figures3b.png"), width = 6, height = 8, dpi = 300)
 
 ```
 
@@ -268,14 +268,13 @@ matrixset %>%
 return(stairplt)
 }
 
-stairplt21 <- stairstep_function(weeklydat21)
-stairplt23 <- stairstep_function(weeklydat23)
-
-stairplt21
-stairplt23
+figures4a <- stairstep_function(weeklydat21)
+figures4b <- stairstep_function(weeklydat23)
 
 
-# ggsave(plot = stairplt21,  paste0(manuscript_repo,"/Output/stairstep21.png"), width = 8, height = 6, dpi = 300)
-# ggsave(plot = stairplt23,  paste0(manuscript_repo,"/Output/stairstep23.png"), width = 12, height = 8, dpi = 300)
+
+
+ggsave(plot = figures4a,  paste0(manuscript_repo,"/Output/figures4a.png"), width = 8, height = 6, dpi = 300)
+ggsave(plot = figures4b,  paste0(manuscript_repo,"/Output/figures4b.png"), width = 12, height = 8, dpi = 300)
 
 ```
