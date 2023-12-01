@@ -34,7 +34,7 @@ library(arrow)
 
 userid="rpe5"
 
-'%!in%' <- Negate('%in%') #previously %notin% possible #update
+'%!in%' <- Negate('%in%')
 
 last.tuesday21 = as.Date("2022-06-21")
 last.tuesday23 = as.Date("2023-05-16")
