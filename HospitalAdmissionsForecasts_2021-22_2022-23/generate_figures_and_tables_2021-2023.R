@@ -13,7 +13,7 @@ library(cowplot)
 library(scales)
 library(RSocrata)
 #CDC UserID goes here
-userid="nqr2"
+userid="rpe5"
 
 #update path to where cloned GitHub repository lives
 githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
@@ -43,7 +43,6 @@ weeks.to.eval23 =
 
 
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
-flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
 
 suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
@@ -125,23 +124,6 @@ wis_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
                             `2022-2023` = "2022-2023"))
 
 
-# figure4_absWIS <- ggplot(abs_flusight, aes(x = target_end_date,
-#                               y = abs_WIS, group = model,
-#                               col = model)) +
-#   geom_line(size = 1) + geom_point(size = 2) +
-#   scale_color_manual(values = c("#d6936b", "#6baed6")) +
-#   geom_line(data = abs_not_flusight, aes(x = target_end_date, y = abs_WIS, group = model), color = adjustcolor("grey50", .35)) +
-#   labs(y = "Absolute WIS",
-#        x = "Forecast Target End Date",
-#        color = "Model",
-#        title = "Absolute WIS by Model") +
-#   theme_bw()+
-#   scale_x_date(breaks = seq.Date(from = min(abs_flusight$target_end_date), to= max(abs_flusight$target_end_date), by = "2 weeks"), date_labels = "%d %b") +
-#   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
-#   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
-# 
-# 
-# figure4_absWIS
 
 
 ## Figure 4a Absolute (log) WIS by model
@@ -382,51 +364,8 @@ figure3 <- ggplot(scores,
   theme(axis.ticks.y = element_blank())
 figure3
 
-### Alex, check if we actually need this code #####
-# modelrankings21 <- inc.rankings_location21 %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
-# 
-# modelrankings23 <- inc.rankings_location23 %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
-# 
-# scores_tab_nice21 <- Scores_tab21 %>% mutate(across(where(is.numeric),~round(.x, 2)))
-# 
-# scores_tab_nice23 <- arrange(filter(Scores_tab23,  model != "Flusight-ensemble", below_baseline_pct > 50), desc(below_baseline_pct)) %>% mutate(across(where(is.numeric),~round(.x, 2)))
 
-
-#### Not in manuscript! 
-##### WIS avg by week
-
-# plot.scores <- WIS_Season %>% filter(target == "4 wk ahead inc flu hosp") %>% 
-#   group_by(model, target_end_date, season) %>% 
-#   summarise(model = model,
-#             target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
-#             Avg_WIS = mean(WIS)) %>%
-#   unique()
-# 
-# AVG <- plot.scores %>% group_by(target_end_date, season) %>% 
-#   summarise(target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
-#             Avg_WIS = mean(Avg_WIS)) %>% 
-#   mutate(model = rep("Average Score of All Models"), .before = target_end_date) %>% 
-#   unique()     
-# 
-# plot.scores <- as.data.frame(rbind(plot.scores, AVG)) %>% 
-#   filter(model %in% c("Average Score of All Models", "Flusight-baseline", "Flusight-ensemble"))
-# 
-# x <- ggplot(plot.scores, aes(x = target_end_date, 
-#                              y = Avg_WIS, group = model,
-#                              col = model)) +
-#   geom_line() + geom_point() +
-#   labs(y = "Average WIS",
-#        x = "",
-#        color = "Model",
-#        title = "Average 4-Week Ahead Weighted Interval Scores by Model") +
-#   scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
-#   scale_color_manual(values = c( "#d66bae", "#6baed6", "#aed66b"))+
-#   theme_minimal()+
-#   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-#   facet_grid(cols = vars(season), scales = "free_x")
-# x
-
-##### Relative WIS Distribution Figure S 1
+##### Relative WIS Distribution Figure S 1  Sarabeth, where should this be?
 
 model_order <- merge(inc.rankings_all_nice[,c("model", "rel.WIS.skill")], inc.rankings_location, by = "model", all.y = TRUE) %>% arrange(rel.WIS.skill)
 
@@ -441,78 +380,3 @@ figures1 <- model_order %>%
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022", `2022-2023` = "B) 2022-2023")))
 
 figures1
-
-###### Backfill Epicurve
-
-#### Alex need to rename these to match manuscript 
-
-wklyplt <- 
-  ggplot(fullset, aes(x = report_date)) +
-  geom_line(aes(y = value, color = "Weekly Reported Hospitalizations"))+
-  geom_line(aes(y = truthvalue, color = "Final Hospitalizations"))+
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_vline(aes(xintercept = as.Date("2022-02-21")), linetype = "dashed")+
-  labs(y = "Weekly hospitalizations",  x = NULL) +
-  scale_color_manual(name = NULL, values = c("Weekly Reported Hospitalizations" = "#6baed6", "Final Hospitalizations" = "#d6936b"))+
-  theme_bw() +
-  theme(legend.position="bottom")+
-  facet_grid(cols = vars(season), scales = "free_x")
-
-wklyplt
-
-###### Absolute Difference
-
-absoplt <- diffdf %>% filter(location_name != "US") %>% 
-  ggplot(aes(x = absolutediff, y = location_name))+
-  geom_boxplot(color = "#d6936b", outlier.color = "black")+
-  scale_y_discrete( limits = rev) +
-  labs(x = "Difference", y = "", title = "Absolute Changes")+
-  theme_bw()+
-  facet_grid(cols = vars(season))
-
-absoplt
-
-####### Relative Differences
-
-percplt <- diffdf %>% filter(location_name != "US") %>% #can take out != National
-  ggplot(aes(x = final_perc_change*100, y = location_name))+
-  geom_boxplot(color = "#6baed6", outlier.color = "black")+
-  scale_y_discrete( limits = rev) +
-  labs(x = "Percent Difference", y = "", title = "Relative Changes")+
-  theme_bw()+
-  facet_grid(cols = vars(season))
-percplt
-
-###### Backfill Matrix Plot
-
-####check start date
-stairstep_function <- function(weeklydat, fromdate, todate){
-  matrixset <-  weeklydat %>% group_by(report_date, epiweek) %>%
-    summarise(value = sum(value, na.rm = TRUE), date = as.Date(max(date)), asof = as.Date(date + 2)) %>%
-    ungroup() %>% #filter(date > as.Date("2022-01-29"), date < as.Date("2022-06-21")) %>%
-    select(-epiweek)
-  
-  
-  log10limlow <- min(log10(matrixset$value))
-  log10limhigh <- max(log10(matrixset$value))
-  
-  stairplt <- 
-    matrixset %>% 
-    ggplot(aes(y = date,x= report_date))+
-    geom_tile(aes( fill = log10(value)))+
-    theme_bw()+
-    geom_label(aes(label = scales::comma(value)), label.padding = unit(.09, "lines"), size = 2.5)+
-    scale_fill_gradient(name = NULL,low = "#6baed6", high = "#d6936b", limits = c(log10limlow, log10limhigh)) +
-    scale_y_date(date_breaks = "1 week", date_labels = "%b %d", expand = c(0.01,0.01))+
-    scale_x_date(date_breaks = "1 week", date_labels = "%b %d", expand = c(0.01,0.01))+
-    labs(x = "Week Reported", y = "Initial Admission Week")+
-    theme(legend.position = "none", 
-          axis.text.x = element_text(angle = 45, hjust = 1))
-  return(stairplt)
-}
-
-stairplt21 <- stairstep_function(weeklydat21)
-stairplt23 <- stairstep_function(weeklydat23)
-
-stairplt21
-stairplt23

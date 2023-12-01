@@ -15,7 +15,7 @@ library(RSocrata)
 
 userid="rpe5"
 
-'%!in%' <- Negate('%in%') #previously %notin% possible #update
+'%!in%' <- Negate('%in%') 
 
 last.tuesday21 = as.Date("2022-06-21")
 last.tuesday23 = as.Date("2023-04-11")
@@ -37,13 +37,13 @@ weeks.to.eval23 =
       by=7) %>% 
   as.character()
 
+#update path to where cloned GitHub repository lives
+githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
+flusight_forecast_data <-paste0("C:/Users/",userid,"/Desktop/GitHub/Flusight-forecast-data") #Sarabeth, are we keeping this accessible?
 
-dashboard_r_code <- paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code")
-flusight_forecast_data <-paste0("C:/Users/",userid,"/Desktop/GitHub/Flusight-forecast-data")
-dashboard_r_code_weekly_data <- paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/Weekly Data/")
-
-suppressMessages(invisible(source(paste0(dashboard_r_code_weekly_data,"Model names and colors.R"))))
-source(paste0(dashboard_r_code,"/functions2022-2023.R"))
+suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
+source(paste0(manuscript_repo,"/functions2022-2023.R"))
 
 select = dplyr::select
 filter = dplyr::filter
@@ -129,7 +129,7 @@ all_dat23 <- all_dat_new %>% filter(forecast_date %in% weeks.to.eval23, location
 
 
 ##Observed Data
-obs_data21 <- read_csv(paste0(dashboard_r_code,"/truth-Incident Hospitalizations-Archived_9-12-2022.csv")) %>%
+obs_data21 <- read_csv(paste0(manuscript_repo,"/truth-Incident Hospitalizations-Archived_9-12-2022.csv")) %>%
   mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
          location_name = ifelse(location == 'US', 'National', location_name)) %>%
   select(-date) %>%
