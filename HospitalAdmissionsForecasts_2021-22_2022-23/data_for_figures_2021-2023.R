@@ -362,7 +362,7 @@ fullset23 <- forecastdata23 %>% filter(state == "US") %>% left_join(., truthaddo
 
 fullset <- rbind(mutate(fullset21, season = "A) 2021-2022"), mutate(fullset23, season = "B) 2022-2023"))
 
-#write.csv(fullset, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/fullset.csv"))
+#write.csv(fullset, paste0("C:/Users/",userid,"/Desktop/GitHub/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23/Data_for_Figures/fullset.csv"))
 
 ##### Backfill Differences
 
@@ -382,7 +382,7 @@ dffsummary <- diffdf %>% filter (location_name != "Virgin Islands") %>% group_by
             absohigh = max(absolutediff, na.rm = TRUE), 
             absoiqr = IQR(absolutediff, na.rm = TRUE), 
             median = median(absolutediff, na.rm = TRUE)) %>% ungroup
-#write.csv(dffsummary, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/dfsummary_Update.csv"), row.names = FALSE)
+#write.csv(dffsummary, paste0("C:/Users/",userid,"/Desktop/GitHub/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23/Data_for_Figures/dfsummary_Update.csv"), row.names = FALSE)
 
 
 #percent of updates where the change is >= 10 hospitalizations 
@@ -390,7 +390,7 @@ dffsummary <- diffdf %>% filter (location_name != "Virgin Islands") %>% group_by
 statediffs21 <- diffdf %>% filter(state != "US", season == "A) 2021-2022", !is.na(absolutediff))
 statediffs23 <- diffdf %>% filter(state != "US", season == "B) 2022-2023", !is.na(absolutediff))
 
-#write.csv(diffdf, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/diffdf.csv"))
+#write.csv(diffdf, paste0("C:/Users/",userid,"/Desktop/GitHub/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23/Data_for_Figures/diffdf.csv"))
 
 ###### Backfill Matrix Plot
 
@@ -401,5 +401,5 @@ weeklydat23a <- hosp_data_read_func(from = as.Date("2022-10-11"), to = as.Date("
 
 weeklydat23 <- rbind(weeklydat23, weeklydat23a)
 
-#write.csv(weeklydat21, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/weeklydat21.csv"))
-#write.csv(weeklydat23, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/weeklydat23.csv"))
+#write.csv(weeklydat21, paste0("C:/Users/",userid,"/Desktop/GitHub/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23/Data_for_Figures/weeklydat21.csv"))
+#write.csv(weeklydat23, paste0("C:/Users/",userid,"/Desktop/GitHub/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23/Data_for_Figures/weeklydat23.csv"))
