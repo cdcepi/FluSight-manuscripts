@@ -1,46 +1,55 @@
 ######### Setup
 
-library(tidyverse)
-library(epiDisplay)
-library(MMWRweek)
-library(DT)
-library(plotly)
-library(gridExtra)
-library(covidHubUtils)
-library(ggridges)
-library(viridis)
-library(cowplot)
-library(scales)
 library(RSocrata)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(stringr)
 
+select = dplyr::select
+filter = dplyr::filter
+
+#CDC UserID goes here
 userid="rpe5"
-
-'%!in%' <- Negate('%in%') 
-
-last.tuesday21 = as.Date("2022-06-21")
-last.tuesday23 = as.Date("2023-04-11")
-
-window.width = c(2, 4, 8)
-
-eval.weeks = 8
-
-#updated to reflect inclusion criteria for 21-22 of Feb 21, 2022 to June 20, 2022 and Oct 17, 2022 to May 15, 2023 for 22-23
-weeks.to.eval21 = 
-  seq(as.Date("2022-02-21"),
-      as.Date("2022-06-20"),
-      by=7) %>% 
-  as.character()
-
-weeks.to.eval23 = 
-  seq(as.Date("2022-10-17"),
-      as.Date("2023-04-10"),
-      by=7) %>% 
-  as.character()
 
 #update path to where cloned GitHub repository lives
 githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
-flusight_forecast_data <-paste0("C:/Users/",userid,"/Desktop/GitHub/Flusight-forecast-data")
+flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
+source(paste0(manuscript_repo,"/functions2022-2023.R"))
+
+flu21_target_end_dates <- c("2022-02-26", "2022-03-05", "2022-03-12", "2022-03-19", "2022-03-26", "2022-04-02","2022-04-09", "2022-04-16", 
+                            "2022-04-23", "2022-04-30", "2022-05-07", "2022-05-14", "2022-05-21", "2022-05-28", "2022-06-04", "2022-06-11", 
+                            "2022-06-18", "2022-06-25", "2022-07-02", "2022-07-09", "2022-07-16")
+flu23_target_end_dates <- c("2022-10-22", "2022-10-29", "2022-11-05", "2022-11-12", "2022-11-19", "2022-11-26", "2022-12-03", "2022-12-10",
+                            "2022-12-17", "2022-12-24", "2022-12-31", "2023-01-07", "2023-01-14", "2023-01-21", "2023-01-28", "2023-02-04", 
+                            "2023-02-11", "2023-02-18", "2023-02-25", "2023-03-04", "2023-03-11", "2023-03-18", "2023-03-25", "2023-04-01",
+                            "2023-04-08", "2023-04-15", "2023-04-22", "2023-04-29", "2023-05-06", "2023-05-13", "2023-05-20", "2023-05-27" ,
+                            "2023-06-03", "2023-06-10")
+
+obs_data21 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-Archived_9-12-2022.csv")) %>%
+  mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
+         location_name = ifelse(location == 'US', 'National', location_name)) %>%
+  select(-date) %>%
+  filter(wk_end_date %in% as.Date(unique(flu21_target_end_dates)), location != 78 )
+
+
+obs_data21 <- obs_data21 %>%
+  rename(value_inc = value,
+         target_end_date = wk_end_date) %>%
+  filter(target_end_date < Sys.Date())
+
+obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-2023-06-23.csv")) %>%
+  mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
+         location_name = ifelse(location == 'US', 'National', location_name)) %>%
+  select(-date) %>%
+  filter(wk_end_date %in% as.Date(unique(flu23_target_end_dates)), location != 78)
+
+
+obs_data23 <- obs_data23 %>%
+  dplyr::rename(value_inc = value,
+                target_end_date = wk_end_date) %>%
+  filter(target_end_date < Sys.Date())
 
 suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
@@ -49,7 +58,7 @@ select = dplyr::select
 filter = dplyr::filter
 
 
-###### Backfill Epi curve
+###### Backfill Epi curve: Figure S2
 
 tues_start <- as.Date("2023-01-17")
 tues_end <- as.Date("2023-06-13")
@@ -112,7 +121,7 @@ fullset <- rbind(mutate(fullset21, season = "A) 2021-2022"), mutate(fullset23, s
 
 #write.csv(fullset, paste0(manuscript_repo, "/Data_for_Figures/fullset.csv"))
 
-##### Backfill Differences
+##### Backfill Differences: Figure S3
 
 diffdf21 <- diff_df_function(truthtransmute21, forecastdata21) %>% mutate(season = "A) 2021-2022")
 diffdf23 <- diff_df_function(truthtransmute23, forecastdata23) %>% mutate(season = "B) 2022-2023")
@@ -140,7 +149,7 @@ statediffs23 <- diffdf %>% filter(state != "US", season == "B) 2022-2023", !is.n
 
 #write.csv(diffdf, paste0(manuscript_repo, "/Data_for_Figures/diffdf.csv"))
 
-###### Backfill Matrix Plot
+###### Backfill Matrix Plot: Figure S4
 
 weeklydat21 <- hosp_data_read_func(from = as.Date("2022-01-31"), to = as.Date("2022-07-18"))
 weeklydat23 <- hosp_data_read_func(from = as.Date("2022-10-10"), to = as.Date("2023-01-09"))

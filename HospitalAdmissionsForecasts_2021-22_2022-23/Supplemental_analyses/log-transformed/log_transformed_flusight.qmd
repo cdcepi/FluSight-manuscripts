@@ -55,13 +55,13 @@ weeks.to.eval23 =
       by=7) %>% 
   as.character()
 
-
-dashboard_r_code <- paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code")
+#update path to where cloned GitHub repository lives
+githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
 flusight_forecast_data <-paste0("C:/Users/",userid,"/Desktop/GitHub/Flusight-forecast-data")
-dashboard_r_code_weekly_data <- paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/Weekly Data/")
 
-suppressMessages(invisible(source(paste0(dashboard_r_code_weekly_data,"Model names and colors.R"))))
-source(paste0(dashboard_r_code,"/functions2022-2023.R"))
+suppressMessages(invisible(source(paste0(manuscript_repo,"Model names and colors.R"))))
+source(paste0(manuscript_repo,"/functions2022-2023.R"))
 
 select = dplyr::select
 filter = dplyr::filter
@@ -155,7 +155,7 @@ dat23  <- unique_model_names %>%
 
 
 ##Observed Data
-obs_data21 <- read_csv(paste0(dashboard_r_code,"/truth-Incident Hospitalizations-Archived_9-12-2022.csv")) %>%
+obs_data21 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-Archived_9-12-2022.csv")) %>%
   mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
          location_name = ifelse(location == 'US', 'National', location_name)) %>%
   select(-date) %>%
@@ -174,7 +174,7 @@ location.names21 = obs_data21 %>% select(location, location_name) %>% unique()
 all_dat21 = left_join(all_dat21,location.names21, by = c("location"))
 
 
-obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations.csv")) %>%
+obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-2023-06-23.csv")) %>%
   mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
          location_name = ifelse(location == 'US', 'National', location_name)) %>%
   select(-date) %>%
@@ -367,18 +367,18 @@ fig23ln <- forecastsandobservedplt(all_dat23ln, obs_data23ln, "b")
 # fig21ln
 # fig23ln
 
-# jpeg(file = paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/Forecasts_and_observed_2021-2022.jpg"), width=10, height=8, units="in", res=300)
+# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Forecasts_and_observed_2021-2022.jpg"), width=10, height=8, units="in", res=300)
 # print(fig21ln)
 # dev.off()
-# jpeg(file = paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/Forecasts_and_observed_2022-2023.jpg"), width=10, height=8, units="in", res=300)
+# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Forecasts_and_observed_2022-2023.jpg"), width=10, height=8, units="in", res=300)
 # print(fig23ln)
 # dev.off()
 
 
-#ggsave(paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/Forecasts_and_observed_2021-2022.png"), plot = fig21ln, width=10, height=8)
+#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Forecasts_and_observed_2021-2022.png"), plot = fig21ln, width=10, height=8)
 
 
-#ggsave(paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/Forecasts_and_observed_2022-2023.png"), plot = fig23ln, width=10, height=8)
+#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Forecasts_and_observed_2022-2023.png"), plot = fig23ln, width=10, height=8)
 
 
 
@@ -447,11 +447,11 @@ g
 #   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 # 
 # lg 
-jpeg(file = paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/Abs_WIS_States_1and4week_figure_all.jpg"), width=8, height=5, units="in", res=300)
+jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Abs_WIS_States_1and4week_figure_all.jpg"), width=8, height=5, units="in", res=300)
 print(g)
 dev.off()
 
- # ggsave(paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard r Code/2022-23/supplemental_log-transformed/Log_WIS_States_1and4week_figure_all.png"), plot = lg, width = 8, height = 5)
+ # ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Log_WIS_States_1and4week_figure_all.png"), plot = lg, width = 8, height = 5)
 ```
 
 ##### Coverage Figures
@@ -507,7 +507,7 @@ z <- ggplot(coverage95_flusight, aes(x = target_end_date,
 
 z
 
-jpeg(file = paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/Coverage_95_States_1and4week_figure_all.jpg"), width=8, height=5, units="in", res=300)
+jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Coverage_95_States_1and4week_figure_all.jpg"), width=8, height=5, units="in", res=300)
 print(z)
 dev.off()
 
@@ -546,7 +546,7 @@ y <- ggplot(coverage50_flusight, aes(x = target_end_date,
 #theme_minimal()
 y
 #
-jpeg(file = paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/Coverage_50_States_1and4week_figure_all.jpg"), width=8, height=5, units="in", res=300)
+jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Coverage_50_States_1and4week_figure_all.jpg"), width=8, height=5, units="in", res=300)
 print(y)
 dev.off()
 ```
@@ -815,7 +815,7 @@ bimodal_rank23 <- ave_rank_percent23ln%>% filter(pct_top25 < 50, pct_bottom25 < 
 #   theme_bw()
 # p2
 # # 
-# jpeg(file = paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/model-ranksA.jpg"), width=8, height=5, units="in", res=300)
+# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/model-ranksA.jpg"), width=8, height=5, units="in", res=300)
 # print(p2)
 # dev.off()
 
@@ -833,11 +833,11 @@ p2 <- inc_scores_overall %>%
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")) )
  p2
 # # 
-# jpeg(file = paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/model-ranks_allcols.jpg"), width=8, height=8, units="in", res=300)
+# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/model-ranks_allcols.jpg"), width=8, height=8, units="in", res=300)
 # print(p2)
 # dev.off()
  # 
- # ggsave(paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/model-ranks_allcols.png"), width=8, height=8, units="in", plot = p2)
+ # ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/model-ranks_allcols.png"), width=8, height=8, units="in", plot = p2)
 
 ```
 ## Model Ranking
@@ -875,11 +875,11 @@ fig_wis_loc <- ggplot(scores,
   theme(axis.ticks.y = element_blank())
 fig_wis_loc
 
-# jpeg(file = paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/WIS_scores_Location_all.jpg"), width=12, height=8, units="in", res=300)
+# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/WIS_scores_Location_all.jpg"), width=12, height=8, units="in", res=300)
 # print(fig_wis_loc)
 # dev.off()
 # 
-#ggsave(paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/logWIS_scores_Location_all.png"), plot = fig_wis_loc, width = 12, height= 8)
+#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/logWIS_scores_Location_all.png"), plot = fig_wis_loc, width = 12, height= 8)
 
 
 modelrankings21ln <- inc.rankings_location21ln %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
@@ -930,7 +930,7 @@ x <- ggplot(plot.scores, aes(x = target_end_date,
   facet_grid(cols = vars(season), scales = "free_x")
 x
 
- #ggsave(plot = x, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/Ave_4wk_WIS_model.png"), height = 6, width = 8)
+ #ggsave(plot = x, paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Ave_4wk_WIS_model.png"), height = 6, width = 8)
 ```
 
 ##### Relative WIS Distribution
@@ -953,9 +953,9 @@ u <- model_order %>%
 u
 
 # 
-# jpeg(file = paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/WIS_scores_Boxplot.jpg"), width=10, height=8, units="in", res=300)
+# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/WIS_scores_Boxplot.jpg"), width=10, height=8, units="in", res=300)
 # print(u)
 # dev.off()
 # 
-#ggsave(paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Dashboard R Code/2022-23/supplemental_log-transformed/WIS_scores_Boxplot.png"), plot = u, width=10, height=8)
+#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/WIS_scores_Boxplot.png"), plot = u, width=10, height=8)
 ```
