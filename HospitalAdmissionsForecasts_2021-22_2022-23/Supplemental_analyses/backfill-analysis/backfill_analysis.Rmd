@@ -16,7 +16,7 @@ select = dplyr::select
 filter = dplyr::filter
 
 #CDC UserID goes here
-userid="nqr2"
+userid="rpe5"
 
 #update path to where cloned GitHub repository lives
 githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
