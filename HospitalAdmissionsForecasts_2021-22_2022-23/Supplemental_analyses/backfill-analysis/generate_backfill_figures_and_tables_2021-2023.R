@@ -1,6 +1,5 @@
-###### Backfill Epicurve
+###### Backfill Epicurve: Figure S2
 
-#### Alex need to rename these to match manuscript 
 
 wklyplt <- 
   ggplot(fullset, aes(x = report_date)) +
@@ -16,7 +15,7 @@ wklyplt <-
 
 wklyplt
 
-###### Absolute Difference
+###### Absolute Difference: Figure S3
 
 absoplt <- diffdf %>% filter(location_name != "US") %>% 
   ggplot(aes(x = absolutediff, y = location_name))+
@@ -39,7 +38,7 @@ percplt <- diffdf %>% filter(location_name != "US") %>% #can take out != Nationa
   facet_grid(cols = vars(season))
 percplt
 
-###### Backfill Matrix Plot
+###### Backfill Matrix Plot: Figure S4
 
 ####check start date
 stairstep_function <- function(weeklydat, fromdate, todate){

@@ -50,7 +50,7 @@ obs_data21 <- obs_data21 %>%
          target_end_date = wk_end_date) %>%
   filter(target_end_date < Sys.Date())
 
-obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations.csv")) %>%
+obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-2023-06-23.csv")) %>%
   mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
          location_name = ifelse(location == 'US', 'National', location_name)) %>%
   select(-date) %>%
@@ -64,7 +64,7 @@ obs_data23 <- obs_data23 %>%
 
 ```
 
-##### Backfill epicurve
+##### Backfill epicurve: Figure S2
 
 ```{r, backfill}
 #Data are pulled via the api for both Tuesday and Mondays. Monday pulls are in a function sourced from functions2022-2023
@@ -150,7 +150,7 @@ wklyplt
 # ggsave(plot = wklyplt, paste0(manuscript_repo,"/Output/backfill_epicurv_mon_tue.png"), height = 6, width = 8, dpi = 300)
 ```
 
-##### Backfill Differences
+##### Backfill Differences: Figure S3
 
 ```{r, Backfill Differences}
 
@@ -230,7 +230,7 @@ percplt
 
 ```
 
-##### Backfill matrix plot
+##### Backfill matrix plot: Figure S4
 
 ```{r, stairstep plt}
 

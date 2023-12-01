@@ -51,6 +51,7 @@ source(paste0(manuscript_repo,"/functions2022-2023.R"))
 select = dplyr::select
 filter = dplyr::filter
 
+
 all_dat21 <- read_parquet(paste0(manuscript_repo, "/Data_for_Figures/all_dat21.parquet")) %>% mutate(target_end_date = as.Date(target_end_date))
 all_dat23 <- read_parquet(paste0(manuscript_repo, "/Data_for_Figures/all_dat23.parquet")) %>% mutate(target_end_date = as.Date(target_end_date))
 
