@@ -30,6 +30,7 @@ library(viridis)
 library(cowplot)
 library(scales)
 library(RSocrata)
+library(arrow)
 
 userid="rpe5"
 
@@ -76,82 +77,8 @@ filter = dplyr::filter
 #| warnings: false
 #| include: false
 
-datapath <- paste0(flusight_forecast_data,"/data-forecasts")
-filenames = list.files(path=datapath, pattern=".csv",
-                       full.names = TRUE, recursive = TRUE)
-
-unique_model_names <- unique(str_split(filenames, "/", simplify = TRUE)[, 8:9])
-unique_model_names = cbind(unique_model_names, substr(unique_model_names[,2],1,10) )
-
-unique_model_names = data.frame(model = as.character(unique_model_names[,1]),
-                                filename = as.character(unique_model_names[,2]),
-                                date.submitted = unique_model_names[,3],
-                                next.tuesday = get_next_tuesday(as.Date(unique_model_names[,3]))) %>%
-  group_by(model, next.tuesday) %>%
-  summarise(filename = as.character(filename[which.max(as.Date(date.submitted))])) %>%
-  ungroup() %>%
-  mutate(model = as.character(model),
-         next.tuesday = as.character(next.tuesday))
-
-dat21 <- unique_model_names %>%
-  filter(next.tuesday %in%
-           as.character(
-             last.tuesday21 - 7*(0:((eval.weeks-1)+max(window.width)+(4-1)-1))
-           )
-  ) %>%
-  filter(next.tuesday == as.character(last.tuesday21))
-
-dat23  <- unique_model_names %>%
-  filter(next.tuesday %in%
-           as.character(
-             last.tuesday23 - 7*(0:((eval.weeks-1)+max(window.width)+(4-1)-1))
-           )
-  ) %>%
-  filter(next.tuesday == as.character(last.tuesday23))
-
-
-  filenames =
-    paste0(flusight_forecast_data,"/data-forecasts/",
-           unique_model_names$model, "/",
-           unique_model_names$filename)
-
-
-  dat_list <- lapply(filenames,
-                     FUN = function(x){
-                       read_csv(x, col_types = cols(.default = "c")) %>%
-                         filter(grepl("hosp", target),
-                                target %in%
-                                  paste(1:4,"wk ahead inc flu hosp"))
-                       }
-                     )
-
-
-  models = unique_model_names$model
-  unique_models = unique(models)
-
-  all_dat_new <- tibble()
-  for (i in c(1:length(dat_list))) {
-    all_dat_new <- bind_rows(all_dat_new,
-                             dat_list[[i]] %>%
-                               select(location, target, target_end_date, forecast_date,
-                                      type, quantile, value) %>%
-                               mutate(
-                                 location = as.character(location),
-                                 location =
-                                   as.character(ifelse(location %in% as.character(1:9),
-                                                       paste0("0",location),location)),
-                                 model = models[i],
-                                 value = as.numeric(value),
-                                 quantile = as.numeric(quantile)  ,
-                                 quantile=ifelse(quantile=="NaN", NA, quantile)))
-    }
-
-
-  all_dat21 = all_dat_new %>% filter(forecast_date %in% weeks.to.eval21, location != 78) %>% {unique(.)}
-
-
-  all_dat23 <- all_dat_new %>% filter(forecast_date %in% weeks.to.eval23, location != 78) %>% {unique(.)}
-
+all_dat21 <- read_parquet(paste0(manuscript_repo, "/Data_for_Figures/all_dat21.parquet"))
+all_dat23 <- read_parquet(paste0(manuscript_repo, "/Data_for_Figures/all_dat23.parquet"))
 
 
 ##Observed Data
@@ -171,8 +98,6 @@ obs_data21 <- obs_data21 %>%
 location.names21 = obs_data21 %>% select(location, location_name) %>% unique()
 
 
-all_dat21 = left_join(all_dat21,location.names21, by = c("location"))
-
 
 obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-2023-06-23.csv")) %>%
   mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
@@ -189,8 +114,6 @@ obs_data23 <- obs_data23 %>%
 
 location.names23 = obs_data23 %>% select(location, location_name) %>% unique()
 
-
-all_dat23 = left_join(all_dat23,location.names23, by = c("location"))
 
 
 dat_for_scores21 <- dat_for_scores_function(all_dat21, obs_data21)
