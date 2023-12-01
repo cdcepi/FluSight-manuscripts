@@ -18,11 +18,12 @@ select = dplyr::select
 filter = dplyr::filter
 
 #CDC UserID goes here
-userid="rpe5"
+userid="shaws"
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+githubpath = paste0("C:/Users/",userid,"/Documents/GitHub")
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
+backfill_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23/Supplemental_analyses/backfill-analysis")
 flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
 
@@ -62,9 +63,6 @@ obs_data23 <- obs_data23 %>%
 suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
 
-select = dplyr::select
-filter = dplyr::filter
-
 
 ###### Backfill Epi curve: Figure S2
 
@@ -78,7 +76,7 @@ jsonpath <- read.socrata(url = "https://healthdata.gov/resource/qqte-vkut.json")
 tues_set <- data.frame(state = character(), date = as.Date(character()), value = integer(), report_date = character(), epiweek = character(), epiyear = character())
 d <- tues_start
 
-#loop to pull in covidcast api data and aggregate it weekly
+#loop to pull in api data and aggregate it weekly
 while (d <= last(tuesdates)){
   d = as.Date(d, origin = "1970-01-01")
   filename = case_when(length(jsonpath[str_detect(string = jsonpath$update_date, pattern = as.character(d)), 12]) > 1 ~
@@ -127,7 +125,7 @@ fullset23 <- forecastdata23 %>% filter(state == "US") %>% left_join(., truthaddo
 
 fullset <- rbind(mutate(fullset21, season = "A) 2021-2022"), mutate(fullset23, season = "B) 2022-2023"))
 
-#write.csv(fullset, paste0(manuscript_repo, "/Data_for_Figures/fullset.csv"))
+#write.csv(fullset, paste0(backfill_repo, "/Data for Backfill Figures/fullset.csv"), row.names = FALSE)
 
 ##### Backfill Differences: Figure S3
 
@@ -147,7 +145,7 @@ dffsummary <- diffdf %>% filter (location_name != "Virgin Islands") %>% group_by
             absohigh = max(absolutediff, na.rm = TRUE), 
             absoiqr = IQR(absolutediff, na.rm = TRUE), 
             median = median(absolutediff, na.rm = TRUE)) %>% ungroup
-#write.csv(dffsummary, paste0(manuscript_repo, "/Data_for_Figures/dfsummary_Update.csv"), row.names = FALSE)
+#write.csv(dffsummary, paste0(backfill_repo, "/Data for Backfill Figures/dfsummary_Update.csv"), row.names = FALSE)
 
 
 #percent of updates where the change is >= 10 hospitalizations 
@@ -155,7 +153,7 @@ dffsummary <- diffdf %>% filter (location_name != "Virgin Islands") %>% group_by
 statediffs21 <- diffdf %>% filter(state != "US", season == "A) 2021-2022", !is.na(absolutediff))
 statediffs23 <- diffdf %>% filter(state != "US", season == "B) 2022-2023", !is.na(absolutediff))
 
-#write.csv(diffdf, paste0(manuscript_repo, "/Data_for_Figures/diffdf.csv"))
+#write.csv(diffdf, paste0(backfill_repo, "/Data for Backfill Figures/diffdf.csv"), row.names = FALSE)
 
 ###### Backfill Matrix Plot: Figure S4
 
@@ -166,5 +164,5 @@ weeklydat23a <- hosp_data_read_func(from = as.Date("2022-10-11"), to = as.Date("
 
 weeklydat23 <- rbind(weeklydat23, weeklydat23a)
 
-#write.csv(weeklydat21, paste0(manuscript_repo, "/Data_for_Figures/weeklydat21.csv"))
-#write.csv(weeklydat23, paste0(manuscript_repo, "/Data_for_Figures/weeklydat23.csv"))
+#write.csv(weeklydat21, paste0(backfill_repo, "/Data for Backfill Figures/weeklydat21.csv"), row.names = FALSE)
+#write.csv(weeklydat23, paste0(backfill_repo, "/Data for Backfill Figures/weeklydat23.csv"), row.names = FALSE)

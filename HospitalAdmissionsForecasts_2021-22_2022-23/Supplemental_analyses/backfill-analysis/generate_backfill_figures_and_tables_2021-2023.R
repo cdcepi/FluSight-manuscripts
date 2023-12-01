@@ -5,10 +5,40 @@
 # Each section contains the vizualization code related to the figure of the same name.
 
 
+library(RSocrata)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(stringr)
+
+select = dplyr::select
+filter = dplyr::filter
+
+#CDC UserID goes here
+userid="shaws"
+
+#update path to where cloned GitHub repository lives
+githubpath = paste0("C:/Users/",userid,"/Documents/GitHub")
+manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
+backfill_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23/Supplemental_analyses/backfill-analysis")
+flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
+source(paste0(manuscript_repo,"/functions2022-2023.R"))
+
+flu21_target_end_dates <- c("2022-02-26", "2022-03-05", "2022-03-12", "2022-03-19", "2022-03-26", "2022-04-02","2022-04-09", "2022-04-16", 
+                            "2022-04-23", "2022-04-30", "2022-05-07", "2022-05-14", "2022-05-21", "2022-05-28", "2022-06-04", "2022-06-11", 
+                            "2022-06-18", "2022-06-25", "2022-07-02", "2022-07-09", "2022-07-16")
+flu23_target_end_dates <- c("2022-10-22", "2022-10-29", "2022-11-05", "2022-11-12", "2022-11-19", "2022-11-26", "2022-12-03", "2022-12-10",
+                            "2022-12-17", "2022-12-24", "2022-12-31", "2023-01-07", "2023-01-14", "2023-01-21", "2023-01-28", "2023-02-04", 
+                            "2023-02-11", "2023-02-18", "2023-02-25", "2023-03-04", "2023-03-11", "2023-03-18", "2023-03-25", "2023-04-01",
+                            "2023-04-08", "2023-04-15", "2023-04-22", "2023-04-29", "2023-05-06", "2023-05-13", "2023-05-20", "2023-05-27" ,
+                            "2023-06-03", "2023-06-10")
+
 ###### Backfill Epicurve: Figure S2
 
 
-wklyplt <- 
+fullset <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/fullset.csv"))
+
+figures2 <- 
   ggplot(fullset, aes(x = report_date)) +
   geom_line(aes(y = value, color = "Weekly Reported Hospitalizations"))+
   geom_line(aes(y = truthvalue, color = "Final Hospitalizations"))+
@@ -20,11 +50,13 @@ wklyplt <-
   theme(legend.position="bottom")+
   facet_grid(cols = vars(season), scales = "free_x")
 
-wklyplt
+figures2
 
 ###### Absolute Difference: Figure S3
 
-absoplt <- diffdf %>% filter(location_name != "US") %>% 
+diffdf <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/dfsummary_Update.csv"))
+
+figures3a <- diffdf %>% filter(location_name != "US") %>% 
   ggplot(aes(x = absolutediff, y = location_name))+
   geom_boxplot(color = "#d6936b", outlier.color = "black")+
   scale_y_discrete( limits = rev) +
@@ -32,18 +64,18 @@ absoplt <- diffdf %>% filter(location_name != "US") %>%
   theme_bw()+
   facet_grid(cols = vars(season))
 
-absoplt
+figures3a
 
 ####### Relative Differences
 
-percplt <- diffdf %>% filter(location_name != "US") %>% #can take out != National
+figures3b <- diffdf %>% filter(location_name != "US") %>% #can take out != National
   ggplot(aes(x = final_perc_change*100, y = location_name))+
   geom_boxplot(color = "#6baed6", outlier.color = "black")+
   scale_y_discrete( limits = rev) +
   labs(x = "Percent Difference", y = "", title = "Relative Changes")+
   theme_bw()+
   facet_grid(cols = vars(season))
-percplt
+figures3b
 
 ###### Backfill Matrix Plot: Figure S4
 
@@ -73,8 +105,9 @@ stairstep_function <- function(weeklydat, fromdate, todate){
   return(stairplt)
 }
 
-stairplt21 <- stairstep_function(weeklydat21)
-stairplt23 <- stairstep_function(weeklydat23)
+weeklydat21 <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/weeklydat21.csv"))
+weeklydat23 <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/weeklydat23.csv"))
 
-stairplt21
-stairplt23
+figures4a <- stairstep_function(weeklydat21)
+figures4b <- stairstep_function(weeklydat23)
+
