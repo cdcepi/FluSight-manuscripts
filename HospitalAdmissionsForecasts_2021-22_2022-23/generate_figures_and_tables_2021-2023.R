@@ -1,22 +1,22 @@
 ######### Setup
-
+library(arrow)
 library(tidyverse)
-library(epiDisplay)
-library(MMWRweek)
-library(DT)
-library(plotly)
-library(gridExtra)
-library(covidHubUtils)
-library(ggridges)
-library(viridis)
-library(cowplot)
-library(scales)
-library(RSocrata)
+# library(epiDisplay)
+# library(MMWRweek)
+# library(DT)
+# library(plotly)
+# library(gridExtra)
+ library(covidHubUtils)
+ library(ggridges)
+# library(viridis)
+# library(cowplot)
+# library(scales)
+# library(RSocrata)
 #CDC UserID goes here
-userid="rpe5"
+userid="shaws"
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+githubpath = paste0("C:/Users/",userid,"/Documents/GitHub")
 
 
 '%!in%' <- Negate('%in%') #previously %notin% possible #update
@@ -43,6 +43,7 @@ weeks.to.eval23 =
 
 
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
+flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
 
 suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
@@ -50,122 +51,12 @@ source(paste0(manuscript_repo,"/functions2022-2023.R"))
 select = dplyr::select
 filter = dplyr::filter
 
-datapath <- paste0(flusight_forecast_data,"/data-forecasts")
-filenames = list.files(path=datapath, pattern=".csv", 
-                       full.names = TRUE, recursive = TRUE)
+all_dat21 <- read_parquet(paste0(manuscript_repo, "/Data_for_Figures/all_dat21.parquet")) %>% mutate(target_end_date = as.Date(target_end_date))
+all_dat23 <- read_parquet(paste0(manuscript_repo, "/Data_for_Figures/all_dat23.parquet")) %>% mutate(target_end_date = as.Date(target_end_date))
 
-unique_model_names <- unique(str_split(filenames, "/", simplify = TRUE)[, 8:9])
-unique_model_names = cbind(unique_model_names, substr(unique_model_names[,2],1,10) ) 
+obs_data21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/obs_data21.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+obs_data23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/obs_data23.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
 
-unique_model_names = data.frame(model = as.character(unique_model_names[,1]),
-                                filename = as.character(unique_model_names[,2]), 
-                                date.submitted = unique_model_names[,3],
-                                next.tuesday = get_next_tuesday(as.Date(unique_model_names[,3]))) %>% 
-  group_by(model, next.tuesday) %>% 
-  summarise(filename = as.character(filename[which.max(as.Date(date.submitted))])) %>% 
-  ungroup() %>% 
-  mutate(model = as.character(model),
-         next.tuesday = as.character(next.tuesday))
-
-dat21 <- unique_model_names %>% 
-  filter(next.tuesday %in% 
-           as.character(
-             last.tuesday21 - 7*(0:((eval.weeks-1)+max(window.width)+(4-1)-1))
-           )
-  ) %>%
-  filter(next.tuesday == as.character(last.tuesday21))
-
-dat23  <- unique_model_names %>% 
-  filter(next.tuesday %in% 
-           as.character(
-             last.tuesday23 - 7*(0:((eval.weeks-1)+max(window.width)+(4-1)-1))
-           )
-  ) %>%
-  filter(next.tuesday == as.character(last.tuesday23))
-
-
-filenames = 
-  paste0(flusight_forecast_data,"/data-forecasts/",
-         unique_model_names$model, "/",
-         unique_model_names$filename)
-
-
-dat_list <- lapply(filenames,
-                   FUN = function(x){
-                     read_csv(x, col_types = cols(.default = "c")) %>%
-                       filter(grepl("hosp", target),
-                              target %in% 
-                                paste(1:4,"wk ahead inc flu hosp"))
-                   }
-)
-
-
-models = unique_model_names$model
-unique_models = unique(models)
-
-all_dat_new <- tibble()
-for (i in c(1:length(dat_list))) {
-  all_dat_new <- bind_rows(all_dat_new,
-                           dat_list[[i]] %>%
-                             select(location, target, target_end_date, forecast_date,
-                                    type, quantile, value) %>%
-                             mutate(
-                               location = as.character(location),
-                               location = 
-                                 as.character(ifelse(location %in% as.character(1:9),
-                                                     paste0("0",location),location)),
-                               model = models[i],
-                               value = as.numeric(value),
-                               quantile = as.numeric(quantile)  ,
-                               quantile=ifelse(quantile=="NaN", NA, quantile)))
-}
-
-
-all_dat21 = all_dat_new %>% filter(forecast_date %in% weeks.to.eval21, location != 78) %>% {unique(.)}
-
-
-all_dat23 <- all_dat_new %>% filter(forecast_date %in% weeks.to.eval23, location != 78) %>% {unique(.)}
-
-
-##Observed Data
-obs_data21 <- read_csv(paste0(manuscript_repo,"/truth-Incident Hospitalizations-Archived_9-12-2022.csv")) %>%
-  mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
-         location_name = ifelse(location == 'US', 'National', location_name)) %>%
-  select(-date) %>%
-  filter(wk_end_date %in% as.Date(unique(all_dat21$target_end_date)), location != 78 )
-
-
-obs_data21 <- obs_data21 %>%
-  rename(value_inc = value,
-         target_end_date = wk_end_date) %>%
-  filter(target_end_date < Sys.Date())
-
-
-location.names21 = obs_data21 %>% select(location, location_name) %>% unique()
-
-
-all_dat21 = left_join(all_dat21,location.names21, by = c("location"))
-
-
-obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-2023-06-23.csv")) %>%
-  mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
-         location_name = ifelse(location == 'US', 'National', location_name)) %>%
-  select(-date) %>%
-  filter(wk_end_date %in% as.Date(unique(all_dat23$target_end_date) ), location != 78)
-
-
-obs_data23 <- obs_data23 %>%
-  dplyr::rename(value_inc = value,
-                target_end_date = wk_end_date) %>%
-  filter(target_end_date < Sys.Date())
-
-
-location.names23 = obs_data23 %>% select(location, location_name) %>% unique()
-
-
-all_dat23 = left_join(all_dat23,location.names23, by = c("location"))
-
-##################### Inc Rankings/ Table 1
 
 inc.rankings_all21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all21.csv"))
 inc.rankings_all23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all23.csv"))
@@ -173,6 +64,57 @@ inc.rankings_all23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.ra
 inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel.WIS.skill)
 
 logtable1 <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/logtable1.csv")) 
+
+
+WIS_Season21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season21.csv"))
+WIS_Season23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season23.csv"))
+
+inc.rankings_location21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location21.csv"))
+inc.rankings_location23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location23.csv"))
+
+# WIS_Season21 <- WIS_Season21 %>% filter(model %in% inc.rankings_all21$model)
+# inc.rankings_location21 <- make_WIS_ranking_location(WIS_Season21)
+# inc.rankings_location21$below <- ifelse(inc.rankings_location21$relative_WIS < 1, 1, 0)
+# 
+# WIS_Season23 <- WIS_Season23 %>% filter(model %in% inc.rankings_all23$model)
+# inc.rankings_location23 <- make_WIS_ranking_location(WIS_Season23)
+# inc.rankings_location23$below <- ifelse(inc.rankings_location23$relative_WIS < 1, 1, 0)
+
+abs_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+abs_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_not_flusight.csv"))%>% mutate(target_end_date = as.Date(target_end_date))
+
+Scores_tab21 <- scores_tab_function(inc.rankings_location21,inc.rankings_all21, WIS_Season21)
+Scores_tab23 <- scores_tab_function(inc.rankings_location23, inc.rankings_all23, WIS_Season23)
+
+coverage95_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+coverage95_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_not_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+
+
+WIS_Season <- rbind(mutate(WIS_Season21, season = "2021-2022"), mutate(WIS_Season23, season = "2022-2023"))
+
+cov95_breakdown21 <- cov95_function(WIS_Season21, Scores_tab21)
+
+cov95_breakdown23 <- cov95_function(WIS_Season23, Scores_tab23)
+
+
+cov95_breakdownall <- rbind(mutate(cov95_breakdown21, season = "2021-2022"), mutate(cov95_breakdown23, season = "2022-2023"))
+
+inc_scores_overall <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc_scores_overall.csv"))
+
+abs_breakdown_WIS <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_breakdown_WIS.csv"))
+
+inc.rankings_location <- rbind(mutate(inc.rankings_location21, season = "2021-2022"), mutate(inc.rankings_location23, season = "2022-2023"))
+inc.rankings_all_nice <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all_nice.csv"))
+
+
+##################### Inc Rankings/ Table 1
+
+# inc.rankings_all21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all21.csv"))
+# inc.rankings_all23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all23.csv"))
+# 
+# inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel.WIS.skill)
+# 
+# logtable1 <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/logtable1.csv")) 
 
 inc.rankings_all %>% left_join(., logtable1, join_by("model" == "Model", "season" == "Season")) %>% 
   rename(Model = model,
@@ -199,28 +141,28 @@ inc.rankings_all %>% left_join(., logtable1, join_by("model" == "Model", "season
   knitr::kable(align = c("lcccccccc"), caption = "Table 1",#col.names = c()
   ) %>% 
   kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
-  kableExtra::footnote( general_title = "") #%>% 
+  kableExtra::footnote( general_title = "")# %>% 
 #kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/table1.pdf"))
 
 
 #### 
+# 
+# WIS_Season21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season21.csv"))
+# WIS_Season23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season23.csv"))
+# 
+# inc.rankings_location21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location21.csv"))
+# inc.rankings_location23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location23.csv"))
+# 
+# WIS_Season21 <- WIS_Season21 %>% filter(model %in% inc.rankings_all21$model)
+# inc.rankings_location21 <- make_WIS_ranking_location(WIS_Season21)
+# inc.rankings_location21$below <- ifelse(inc.rankings_location21$relative_WIS < 1, 1, 0)
+# 
+# WIS_Season23 <- WIS_Season23 %>% filter(model %in% inc.rankings_all23$model)
+# inc.rankings_location23 <- make_WIS_ranking_location(WIS_Season23)
+# inc.rankings_location23$below <- ifelse(inc.rankings_location23$relative_WIS < 1, 1, 0)
+# 
 
-WIS_Season21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season21.csv"))
-WIS_Season23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season23.csv"))
-
-inc.rankings_location21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location21.csv"))
-inc.rankings_location23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location23.csv"))
-
-WIS_Season21 <- WIS_Season21 %>% filter(model %in% inc.rankings_all21$model)
-inc.rankings_location21 <- make_WIS_ranking_location(WIS_Season21)
-inc.rankings_location21$below <- ifelse(inc.rankings_location21$relative_WIS < 1, 1, 0)
-
-WIS_Season23 <- WIS_Season23 %>% filter(model %in% inc.rankings_all23$model)
-inc.rankings_location23 <- make_WIS_ranking_location(WIS_Season23)
-inc.rankings_location23$below <- ifelse(inc.rankings_location23$relative_WIS < 1, 1, 0)
-
-
-############### Forecasts and Observed
+############### Forecasts and Observed Figure 1a and b
 
 
 fig21 <- forecastsandobservedplt(all_dat21, obs_data21, "a")
@@ -229,8 +171,8 @@ fig21 <- forecastsandobservedplt(all_dat21, obs_data21, "a")
 fig23 <- forecastsandobservedplt(all_dat23, obs_data23, "b")
 
 ############## Absolute WIS by Model
-abs_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
-abs_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_not_flusight.csv"))%>% mutate(target_end_date = as.Date(target_end_date))
+# abs_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+# abs_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_not_flusight.csv"))%>% mutate(target_end_date = as.Date(target_end_date))
 
 wis_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead", 
                             `4 wk ahead inc flu hosp` = "4 Week Ahead", 
@@ -238,13 +180,11 @@ wis_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
                             `2022-2023` = "2022-2023"))
 
 
-
-
 ## Figure 4a Absolute (log) WIS by model
 figure4a <-  ggplot(abs_flusight, aes(x = target_end_date,
                                 y = log_WIS, group = model,
                                 col = model)) +
-  geom_line(size = 1) + geom_point(size = 2) +
+  geom_line(linewidth = 1) + geom_point(size = 2) +
   scale_color_manual(values = c("#d6936b", "#6baed6")) +
   geom_line(data = abs_not_flusight, aes(x = target_end_date, y = log_WIS, group = model), color = adjustcolor("grey50", .35)) +
   labs(y = "Absolute WIS",
@@ -258,26 +198,23 @@ figure4a <-  ggplot(abs_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 
-figure4a
+
 
 ########## Coverage and Scores
 
-Scores_tab21 <- scores_tab_function(inc.rankings_location21,inc.rankings_all21, WIS_Season21)
-Scores_tab23 <- scores_tab_function(inc.rankings_location23, inc.rankings_all23, WIS_Season23)
+# Scores_tab21 <- scores_tab_function(inc.rankings_location21,inc.rankings_all21, WIS_Season21)
+# Scores_tab23 <- scores_tab_function(inc.rankings_location23, inc.rankings_all23, WIS_Season23)
 
 ########## 95% Coverage by Models Figure 4b
 
-coverage95_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
-coverage95_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_not_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+# coverage95_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+# coverage95_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_not_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
 
 
 coverage_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead", 
                                  `4 wk ahead inc flu hosp` = "4 Week Ahead", 
                                  `2021-2022` = "2021-2022", 
-                                 `2022-2023` = "2022-2023"#, 
-                                 #coverage50 = "Panel C", 
-                                 #coverage95 = "Panel D"
-))
+                                 `2022-2023` = "2022-2023"))
 
 
 
@@ -296,96 +233,96 @@ figure4b <- ggplot(coverage95_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
 
-figure4b
+
 
 ############ Coverage Tables Table 2
 #This relies on a lot of code above / not self contained sections
 
-WIS_Season <- rbind(mutate(WIS_Season21, season = "2021-2022"), mutate(WIS_Season23, season = "2022-2023"))
+# WIS_Season <- rbind(mutate(WIS_Season21, season = "2021-2022"), mutate(WIS_Season23, season = "2022-2023"))
 
-locationcount <- length(unique(WIS_Season$location_name))# - 1
-
-coverage95_summary <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "1 wk ahead inc flu hosp") %>% 
-  group_by(forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% ungroup() %>% unique()
-
-coverage95_summary_4 <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "4 wk ahead inc flu hosp") %>% 
-  group_by(forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% ungroup() %>%  unique()
-coverage50_summary_4 <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "4 wk ahead inc flu hosp") %>% 
-  group_by(forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage50 = sum(coverage.50)/locationcount) %>% unique()
-
-
-coverage50_summary <- WIS_Season %>% filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "1 wk ahead inc flu hosp") %>% 
-  group_by(forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage50 = sum(coverage.50)/locationcount) %>% ungroup() %>% unique()
-
-coverage95_summary_all <- WIS_Season %>%  filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "1 wk ahead inc flu hosp") %>% 
-  group_by(model, forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% unique() %>% 
-  group_by(model) %>% summarise(model = model,
-                                avg = mean(coverage95)) %>% unique()
-
-coverage50_summary_all <- WIS_Season %>% filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "1 wk ahead inc flu hosp") %>% 
-  group_by(model, forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage50 = sum(coverage.50)/locationcount)# %>% 
-
-coverage95_summary_all2 <- WIS_Season %>%  filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
-  filter(target == "2 wk ahead inc flu hosp") %>% 
-  group_by(model, forecast_date, season) %>% 
-  summarise(model = model,
-            forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% unique() %>% 
-  group_by(model) %>% summarise(model = model,
-                                avg = mean(coverage95)) %>% unique()
-
-weekly_breakdown <- WIS_Season %>% group_by(model, season) %>% summarise(
-  model = model,
-  One_week_Cov = mean(coverage.95[target == "1 wk ahead inc flu hosp"])*100,
-  Two_week_Cov = mean(coverage.95[target == "2 wk ahead inc flu hosp"])*100,
-  Three_week_Cov = mean(coverage.95[target == "3 wk ahead inc flu hosp"])*100,
-  Four_week_Cov = mean(coverage.95[target == "4 wk ahead inc flu hosp"])*100
-) %>% unique()
-
-
-
-cov95_breakdown21 <- cov95_function(WIS_Season21, Scores_tab21)
-
-cov95_breakdown23 <- cov95_function(WIS_Season23, Scores_tab23)
+# locationcount <- length(unique(WIS_Season$location_name))# - 1
+# 
+# coverage95_summary <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
+#   filter(target == "1 wk ahead inc flu hosp") %>% 
+#   group_by(forecast_date, season) %>% 
+#   summarise(model = model,
+#             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+#             coverage95 = sum(coverage.95)/locationcount) %>% ungroup() %>% unique()
+# 
+# coverage95_summary_4 <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
+#   filter(target == "4 wk ahead inc flu hosp") %>% 
+#   group_by(forecast_date, season) %>% 
+#   summarise(model = model,
+#             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+#             coverage95 = sum(coverage.95)/locationcount) %>% ungroup() %>%  unique()
+# coverage50_summary_4 <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
+#   filter(target == "4 wk ahead inc flu hosp") %>% 
+#   group_by(forecast_date, season) %>% 
+#   summarise(model = model,
+#             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+#             coverage50 = sum(coverage.50)/locationcount) %>% unique()
+# 
+# 
+# coverage50_summary <- WIS_Season %>% filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
+#   filter(target == "1 wk ahead inc flu hosp") %>% 
+#   group_by(forecast_date, season) %>% 
+#   summarise(model = model,
+#             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+#             coverage50 = sum(coverage.50)/locationcount) %>% ungroup() %>% unique()
+# 
+# coverage95_summary_all <- WIS_Season %>%  filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
+#   filter(target == "1 wk ahead inc flu hosp") %>% 
+#   group_by(model, forecast_date, season) %>% 
+#   summarise(model = model,
+#             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+#             coverage95 = sum(coverage.95)/locationcount) %>% unique() %>% 
+#   group_by(model) %>% summarise(model = model,
+#                                 avg = mean(coverage95)) %>% unique()
+# 
+# coverage50_summary_all <- WIS_Season %>% filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
+#   filter(target == "1 wk ahead inc flu hosp") %>% 
+#   group_by(model, forecast_date, season) %>% 
+#   summarise(model = model,
+#             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+#             coverage50 = sum(coverage.50)/locationcount)# %>% 
+# 
+# coverage95_summary_all2 <- WIS_Season %>%  filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
+#   filter(target == "2 wk ahead inc flu hosp") %>% 
+#   group_by(model, forecast_date, season) %>% 
+#   summarise(model = model,
+#             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
+#             coverage95 = sum(coverage.95)/locationcount) %>% unique() %>% 
+#   group_by(model) %>% summarise(model = model,
+#                                 avg = mean(coverage95)) %>% unique()
+# 
+# weekly_breakdown <- WIS_Season %>% group_by(model, season) %>% summarise(
+#   model = model,
+#   One_week_Cov = mean(coverage.95[target == "1 wk ahead inc flu hosp"])*100,
+#   Two_week_Cov = mean(coverage.95[target == "2 wk ahead inc flu hosp"])*100,
+#   Three_week_Cov = mean(coverage.95[target == "3 wk ahead inc flu hosp"])*100,
+#   Four_week_Cov = mean(coverage.95[target == "4 wk ahead inc flu hosp"])*100
+# ) %>% unique()
+# 
 
 
-cov95_breakdownall <- rbind(mutate(cov95_breakdown21, season = "2021-2022"), mutate(cov95_breakdown23, season = "2022-2023"))
+# cov95_breakdown21 <- cov95_function(WIS_Season21, Scores_tab21)
+# 
+# cov95_breakdown23 <- cov95_function(WIS_Season23, Scores_tab23)
+# 
+# 
+# cov95_breakdownall <- rbind(mutate(cov95_breakdown21, season = "2021-2022"), mutate(cov95_breakdown23, season = "2022-2023"))
 
 cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, round, digits = 2) %>% select(-season) %>%  
   knitr::kable(align = c("lcccccccccc"), caption = "Table 2", col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
   kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
   kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
   kableExtra::kable_classic() # %>% 
-
+# kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/","table2.pdf"))
 
 
 ########### Absolute WIS by Week / Table 3
 
-abs_breakdown_WIS <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_breakdown_WIS.csv"))
+# abs_breakdown_WIS <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/abs_breakdown_WIS.csv"))
 
 
 abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 2) %>%  
@@ -399,30 +336,30 @@ abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 
 
 ############ Model Ranks
 
-inc_scores_overall <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc_scores_overall.csv"))
+# inc_scores_overall <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc_scores_overall.csv"))
 
-n_unique_predict<- inc_scores_overall %>% filter(season == "2022-2023") %>% 
-  group_by(target_end_date, location_name, target, season) %>%
-  summarize(n()) %>%
-  nrow()
-
-
-## average rank
-average_rank_percent <- inc_scores_overall %>%
-  group_by(model, season) %>%
-  summarize(average_rank = mean(rev_rank), total_n = n(),
-            n_top50 = sum(rev_rank> 0.5) , pct_top50 = n_top50/total_n*100,
-            n_top25 = sum(rev_rank> 0.75) , pct_top25 = n_top25/total_n*100,
-            n_bottom50 = sum(rev_rank< 0.5) , pct_bottom50 = n_bottom50/total_n*100,
-            n_bottom25 = sum(rev_rank< 0.25) , pct_bottom25 = n_bottom25/total_n*100) %>%
-  #print(n=Inf) %>% 
-  arrange(-pct_top50)
-
-ave_rank_percent21 <- average_rank_percent %>% filter(season == "2021-2022") %>% ungroup()
-ave_rank_percent23 <- average_rank_percent %>% filter(season == "2022-2023") %>% ungroup()
-
-bimodal_rank21 <- ave_rank_percent21 %>% mutate(pct_top_bottom = pct_top25 + pct_bottom25) %>% filter(pct_top_bottom >=75)
-bimodal_rank23 <- ave_rank_percent23 %>% mutate(pct_top_bottom = pct_top25 + pct_bottom25) %>% filter(pct_top_bottom >=75)
+# n_unique_predict<- inc_scores_overall %>% filter(season == "2022-2023") %>% 
+#   group_by(target_end_date, location_name, target, season) %>%
+#   summarize(n()) %>%
+#   nrow()
+# 
+# 
+# ## average rank
+# average_rank_percent <- inc_scores_overall %>%
+#   group_by(model, season) %>%
+#   summarize(average_rank = mean(rev_rank), total_n = n(),
+#             n_top50 = sum(rev_rank> 0.5) , pct_top50 = n_top50/total_n*100,
+#             n_top25 = sum(rev_rank> 0.75) , pct_top25 = n_top25/total_n*100,
+#             n_bottom50 = sum(rev_rank< 0.5) , pct_bottom50 = n_bottom50/total_n*100,
+#             n_bottom25 = sum(rev_rank< 0.25) , pct_bottom25 = n_bottom25/total_n*100) %>%
+#   #print(n=Inf) %>% 
+#   arrange(-pct_top50)
+# 
+# ave_rank_percent21 <- average_rank_percent %>% filter(season == "2021-2022") %>% ungroup()
+# ave_rank_percent23 <- average_rank_percent %>% filter(season == "2022-2023") %>% ungroup()
+# 
+# bimodal_rank21 <- ave_rank_percent21 %>% mutate(pct_top_bottom = pct_top25 + pct_bottom25) %>% filter(pct_top_bottom >=75)
+# bimodal_rank23 <- ave_rank_percent23 %>% mutate(pct_top_bottom = pct_top25 + pct_bottom25) %>% filter(pct_top_bottom >=75)
 
 
 inc.rankings_all <- rbind(inc.rankings_all21, inc.rankings_all23)
@@ -446,8 +383,8 @@ figure2 <- inc_scores_overall %>%
 figure2
 
 ##### Relative WIS by Location Figure 3
-inc.rankings_location <- rbind(mutate(inc.rankings_location21, season = "2021-2022"), mutate(inc.rankings_location23, season = "2022-2023"))
-inc.rankings_all_nice <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all_nice.csv"))
+# inc.rankings_location <- rbind(mutate(inc.rankings_location21, season = "2021-2022"), mutate(inc.rankings_location23, season = "2022-2023"))
+# inc.rankings_all_nice <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all_nice.csv"))
 
 scores <- inc.rankings_location %>% filter(is.finite(relative_WIS)) %>% left_join(., y = inc.rankings_all_nice[,c("model","season", "modelorder")], by = c("model", "season"))
 scores_order <- inc.rankings_all_nice
