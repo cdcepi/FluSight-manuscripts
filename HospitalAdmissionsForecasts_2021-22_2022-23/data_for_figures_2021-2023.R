@@ -148,7 +148,7 @@ location.names21 = obs_data21 %>% select(location, location_name) %>% unique()
 all_dat21 = left_join(all_dat21,location.names21, by = c("location"))
 
 
-obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations.csv")) %>%
+obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-2023-06-23.csv")) %>%
   mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
          location_name = ifelse(location == 'US', 'National', location_name)) %>%
   select(-date) %>%
