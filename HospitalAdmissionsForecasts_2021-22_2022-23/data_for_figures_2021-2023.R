@@ -40,7 +40,7 @@ weeks.to.eval23 =
 #update path to where cloned GitHub repository lives
 githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
-flusight_forecast_data <-paste0("C:/Users/",userid,"/Desktop/GitHub/Flusight-forecast-data") #Sarabeth, are we keeping this accessible?
+flusight_forecast_data <-paste0("C:/Users/",userid,"/Desktop/GitHub/Flusight-forecast-data")
 
 suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
@@ -127,7 +127,6 @@ all_dat21 = all_dat_new %>% filter(forecast_date %in% weeks.to.eval21, location 
 all_dat23 <- all_dat_new %>% filter(forecast_date %in% weeks.to.eval23, location != 78) %>% {unique(.)}
 
 
-
 ##Observed Data
 obs_data21 <- read_csv(paste0(manuscript_repo,"/truth-Incident Hospitalizations-Archived_9-12-2022.csv")) %>%
   mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
@@ -166,6 +165,11 @@ location.names23 = obs_data23 %>% select(location, location_name) %>% unique()
 
 all_dat23 = left_join(all_dat23,location.names23, by = c("location"))
 
+# write.csv(all_dat21, paste0(manuscript_repo, "/Data_for_Figures/all_dat21.csv"))
+# write.csv(all_dat23, paste0(manuscript_repo, "/Data_for_Figures/all_dat23.csv"))
+# write.csv(obs_data21, paste0(manuscript_repo, "/Data_for_Figures/obs_data21.csv"))
+# write.csv(obs_data23, paste0(manuscript_repo, "/Data_for_Figures/obs_data23.csv"))
+
 
 dat_for_scores21 <- dat_for_scores_function(all_dat21, obs_data21)
 dat_for_scores23 <- dat_for_scores_function(all_dat23, obs_data23)
@@ -191,10 +195,10 @@ WIS_Season23 <- filter(WIS_all23, as.Date(forecast_date) >= as.Date("2022-10-17"
 inc.rankings_all21 <- inc.rankings_all_func(WIS_Season21)
 inc.rankings_all23 <- inc.rankings_all_func(WIS_Season23)
 
-# write.csv(inc.rankings_all21, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/inc.rankings_all21.csv"))
-# write.csv(inc.rankings_all23, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/inc.rankings_all23.csv"))
-# write.csv(inc.rankings_location21, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/inc.rankings_location21.csv"))
-# write.csv(inc.rankings_location23, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/inc.rankings_location23.csv"))
+# write.csv(inc.rankings_all21, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all21.csv"))
+# write.csv(inc.rankings_all23, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all23.csv"))
+# write.csv(inc.rankings_location21, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location21.csv"))
+# write.csv(inc.rankings_location23, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location23.csv"))
 
 ############### Absolute WIS by Model
 
@@ -208,8 +212,9 @@ abs_states <- WIS_Season %>% filter(location_name != "National") %>%
 abs_flusight <- abs_states %>% filter(model %in% c("Flusight-baseline", "Flusight-ensemble"))
 abs_not_flusight <- abs_states %>% filter(model %!in% c("Flusight-baseline", "Flusight-ensemble"))
 
-# write.csv(abs_flusight, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/abs_flusight.csv"))
-# write.csv(abs_not_flusight, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/abs_not_flusight.csv"))
+# write.csv(abs_states, paste0(manuscript_repo, "/Data_for_Figures/abs_states.csv"))
+# write.csv(abs_flusight, paste0(manuscript_repo, "/Data_for_Figures/abs_flusight.csv"))
+# write.csv(abs_not_flusight, paste0(manuscript_repo, "/Data_for_Figures/abs_not_flusight.csv"))
 
 ########### 95% Coverage by Model
 
@@ -222,8 +227,8 @@ coverage95_states <- WIS_Season %>% filter(location_name != "National") %>%
 coverage95_flusight <- coverage95_states %>% filter(model %in% c("Flusight-baseline", "Flusight-ensemble"))
 coverage95_not_flusight <- coverage95_states %>% filter(model %!in% c("Flusight-baseline", "Flusight-ensemble"))
 
-# write.csv(coverage95_flusight, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/coverage95_flusight.csv"))
-# write.csv(coverage95_not_flusight, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/coverage95_not_flusight.csv"))
+# write.csv(coverage95_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage95_flusight.csv"))
+# write.csv(coverage95_not_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage95_not_flusight.csv"))
 
 ########### 50% Coverage by Model
 
@@ -238,8 +243,8 @@ coverage50_states <- WIS_Season %>% filter(location_name != "National") %>%
 coverage50_flusight <- coverage50_states %>% filter(model %in% c("Flusight-baseline", "Flusight-ensemble"))
 coverage50_not_flusight <- coverage50_states %>% filter(model %!in% c("Flusight-baseline", "Flusight-ensemble"))
 
-# write.csv(coverage50_flusight, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/coverage50_flusight.csv"))
-# write.csv(coverage50_not_flusight, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/coverage50_not_flusight.csv"))
+# write.csv(coverage50_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage50_flusight.csv"))
+# write.csv(coverage50_not_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage50_not_flusight.csv"))
 
 ############ Absolute WIS by Week
 
@@ -277,7 +282,7 @@ abs_breakdown <- WIS_Season %>% group_by(model, season) %>% summarise(
 
 abs_breakdown_WIS <- merge(inc.rankings_all[,c(1,3,11)], abs_breakdown, by= c("model", "season")) %>% arrange(season, rel.WIS.skill)
 
-#write.csv(abs_breakdown_WIS, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/abs_breakdown_WIS.csv"))
+#write.csv(abs_breakdown_WIS, paste0(manuscript_repo, "/Data_for_Figures/abs_breakdown_WIS.csv"))
 
 ########## Model Ranks
 
@@ -293,13 +298,13 @@ inc_scores_overall <- WIS_Season %>%
   ungroup() %>%
   mutate(model = reorder(model, rev_rank, FUN=function(x) quantile(x, probs=0.25, na.rm=TRUE)))
 
-#write.csv(inc_scores_overall, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/inc_scores_overall.csv"))
+#write.csv(inc_scores_overall, paste0(manuscript_repo, "/Data_for_Figures/inc_scores_overall.csv"))
 
 ##### Relative WIS by Location
 
 inc.rankings_all_nice <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% group_by(season) %>% arrange(season, rel.WIS.skill) %>% mutate(modelorder = paste(model, season))
 
-#write.csv(inc.rankings_all_nice, paste0("C:/Users/",userid,"/Desktop/GitHub/Flu-Visualizations/Manuscripts/hospitalizations_season_2021_2022/Data_for_Figures/inc.rankings_all_nice.csv"))
+#write.csv(inc.rankings_all_nice, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all_nice.csv"))
 
 ###### Backfill Epi curve
 

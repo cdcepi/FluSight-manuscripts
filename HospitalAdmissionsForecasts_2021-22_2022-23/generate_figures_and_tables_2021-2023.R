@@ -107,7 +107,6 @@ inc.rankings_location23$below <- ifelse(inc.rankings_location23$relative_WIS < 1
 
 ############### Forecasts and Observed
 
-#### Alex Need to output all_dat and obs_dat #######
 
 fig21 <- forecastsandobservedplt(all_dat21, obs_data21, "a")
 
@@ -156,7 +155,6 @@ Scores_tab23 <- scores_tab_function(inc.rankings_location23, inc.rankings_all23,
 coverage95_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
 coverage95_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_not_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
 
-#### Alex Need to output coverage95_notflusight ##########
 
 coverage_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead", 
                                  `4 wk ahead inc flu hosp` = "4 Week Ahead", 
@@ -365,7 +363,7 @@ figure3 <- ggplot(scores,
 figure3
 
 
-##### Relative WIS Distribution Figure S 1  Sarabeth, where should this be?
+##### Relative WIS Distribution Figure S 1
 
 model_order <- merge(inc.rankings_all_nice[,c("model", "rel.WIS.skill")], inc.rankings_location, by = "model", all.y = TRUE) %>% arrange(rel.WIS.skill)
 
