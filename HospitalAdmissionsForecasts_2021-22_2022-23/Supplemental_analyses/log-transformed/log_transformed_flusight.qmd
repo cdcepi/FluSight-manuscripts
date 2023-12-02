@@ -149,7 +149,7 @@ WIS_all23ln <- wis_all_function(dat_for_scores23ln)
 
 ```
 
-##### Season inc rankings
+##### Season inc rankings: Table S3
 
 ```{r, Season}
 #|echo: false
@@ -160,50 +160,7 @@ WIS_all23ln <- wis_all_function(dat_for_scores23ln)
   
   inc.rankings_all21ln <- inc.rankings_all_func(WIS_Season21ln)
   inc.rankings_all23ln <- inc.rankings_all_func(WIS_Season23ln)
-  
-  # inc.rankings_all21ln %>%
-  #   rename(Model = model,
-  #          `Absolute WIS` = mean.WIS,
-  #          `Relative WIS`= rel.WIS.skill,
-  #          `50% Coverage (%)` = Percent.Cov.50,
-  #          `95% Coverage (%)` = Percent.Cov.95,
-  #          `% of Forecasts Submitted`  = frac.forecasts.submitted,
-  #          `% of Locations Forecasted` = frac.locations.submitted,
-  #          `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
-  #          `% of Submitted Locations with All Forecasts` = frac.submitted.locations.fully.forecasted) %>% 
-  #   select(Model, `Absolute WIS`, `Relative WIS`,
-  #          MAE, `50% Coverage (%)`, 
-  #          `95% Coverage (%)`, 
-  #          `% of Forecasts Submitted`) %>%
-  #   #datatable()
-  #   arrange(`Relative WIS`) %>% mutate_if(is.numeric, round, digits = 2) %>%  knitr::kable(align = c("lcccccccccc"), caption = "Table 1 A) 2021-2022",
-  #                                                                                          #col.names = c()
-  #   ) %>% 
-  #   kableExtra::footnote( general_title = "")%>% 
-  #   kableExtra::kable_classic() %>% 
-  #    kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(dashboard_r_code,"/table1a.pdf"))
-  # 
-    
-  # inc.rankings_all23ln %>%
-  #   rename(Model = model,
-  #          `Absolute WIS` = mean.WIS,
-  #          `Relative WIS`= rel.WIS.skill,
-  #          `50% Coverage (%)` = Percent.Cov.50,
-  #          `95% Coverage (%)` = Percent.Cov.95,
-  #          `% of Forecasts Submitted`  = frac.forecasts.submitted,
-  #          `% of Locations Forecasted` = frac.locations.submitted,
-  #          `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
-  #          `% of Submitted Locations with All Forecasts` = frac.submitted.locations.fully.forecasted) %>% 
-  #   select(Model, `Absolute WIS`, `Relative WIS`,
-  #          MAE, `50% Coverage (%)`, 
-  #          `95% Coverage (%)`, 
-  #          `% of Forecasts Submitted`) %>%
-  #   #datatable()
-  #   arrange(`Relative WIS`) %>% mutate_if(is.numeric, round, digits = 2) %>%  knitr::kable(align = c("lcccccccccc"), caption = "Table 1 B) 2022-2023",#col.names = c()
-  #   ) %>% 
-  #   kableExtra::footnote( general_title = "") %>% 
-  #   kableExtra::kable_classic() # %>% kableExtra::save_kable(file = paste0(dashboard_r_code,"/table1b.pdf"))#, zoom = .6
-  
+
     
 inc.rankings_all <- rbind(mutate(inc.rankings_all21ln, season = "2021-2022"), mutate(inc.rankings_all23ln, season = "2022-2023")) %>% arrange(season, rel.WIS.skill)
 
@@ -229,24 +186,8 @@ inc.rankings_all %>%
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
     kableExtra::footnote( general_title = "") #%>% 
-    #kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(dashboard_r_code,"/2022-23/supplemental_log-transformed/table1_all.pdf"))
-#     
-#   log_transformedtable1 <- inc.rankings_all %>%
-#     rename(Model = model,
-#            `Absolute WIS` = mean.WIS,
-#            `Relative WIS`= rel.WIS.skill,
-#            `50% Coverage (%)` = Percent.Cov.50,
-#            `95% Coverage (%)` = Percent.Cov.95,
-#            `% of Forecasts Submitted`  = frac.forecasts.submitted,
-#            `% of Locations Forecasted` = frac.locations.submitted,
-#            `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
-#            `% of Submitted Locations with All Forecasts` = frac.submitted.locations.fully.forecasted,
-#            `Season` = season) %>%
-#     select(Model, `Absolute WIS`, `Relative WIS`, `Season`)
-# 
-# write.csv(log_transformedtable1, paste0(dashboard_r_code,"/2022-23/supplemental_log-transformed/logtable1.csv"), row.names = FALSE)
-#     
-#     
+    #kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
+
     
   WIS_Season21ln <- WIS_Season21ln %>% filter(model %in% inc.rankings_all21ln$model)
   inc.rankings_location21ln <- make_WIS_ranking_location(WIS_Season21ln)
@@ -307,7 +248,7 @@ fig23ln <- forecastsandobservedplt(all_dat23ln, obs_data23ln, "b")
 
 ```
 
-##### Absolute WIS by model
+##### Absolute WIS by model: Figure S6
 
 ```{r, Abs WIS}
 # |fig-height: 8
@@ -370,7 +311,7 @@ g
 #   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 # 
 # lg 
-jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Abs_WIS_States_1and4week_figure_all.jpg"), width=8, height=5, units="in", res=300)
+jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S6.jpg"), width=8, height=5, units="in", res=300)
 print(g)
 dev.off()
 
@@ -596,7 +537,7 @@ cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, r
 ```
 ## Coverage
 
-##### Absolute WIS by week table
+##### Absolute WIS by week table: Table S4
 
 ```{r, Abs WIS by wk}
 # |fig-height: 10
@@ -655,7 +596,7 @@ abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 
   kableExtra::footnote(general = "Table 3", general_title = "")%>% 
   kableExtra::pack_rows(index = table(abs_breakdown_WIS$season)) %>% 
   kableExtra::kable_classic() # %>% 
-  # kableExtra::save_kable(file = paste0(dashboard_r_code,"/2022-23/supplemental_log-transformed/","table3.pdf"))
+  # kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output//table_S4.pdf"))
 
 fs_wis_min_date21ln <- abs_states %>% filter(season == "2021-2022", model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
 fs_wis_max_date21ln <- abs_states %>% filter(season == "2021-2022",model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
@@ -675,7 +616,7 @@ fs_wis_max4_date23ln <- abs_states %>% filter(season == "2022-2023",model == "Fl
 
 ## Absolute WIS
 
-##### Model rank plot
+##### Model rank plot: Figure S5
 
 ```{r, Model Ranks}
 # |fig-height: 8
@@ -756,15 +697,15 @@ p2 <- inc_scores_overall %>%
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")) )
  p2
 # # 
-# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/model-ranks_allcols.jpg"), width=8, height=8, units="in", res=300)
+# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.jpg"), width=8, height=8, units="in", res=300)
 # print(p2)
 # dev.off()
  # 
- # ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/model-ranks_allcols.png"), width=8, height=8, units="in", plot = p2)
+ # ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = p2)
 
 ```
 ## Model Ranking
-##### Relative WIS by Location
+##### Relative WIS by Location: Figure S7
 
 ```{r, Relative WIS by location}
 # |fig-height: 10
@@ -798,11 +739,11 @@ fig_wis_loc <- ggplot(scores,
   theme(axis.ticks.y = element_blank())
 fig_wis_loc
 
-# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/WIS_scores_Location_all.jpg"), width=12, height=8, units="in", res=300)
+# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.jpg"), width=12, height=8, units="in", res=300)
 # print(fig_wis_loc)
 # dev.off()
 # 
-#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/logWIS_scores_Location_all.png"), plot = fig_wis_loc, width = 12, height= 8)
+#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = fig_wis_loc, width = 12, height= 8)
 
 
 modelrankings21ln <- inc.rankings_location21ln %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)

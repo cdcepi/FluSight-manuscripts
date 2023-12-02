@@ -221,7 +221,7 @@ WIS_all23 <- wis_all_function(dat_for_scores23)
 
 ```
 
-##### Season inc rankings
+##### Season inc rankings: Table S5
 
 ```{r, Season}
 #|echo: false
@@ -263,7 +263,9 @@ logtable1 <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/Supplementa
     knitr::kable(align = c("lcccccccc"), caption = "Table 1",#col.names = c()
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
-    kableExtra::footnote( general_title = "") 
+    kableExtra::footnote( general_title = "") #%>% 
+    #kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Table_S5.pdf"))
+
     
     
     

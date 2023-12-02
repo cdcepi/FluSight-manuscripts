@@ -58,7 +58,7 @@ source(paste0(manuscript_repo,"/functions2022-2023.R"))
 select = dplyr::select
 filter = dplyr::filter
 
-##### Season Rankings
+##### Season Rankings: Table S3
 
 inc.rankings_all %>%
   rename(Model = model,
@@ -84,14 +84,36 @@ inc.rankings_all %>%
   kableExtra::footnote( general_title = "") #%>% 
 #kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(dashboard_r_code,"/2022-23/supplemental_log-transformed/table1_all.pdf"))
 
-##### Forecasts and Observed
-
-fig21ln <- forecastsandobservedplt(all_dat21ln, obs_data21ln, "a")
 
 
-fig23ln <- forecastsandobservedplt(all_dat23ln, obs_data23ln, "b")
+##### Absolute WIS by Week Table: Table S4
 
-##### Absolute WIS by model
+
+abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 2) %>%  
+  knitr::kable(align = c("lccccc"), caption = "Table 3", col.names = c("Model", "Relative WIS", "1 Wk ABS WIS", "2 Wk ABS WIS", "3 Wk ABS WIS", "4 Wk ABS WIS")) %>% 
+  kableExtra::footnote(general = "Table 3", general_title = "")%>% 
+  kableExtra::pack_rows(index = table(abs_breakdown_WIS$season)) %>% 
+  kableExtra::kable_classic() # %>% 
+# kableExtra::save_kable(file = paste0(dashboard_r_code,"/2022-23/supplemental_log-transformed/","table3.pdf"))
+
+##### Model rank plot: Figure S5
+
+
+p2 <- inc_scores_overall %>% 
+  ggplot(aes(y=model, x=rev_rank, fill = factor(after_stat(quantile)))) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient", calc_ecdf = TRUE,
+    quantiles = 4, quantile_lines = TRUE, color = "gray30"
+  ) +
+  scale_fill_manual(values = c("#6baed6", "#c86bd6","#d6936b","#78d66b"), name = "Quartiles")+
+  labs(x = "Standardized Rank", y = "Model", color = "Quartiles")+
+  scale_x_continuous(limits=c(0,1)) + 
+  theme_bw()+
+  facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c("2021-2022" = "A") "2021-2022","2022-2023" = "B") "2022-2023")))
+p2
+
+
+##### Absolute WIS by model: Figure S6
 
 g <- ggplot(abs_flusight, aes(x = target_end_date, 
                               y = abs_WIS, group = model,
@@ -110,91 +132,8 @@ g <- ggplot(abs_flusight, aes(x = target_end_date,
 
 g
 
-##### Coverage Figures
 
-Scores_tab21ln <- scores_tab_function(inc.rankings_location21ln,inc.rankings_all21ln, WIS_Season21ln)
-Scores_tab23ln <- scores_tab_function(inc.rankings_location23ln, inc.rankings_all23ln, WIS_Season23ln)
-
-##### 95% Coverage by Model
-
-coverage_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead", 
-                                 `4 wk ahead inc flu hosp` = "4 Week Ahead", 
-                                 `2021-2022` = "2021-2022", 
-                                 `2022-2023` = "2022-2023"))
-
-
-
-z <- ggplot(coverage95_flusight, aes(x = target_end_date, 
-                                     y = coverage95, group = model,
-                                     col = model)) +
-  geom_line(linewidth = 1) + geom_point(size = 2) +
-  geom_line(data = coverage95_not_flusight, aes(x = target_end_date, y = coverage95, group = model), color = adjustcolor("grey50", .35)) + 
-  labs(y = "95% Coverage",
-       x = "",
-       color = "Model",
-       title = "95% Coverage by Model") +
-  scale_color_manual(values = c("#d6936b", "#6baed6")) +
-  theme_bw()+
-  scale_x_date(breaks = seq.Date(from = min(coverage95_flusight$target_end_date), to= max(coverage95_flusight$target_end_date), by = "2 weeks"), date_labels = "%d %b") +
-  theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
-  facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
-
-z
-
-##### 50% coverage by model
-
-y <- ggplot(coverage50_flusight, aes(x = target_end_date, 
-                                     y = coverage50, group = model,
-                                     col = model)) +
-  geom_line(size = 1) + geom_point(size = 2) +
-  geom_line(data = coverage50_not_flusight, aes(x = target_end_date, y = coverage50, group = model), color = adjustcolor("grey50", .35)) + 
-  labs(y = "50% Coverage",
-       x = "",
-       color = "Model",
-       title = "50% Coverage by Model") +
-  scale_color_manual(values = c("#d6936b", "#6baed6")) +
-  theme_bw()+
-  scale_x_date(breaks = seq.Date(from = min(coverage50_flusight$target_end_date), to= max(coverage50_flusight$target_end_date), by = "2 weeks"), date_labels = "%d %b") +
-  theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
-  facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
-#theme_minimal()
-y
-
-##### Coverage Tables
-
-cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, round, digits = 2) %>% select(-season) %>%  
-  knitr::kable(align = c("lcccccccccc"), caption = "Table 2", col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
-  kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
-  kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
-  kableExtra::kable_classic()
-
-##### Absolute WIS by Week Table
-
-
-abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 2) %>%  
-  knitr::kable(align = c("lccccc"), caption = "Table 3", col.names = c("Model", "Relative WIS", "1 Wk ABS WIS", "2 Wk ABS WIS", "3 Wk ABS WIS", "4 Wk ABS WIS")) %>% 
-  kableExtra::footnote(general = "Table 3", general_title = "")%>% 
-  kableExtra::pack_rows(index = table(abs_breakdown_WIS$season)) %>% 
-  kableExtra::kable_classic() # %>% 
-# kableExtra::save_kable(file = paste0(dashboard_r_code,"/2022-23/supplemental_log-transformed/","table3.pdf"))
-
-##### Model rank plot
-
-
-p2 <- inc_scores_overall %>% 
-  ggplot(aes(y=model, x=rev_rank, fill = factor(after_stat(quantile)))) +
-  stat_density_ridges(
-    geom = "density_ridges_gradient", calc_ecdf = TRUE,
-    quantiles = 4, quantile_lines = TRUE, color = "gray30"
-  ) +
-  scale_fill_manual(values = c("#6baed6", "#c86bd6","#d6936b","#78d66b"), name = "Quartiles")+
-  labs(x = "Standardized Rank", y = "Model", color = "Quartiles")+
-  scale_x_continuous(limits=c(0,1)) + 
-  theme_bw()+
-  facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c("2021-2022" = "A") "2021-2022","2022-2023" = "B") "2022-2023")))
-p2
-
-##### Relative WIS by Location
+##### Relative WIS by Location Figure S7
 
 scores_order <- inc.rankings_all_nice
 levels_order <- scores_order$modelorder
@@ -244,20 +183,3 @@ x <- ggplot(plot.scores, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_grid(cols = vars(season), scales = "free_x")
 x
-
-##### Relative WIS Distribution
-
-
-model_order <- merge(inc.rankings_all_nice[,c(1:3, 11)], inc.rankings_location, by = c("model","season"), all.y = TRUE) %>% arrange(season,rel.WIS.skill)
-
-u <- model_order %>% 
-  ggplot( aes(x = fct_inorder(model), y = relative_WIS))+
-  geom_boxplot()+
-  theme_bw() +
-  geom_hline(aes(yintercept = 1), color = "#6baed6")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), 
-        plot.margin = margin(0,1,0,25))+
-  labs(x = "Model", y = "Relative WIS")+
-  facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022", `2022-2023` = "B) 2022-2023")))
-
-u
