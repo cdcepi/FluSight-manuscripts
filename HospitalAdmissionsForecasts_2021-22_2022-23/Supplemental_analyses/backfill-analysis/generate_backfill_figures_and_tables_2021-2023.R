@@ -15,10 +15,10 @@ select = dplyr::select
 filter = dplyr::filter
 
 #CDC UserID goes here
-userid="shaws"
+userid="nqr2"
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Documents/GitHub")
+githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
 backfill_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23/Supplemental_analyses/backfill-analysis")
 flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
@@ -36,7 +36,7 @@ flu23_target_end_dates <- c("2022-10-22", "2022-10-29", "2022-11-05", "2022-11-1
 ###### Backfill Epicurve: Figure S2
 
 
-fullset <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/fullset.csv"))
+fullset <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/fullset.csv")) %>% mutate(report_date = as.Date(report_date))
 
 figures2 <- 
   ggplot(fullset, aes(x = report_date)) +
@@ -54,7 +54,7 @@ figures2
 
 ###### Absolute Difference: Figure S3
 
-diffdf <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/dfsummary_Update.csv"))
+diffdf <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/diffdf.csv"))
 
 figures3a <- diffdf %>% filter(location_name != "US") %>% 
   ggplot(aes(x = absolutediff, y = location_name))+
@@ -105,8 +105,8 @@ stairstep_function <- function(weeklydat, fromdate, todate){
   return(stairplt)
 }
 
-weeklydat21 <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/weeklydat21.csv"))
-weeklydat23 <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/weeklydat23.csv"))
+weeklydat21 <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/weeklydat21.csv")) %>% mutate(date = as.Date(date), report_date = as.Date(report_date))
+weeklydat23 <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/weeklydat23.csv")) %>% mutate(date = as.Date(date), report_date = as.Date(report_date))
 
 figures4a <- stairstep_function(weeklydat21)
 figures4b <- stairstep_function(weeklydat23)

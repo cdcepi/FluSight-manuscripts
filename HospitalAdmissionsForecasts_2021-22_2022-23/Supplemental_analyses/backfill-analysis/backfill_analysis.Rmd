@@ -16,10 +16,10 @@ select = dplyr::select
 filter = dplyr::filter
 
 #CDC UserID goes here
-userid="shaws"
+userid="nqr2"
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Documents/GitHub")
+githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
 flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
@@ -147,7 +147,7 @@ figures2 <-
 
 figures2
  
-# ggsave(plot = figures2, paste0(manuscript_repo,"/Output/figures2.png"), height = 6, width = 8, dpi = 300)
+ggsave(plot = figures2, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures2.png"), height = 6, width = 8, dpi = 300)
 ```
 
 ##### Backfill Differences 
@@ -170,7 +170,7 @@ dffsummary <- diffdf %>% filter (location_name != "Virgin Islands") %>% group_by
             absohigh = max(absolutediff, na.rm = TRUE), 
             absoiqr = IQR(absolutediff, na.rm = TRUE), 
             median = median(absolutediff, na.rm = TRUE)) %>% ungroup
-#write.csv(dffsummary, paste0(manuscript_repo,"/Output/backfill_difference_summary.csv"), row.names = FALSE)
+#write.csv(dffsummary, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/backfill_difference_summary.csv"), row.names = FALSE)
 
 
 
@@ -209,7 +209,7 @@ figures3a <- diffdf %>% filter(location_name != "US") %>%
 
 figures3a
 
-  # ggsave(plot = figures3a,  paste0(manuscript_repo,"/Output/figures3a.png"), width = 6, height = 8, dpi = 300)
+ggsave(plot = figures3a,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures3a.png"), width = 6, height = 8, dpi = 300)
 
 ```
 
@@ -226,7 +226,7 @@ figures3b <- diffdf %>% filter(location_name != "US") %>% #can take out != Natio
 facet_grid(cols = vars(season))
 figures3b
 
- # ggsave(plot = figures3b, paste0(manuscript_repo,"/Output/figures3b.png"), width = 6, height = 8, dpi = 300)
+ggsave(plot = figures3b, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures3b.png"), width = 6, height = 8, dpi = 300)
 
 ```
 
@@ -274,7 +274,7 @@ figures4b <- stairstep_function(weeklydat23)
 
 
 
-ggsave(plot = figures4a,  paste0(manuscript_repo,"/Output/figures4a.png"), width = 8, height = 6, dpi = 300)
-ggsave(plot = figures4b,  paste0(manuscript_repo,"/Output/figures4b.png"), width = 12, height = 8, dpi = 300)
+ggsave(plot = figures4a,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures4a.png"), width = 8, height = 6, dpi = 300)
+ggsave(plot = figures4b,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures4b.png"), width = 12, height = 8, dpi = 300)
 
 ```

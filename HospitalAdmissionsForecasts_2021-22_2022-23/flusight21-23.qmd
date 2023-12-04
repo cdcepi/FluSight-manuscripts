@@ -36,7 +36,7 @@ library(cowplot)
 library(RSocrata)
 
 #CDC UserID goes here
-#userid="nqr2"
+userid="nqr2"
 
 #update path to where cloned GitHub repository lives
 githubpath = paste0("C:/Users/", userid, "/Desktop/GitHub")
@@ -65,13 +65,16 @@ weeks.to.eval23 =
       by=7) %>% 
   as.character()
 
-
+#paths for github repos
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
 flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
 
+#model names are read in from the below script
 suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
+#sources functions used in qmd
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
 
+#ensure we are using dplyr select and filter without specifying every single time
 select = dplyr::select
 filter = dplyr::filter
 
@@ -80,7 +83,7 @@ filter = dplyr::filter
 #### Get data
 
 ```{r, read data}
-
+#this chunk reads in all forecasts from all models and dates 
 datapath <- paste0(flusight_forecast_data,"/data-forecasts")
 filenames = list.files(path=datapath, pattern=".csv", 
                        full.names = TRUE, recursive = TRUE)
@@ -98,30 +101,14 @@ unique_model_names = data.frame(model = as.character(unique_model_names[,1]),
   mutate(model = as.character(model),
          next.tuesday = as.character(next.tuesday))
 
-dat21 <- unique_model_names %>% 
-  filter(next.tuesday %in% 
-           as.character(
-             last.tuesday21 - 7*(0:((eval.weeks-1)+max(window.width)+(4-1)-1))
-           )
-  ) %>%
-  filter(next.tuesday == as.character(last.tuesday21))
-
-dat23  <- unique_model_names %>% 
-  filter(next.tuesday %in% 
-           as.character(
-             last.tuesday23 - 7*(0:((eval.weeks-1)+max(window.width)+(4-1)-1))
-           )
-  ) %>%
-  filter(next.tuesday == as.character(last.tuesday23))
-
-
-  filenames = 
+#lists filenames in data-forecasts
+filenames = 
     paste0(flusight_forecast_data,"/data-forecasts/",
            unique_model_names$model, "/",
            unique_model_names$filename)
   
-  
-  dat_list <- lapply(filenames,
+#reads and creates list of all forecasts
+dat_list <- lapply(filenames,
                      FUN = function(x){
                        read_csv(x, col_types = cols(.default = "c")) %>%
                          filter(grepl("hosp", target),
@@ -134,7 +121,9 @@ dat23  <- unique_model_names %>%
   models = unique_model_names$model
   unique_models = unique(models)
   
+#create empty tibble
   all_dat_new <- tibble()
+#create df with forecast data using dat_list created above 
   for (i in c(1:length(dat_list))) {
     all_dat_new <- bind_rows(all_dat_new,
                              dat_list[[i]] %>%
@@ -151,15 +140,13 @@ dat23  <- unique_model_names %>%
                                  quantile=ifelse(quantile=="NaN", NA, quantile)))
     }
   
-  
-  all_dat21 = all_dat_new %>% filter(forecast_date %in% weeks.to.eval21, location != 78) %>% {unique(.)}
+#separate 21-22 and 22-23 data using specified season dates; remove Virgin Islands, and keeps only unique forecasts if more than one was accidentally read in
+all_dat21 = all_dat_new %>% filter(forecast_date %in% weeks.to.eval21, location != 78) %>% {unique(.)}
 
+all_dat23 <- all_dat_new %>% filter(forecast_date %in% weeks.to.eval23, location != 78) %>% {unique(.)}
 
-  all_dat23 <- all_dat_new %>% filter(forecast_date %in% weeks.to.eval23, location != 78) %>% {unique(.)}
   
-  
-  
-##Observed Data
+##read in observed data from 9/12/22 and 6/23/23 for the 21-22, and 22-23 season respectively. Filter out VI
 obs_data21 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-Archived_9-12-2022.csv")) %>%
   mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
          location_name = ifelse(location == 'US', 'National', location_name)) %>%
@@ -172,12 +159,11 @@ obs_data21 <- obs_data21 %>%
          target_end_date = wk_end_date) %>%
   filter(target_end_date < Sys.Date())
 
-
+#function below needs all_dat by location name, this pulls out location and location name and joins it with all_dat
 location.names21 = obs_data21 %>% select(location, location_name) %>% unique()
-
-
 all_dat21 = left_join(all_dat21,location.names21, by = c("location"))
   
+
 
 obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident Hospitalizations-2023-06-23.csv")) %>%
   mutate(wk_end_date = as.Date(date, "%m/%d/%y"),
@@ -185,19 +171,16 @@ obs_data23 <- read_csv(paste0(flusight_forecast_data,"/data-truth/truth-Incident
   select(-date) %>%
   filter(wk_end_date %in% as.Date(unique(all_dat23$target_end_date) ), location != 78)
 
-
 obs_data23 <- obs_data23 %>%
   dplyr::rename(value_inc = value,
                 target_end_date = wk_end_date) %>%
   filter(target_end_date < Sys.Date())
 
-
 location.names23 = obs_data23 %>% select(location, location_name) %>% unique()
-
 
 all_dat23 = left_join(all_dat23,location.names23, by = c("location"))
 
-
+#function for prepping the data for scoring 
 dat_for_scores21 <- dat_for_scores_function(all_dat21, obs_data21)
 dat_for_scores23 <- dat_for_scores_function(all_dat23, obs_data23)
 
@@ -210,8 +193,6 @@ The second peak exhibited higher weekly numbers of hospital admissions, with rep
 ##### WIS Calculations
 
 ```{R, Wis Calculations}
-#| message: false
-#| warnings: false
 
 ## Reformat data and create scores
 
@@ -240,12 +221,9 @@ figure1a <- forecastsandobservedplt(all_dat21, obs_data21, "a")
 
 figure1b <- forecastsandobservedplt(all_dat23, obs_data23, "b")
 
-figure1a
-figure1b
 
-ggsave(paste0(manuscript_repo,"/Output/figure1a.png"), plot = figure1a, width=10, height=8)
-ggsave(paste0(manuscript_repo,"/Output/figure1b.png"), plot = figure1b, width=10, height=8)
-
+#ggsave(paste0(manuscript_repo,"/Output/figure1a.png"), plot = figure1a, width=10, height=8)
+#ggsave(paste0(manuscript_repo,"/Output/figure1b.png"), plot = figure1b, width=10, height=8)
 
 
 ```
@@ -390,9 +368,9 @@ figure2 <- inc_scores_overall %>%
   theme_bw()+
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")) )+
   theme(strip.text = element_text(size = 10))
- figure2
 
- ggsave(paste0(manuscript_repo,"/Output/figure2.png"), width=8, height=8, units="in", plot = figure2)
+
+ #ggsave(paste0(manuscript_repo,"/Output/figure2.png"), width=8, height=8, units="in", plot = figure2)
 
 ```
 
@@ -441,9 +419,8 @@ figure3 <- ggplot(scores,
     scale_x_discrete(labels = function(x) substring(x, 1, nchar(x)-10))+
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")))+
   theme(axis.ticks.y = element_blank())
-figure3
 
-ggsave(paste0(manuscript_repo,"/Output/figure3.png"), plot = figure3, width = 12, height= 8)
+#ggsave(paste0(manuscript_repo,"/Output/figure3.png"), plot = figure3, width = 12, height= 8)
 
 
 modelrankings21 <- inc.rankings_location21 %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
@@ -519,9 +496,7 @@ figure4a <-  ggplot(abs_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 
-figure4a
-
-ggsave(paste0(manuscript_repo,"/Output/figure4a.png"), plot = figure4a, width = 8, height = 5)
+#ggsave(paste0(manuscript_repo,"/Output/figure4a.png"), plot = figure4a, width = 8, height = 5)
 ```
 
 ##### Coverage Tables
@@ -676,8 +651,6 @@ abs_breakdown_WIS <- merge(inc.rankings_all[,c(1,3,11)], abs_breakdown, by= c("m
 # summary(abs_breakdown$Three_week_abs)
 # abs_breakdown %>% filter(season == "2021-2022") %>% {median(.$Four_week_abs)}
 # abs_breakdown %>% filter(season == "2022-2023") %>% {median(.$Four_week_abs)}
-# # 
-
 
   
   
@@ -741,9 +714,8 @@ figure4b <- ggplot(coverage95_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
 
-figure4b
 
- ggsave(paste0(manuscript_repo,"/Output/figure4b.png"), width=8, height=6, plot = figure4b)
+ #ggsave(paste0(manuscript_repo,"/Output/figure4b.png"), width=8, height=6, plot = figure4b)
 
 
 ```
@@ -780,7 +752,6 @@ coverage50_not_flusight <- coverage50_states %>%
 #   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
 #   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
 # 
-# figure4_50cov
 
  # ggsave(paste0(manuscript_repo,"/Output/figure4_50cov.png"), width=8, height=6, plot = figure4_50cov)
 
@@ -812,10 +783,7 @@ figs1 <- model_order %>%
   labs(x = "Model", y = "Relative WIS")+
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022", `2022-2023` = "B) 2022-2023")))
 
-figs1
-
-
- ggsave(paste0(manuscript_repo,"/Output/figures1.jpg"), plot = figs1, width=10, height=8)
+ #ggsave(paste0(manuscript_repo,"/Output/figures1.jpg"), plot = figs1, width=10, height=8)
 ```
 
 
@@ -823,15 +791,15 @@ figs1
 
 ```{r print plots}
 
- figure1a
- figure1b
- figure2 
- figure3 
- figure4a
- figure4b
+ # figure1a
+ # figure1b
+ # figure2 
+ # figure3 
+ # figure4a
+ # figure4b
 # figure4_absWIS 
 # figure4_50cov 
- figs1
+# figs1
 
 ```
 

@@ -5,21 +5,23 @@
 # All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below.
 # Each subsequent section contains the vizualization code related to the figure of the same name.
 
+### FluSight 2021-22, 2022-23
+### CDC FluSight Team 
 
 
 
 ######### Setup
 library(arrow)
 library(tidyverse)
- library(covidHubUtils)
- library(ggridges)
+library(covidHubUtils)
+library(ggridges)
 
 
 #CDC UserID goes here
-userid="shaws"
+#userid="nqr2"
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Documents/GitHub")
+githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
 
 
 '%!in%' <- Negate('%in%') #previously %notin% possible #update
