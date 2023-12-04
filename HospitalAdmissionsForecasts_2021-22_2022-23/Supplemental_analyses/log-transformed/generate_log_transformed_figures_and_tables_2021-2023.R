@@ -17,35 +17,16 @@ library(plotly)
 library(gridExtra)
 library(covidHubUtils)
 library(ggridges)
-library(viridis)
-library(cowplot)
-library(scales)
-library(RSocrata)
+#library(viridis)
+#library(cowplot)
+#library(scales)
+#library(RSocrata)
 library(arrow)
 
-userid="rpe5"
+#CDC userid
+userid="nqr2"
 
 '%!in%' <- Negate('%in%')
-
-last.tuesday21 = as.Date("2022-06-21")
-last.tuesday23 = as.Date("2023-05-16")
-
-window.width = c(2, 4, 8)
-
-eval.weeks = 8
-
-#possibly update
-weeks.to.eval21 = 
-  seq(as.Date("2022-02-21"),
-      as.Date("2022-06-20"),
-      by=7) %>% 
-  as.character()
-
-weeks.to.eval23 = 
-  seq(as.Date("2022-10-17"),
-      as.Date("2023-05-15"),
-      by=7) %>% 
-  as.character()
 
 #update path to where cloned GitHub repository lives
 githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
@@ -59,6 +40,8 @@ select = dplyr::select
 filter = dplyr::filter
 
 ##### Season Rankings: Table S3
+
+inc.rankings_all <- read.csv(paste0(manuscript_repo, "/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/inc.rankings_all.csv"))
 
 inc.rankings_all %>%
   rename(Model = model,
@@ -78,28 +61,30 @@ inc.rankings_all %>%
   #datatable()
   #arrange(`Season`, `Relative WIS`) %>% 
   mutate_if(is.numeric, round, digits = 2) %>%  
-  knitr::kable(align = c("lcccccccccc"), caption = "Table 1",#col.names = c()
+  knitr::kable(align = c("lcccccccccc"), caption = "Table S3",#col.names = c()
   ) %>% 
   kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
   kableExtra::footnote( general_title = "") #%>% 
-#kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(dashboard_r_code,"/2022-23/supplemental_log-transformed/table1_all.pdf"))
+#kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
 
 
 
 ##### Absolute WIS by Week Table: Table S4
 
+cov95_breakdownall <- read.csv(paste0(manuscript_repo, "/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/cov95_breakdownall.csv"))
 
-abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 2) %>%  
-  knitr::kable(align = c("lccccc"), caption = "Table 3", col.names = c("Model", "Relative WIS", "1 Wk ABS WIS", "2 Wk ABS WIS", "3 Wk ABS WIS", "4 Wk ABS WIS")) %>% 
-  kableExtra::footnote(general = "Table 3", general_title = "")%>% 
-  kableExtra::pack_rows(index = table(abs_breakdown_WIS$season)) %>% 
+cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, round, digits = 2) %>% select(-season) %>%  
+  knitr::kable(align = c("lcccccccccc"), caption = "Table S4", col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
+  kableExtra::footnote(general = "Table S4: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
+  kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
   kableExtra::kable_classic() # %>% 
-# kableExtra::save_kable(file = paste0(dashboard_r_code,"/2022-23/supplemental_log-transformed/","table3.pdf"))
+# kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/tables4.pdf"))
 
 ##### Model rank plot: Figure S5
 
+inc_scores_overall <- read.csv(paste0(manuscript_repo, "/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/inc_scores_overall.csv"))
 
-p2 <- inc_scores_overall %>% 
+figures5 <- inc_scores_overall %>% 
   ggplot(aes(y=model, x=rev_rank, fill = factor(after_stat(quantile)))) +
   stat_density_ridges(
     geom = "density_ridges_gradient", calc_ecdf = TRUE,
@@ -109,13 +94,25 @@ p2 <- inc_scores_overall %>%
   labs(x = "Standardized Rank", y = "Model", color = "Quartiles")+
   scale_x_continuous(limits=c(0,1)) + 
   theme_bw()+
-  facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c("2021-2022" = "A") "2021-2022","2022-2023" = "B") "2022-2023")))
-p2
+  facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")))
+
 
 
 ##### Absolute WIS by model: Figure S6
 
-g <- ggplot(abs_flusight, aes(x = target_end_date, 
+abs_states <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/abs_states.csv")) %>% 
+  mutate(target_end_date = as.Date(target_end_date))
+
+abs_flusight <- abs_states %>% filter(model %in% c("Flusight-baseline", "Flusight-ensemble"))
+abs_not_flusight <- abs_states %>% filter(model %!in% c("Flusight-baseline", "Flusight-ensemble"))
+
+wis_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead", 
+                            `4 wk ahead inc flu hosp` = "4 Week Ahead", 
+                            `2021-2022` = "2021-2022", 
+                            `2022-2023` = "2022-2023"))
+
+
+figures6 <- ggplot(abs_flusight, aes(x = target_end_date, 
                               y = abs_WIS, group = model,
                               col = model)) +
   geom_line(size = 1) + geom_point(size = 2) +
@@ -130,15 +127,18 @@ g <- ggplot(abs_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 
-g
 
 
 ##### Relative WIS by Location Figure S7
 
+inc.rankings_all_nice <- read.csv(paste0(manuscript_repo, "/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/inc.rankings_all.csv")) %>% group_by(season) %>% arrange(season, rel.WIS.skill) %>% mutate(modelorder = paste(model, season))
+
+scores <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/scores.csv"))
+
 scores_order <- inc.rankings_all_nice
 levels_order <- scores_order$modelorder
 
-fig_wis_loc <- ggplot(scores, 
+figures7 <- ggplot(scores, 
                       aes(x = factor(modelorder, levels = levels_order), y=location_name, 
                           fill= scales::oob_squish(relative_WIS, range = c(- 2.584963, 2.584963)), 
                           group = season)) +
@@ -159,27 +159,5 @@ fig_wis_loc <- ggplot(scores,
   scale_x_discrete(labels = function(x) substring(x, 1, nchar(x)-10))+
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")))+
   theme(axis.ticks.y = element_blank())
-fig_wis_loc
 
-# jpeg(file = paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/WIS_scores_Location_all.jpg"), width=12, height=8, units="in", res=300)
-# print(fig_wis_loc)
-# dev.off()
-# 
-#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/logWIS_scores_Location_all.png"), plot = fig_wis_loc, width = 12, height= 8)
 
-##### WIS avg by week
-
-x <- ggplot(plot.scores, aes(x = target_end_date, 
-                             y = Avg_WIS, group = model,
-                             col = model)) +
-  geom_line() + geom_point() +
-  labs(y = "Average WIS",
-       x = "",
-       color = "Model",
-       title = "Average 4-Week Ahead Weighted Interval Scores by Model") +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
-  scale_color_manual(values = c( "#d66bae", "#6baed6", "#aed66b"))+
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  facet_grid(cols = vars(season), scales = "free_x")
-x

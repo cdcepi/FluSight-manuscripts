@@ -176,7 +176,16 @@ inc.rankings_all %>%
     kableExtra::footnote( general_title = "") #%>% 
     # kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
 
-    
+# inc.rankings_all %>%
+#     rename(Model = model,
+#            `Absolute WIS` = mean.WIS,
+#            `Relative WIS`= rel.WIS.skill,
+#            `Season` = season) %>% 
+#     select(Model, `Absolute WIS`, `Relative WIS`, Season) %>%
+#     mutate_if(is.numeric, round, digits = 2) %>% 
+#   {write.csv(., paste0(manuscript_repo, "/Supplemental_analyses/log-transformed/logtable1.csv"), row.names = FALSE)}
+
+
 WIS_Season21ln <- WIS_Season21ln %>% filter(model %in% inc.rankings_all21ln$model)
 inc.rankings_location21ln <- make_WIS_ranking_location(WIS_Season21ln)
 inc.rankings_location21ln$below <- ifelse(inc.rankings_location21ln$relative_WIS < 1, 1, 0)
