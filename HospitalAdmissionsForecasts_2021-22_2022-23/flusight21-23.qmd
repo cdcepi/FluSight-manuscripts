@@ -222,8 +222,8 @@ figure1a <- forecastsandobservedplt(all_dat21, obs_data21, "a")
 figure1b <- forecastsandobservedplt(all_dat23, obs_data23, "b")
 
 
-ggsave(paste0(manuscript_repo,"/Output/figure1a.png"), plot = figure1a, width=10, height=8)
-ggsave(paste0(manuscript_repo,"/Output/figure1b.png"), plot = figure1b, width=10, height=8)
+#ggsave(paste0(manuscript_repo,"/Output/figure1a.png"), plot = figure1a, width=10, height=8)
+#ggsave(paste0(manuscript_repo,"/Output/figure1b.png"), plot = figure1b, width=10, height=8)
 
 
 ```
@@ -269,8 +269,8 @@ inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), muta
     knitr::kable(align = c("lcccccccc"), caption = "Table 1",#col.names = c()
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
-    kableExtra::footnote( general_title = "") %>% 
-    kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/table1.pdf"))
+    kableExtra::footnote( general_title = "") #%>% 
+    #kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/table1.pdf"))
   #need below installed to run save_kable  
   #webshot::install_phantomjs()
     
@@ -370,7 +370,7 @@ figure2 <- inc_scores_overall %>%
   theme(strip.text = element_text(size = 10))
 figure2
 
- ggsave(paste0(manuscript_repo,"/Output/figure2.png"), width=8, height=8, units="in", plot = figure2)
+ #ggsave(paste0(manuscript_repo,"/Output/figure2.png"), width=8, height=8, units="in", plot = figure2)
 
 ```
 
@@ -420,7 +420,7 @@ figure3 <- ggplot(scores,
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")))+
   theme(axis.ticks.y = element_blank())
 figure3
-ggsave(paste0(manuscript_repo,"/Output/figure3.png"), plot = figure3, width = 12, height= 8)
+#ggsave(paste0(manuscript_repo,"/Output/figure3.png"), plot = figure3, width = 12, height= 8)
 
 
 modelrankings21 <- inc.rankings_location21 %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
@@ -496,7 +496,7 @@ figure4a <-  ggplot(abs_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 figure4a
-ggsave(paste0(manuscript_repo,"/Output/figure4a.png"), plot = figure4a, width = 8, height = 5)
+#ggsave(paste0(manuscript_repo,"/Output/figure4a.png"), plot = figure4a, width = 8, height = 5)
 ```
 
 ##### Coverage Tables
@@ -594,8 +594,8 @@ cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, r
   kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
   kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
 
-  kableExtra::kable_classic()  %>% 
-   kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
+  kableExtra::kable_classic()  #%>% 
+   #kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
 
 # length(unique(coverage95_states$target_end_date[coverage95_states$target == "1 wk ahead inc flu hosp"]))
 # length(unique(coverage95_states$target_end_date))
@@ -659,8 +659,8 @@ abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 
   knitr::kable(align = c("lccccc"), caption = "Table 3", col.names = c("Model", "Relative WIS", "1 Wk ABS WIS", "2 Wk ABS WIS", "3 Wk ABS WIS", "4 Wk ABS WIS")) %>% 
   kableExtra::footnote(general = "Table 3", general_title = "")%>% 
   kableExtra::pack_rows(index = table(abs_breakdown_WIS$season)) %>% 
-  kableExtra::kable_classic() %>% 
-   kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table3.pdf"))
+  kableExtra::kable_classic() #%>% 
+  # kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table3.pdf"))
 
 
 fs_wis_min_date21 <- abs_states %>% filter(season == "2021-2022", model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
@@ -717,7 +717,7 @@ figure4b <- ggplot(coverage95_flusight, aes(x = target_end_date,
   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
 figure4b
 
- ggsave(paste0(manuscript_repo,"/Output/figure4b.png"), width=8, height=6, plot = figure4b)
+ #ggsave(paste0(manuscript_repo,"/Output/figure4b.png"), width=8, height=6, plot = figure4b)
 
 
 ```
@@ -755,7 +755,7 @@ coverage50_not_flusight <- coverage50_states %>%
 #   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
 # 
 
-  ggsave(paste0(manuscript_repo,"/Output/figure4_50cov.png"), width=8, height=6, plot = figure4_50cov)
+  #ggsave(paste0(manuscript_repo,"/Output/figure4_50cov.png"), width=8, height=6, plot = figure4_50cov)
 
 ```
 
@@ -785,7 +785,7 @@ figs1 <- model_order %>%
   labs(x = "Model", y = "Relative WIS")+
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022", `2022-2023` = "B) 2022-2023")))
 figs1
- ggsave(paste0(manuscript_repo,"/Output/figures1.jpg"), plot = figs1, width=10, height=8)
+ #ggsave(paste0(manuscript_repo,"/Output/figures1.jpg"), plot = figs1, width=10, height=8)
 ```
 
 
@@ -840,5 +840,5 @@ figs1
 #   facet_grid(cols = vars(season), scales = "free_x")
 # x
 
- ggsave(plot = x, paste0(manuscript_repo,"/Output/Ave_4wk_WIS_model.png"), height = 6, width = 8)
+ #ggsave(plot = x, paste0(manuscript_repo,"/Output/Ave_4wk_WIS_model.png"), height = 6, width = 8)
 ```
