@@ -30,10 +30,10 @@
       mutate(target_end_date = as.Date(target_end_date),
              forecast_date = as.Date(forecast_date),
              value = value, 
-             # value = case_when(quantile==0.5 ~ round(value),
-             #                   quantile<0.5 ~ floor(value),
-             #                   quantile>0.5 ~ ceiling(value),
-             #                   type=='point' ~ round(value)),
+             value = case_when(quantile==0.5 ~ round(value),
+                               quantile<0.5 ~ floor(value),
+                               quantile>0.5 ~ ceiling(value),
+                               type=='point' ~ round(value)),
              submission_deadline =
                get_next_tuesday(as.Date(forecast_date))) %>%
       filter(! (type=="quantile" & is.na(quantile)),
