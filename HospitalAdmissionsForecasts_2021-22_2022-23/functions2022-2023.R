@@ -29,10 +29,11 @@
     dat_for_scores = all_dat %>% 
       mutate(target_end_date = as.Date(target_end_date),
              forecast_date = as.Date(forecast_date),
-             value = case_when(quantile==0.5 ~ round(value),
-                               quantile<0.5 ~ floor(value),
-                               quantile>0.5 ~ ceiling(value),
-                               type=='point' ~ round(value)),
+             value = value, 
+             # value = case_when(quantile==0.5 ~ round(value),
+             #                   quantile<0.5 ~ floor(value),
+             #                   quantile>0.5 ~ ceiling(value),
+             #                   type=='point' ~ round(value)),
              submission_deadline =
                get_next_tuesday(as.Date(forecast_date))) %>%
       filter(! (type=="quantile" & is.na(quantile)),
@@ -92,7 +93,7 @@
   wis_all_function <- function(dat_for_scores){
     WIS_all  =
       left_join(dat_for_scores %>% 
-                  filter(quantile %in% c(0.025, 0.25, 0.5, 0.75, 0.975)) %>%
+               #   filter(quantile %in% c(0.025, 0.25, 0.5, 0.75, 0.975)) %>%
                   pivot_wider(names_from = c(type, quantile), values_from=value),
                 WIS_calculation(dat_for_scores),
                 by = c("model", "date", "location_name","forecast_date")) %>%
