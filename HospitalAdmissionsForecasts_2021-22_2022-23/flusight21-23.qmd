@@ -36,7 +36,7 @@ library(cowplot)
 library(RSocrata)
 
 #CDC UserID goes here
-userid="nqr2"
+userid="rpe5"
 
 #update path to where cloned GitHub repository lives
 githubpath = paste0("C:/Users/", userid, "/Desktop/GitHub")
@@ -593,8 +593,8 @@ cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, r
   knitr::kable(align = c("lcccccccccc"), caption = "Table 2", col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
   kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
   kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
-  kableExtra::kable_classic()  %>% 
-   kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
+  kableExtra::kable_classic()  #%>% 
+  # kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
 
 # length(unique(coverage95_states$target_end_date[coverage95_states$target == "1 wk ahead inc flu hosp"]))
 # length(unique(coverage95_states$target_end_date))
@@ -658,8 +658,8 @@ abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 
   knitr::kable(align = c("lccccc"), caption = "Table 3", col.names = c("Model", "Relative WIS", "1 Wk ABS WIS", "2 Wk ABS WIS", "3 Wk ABS WIS", "4 Wk ABS WIS")) %>% 
   kableExtra::footnote(general = "Table 3", general_title = "")%>% 
   kableExtra::pack_rows(index = table(abs_breakdown_WIS$season)) %>% 
-  kableExtra::kable_classic() %>% 
-   kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table3.pdf"))
+  kableExtra::kable_classic() #%>% 
+  # kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table3.pdf"))
 
 fs_wis_min_date21 <- abs_states %>% filter(season == "2021-2022", model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
 fs_wis_max_date21 <- abs_states %>% filter(season == "2021-2022",model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
@@ -791,15 +791,15 @@ figs1 <- model_order %>%
 
 ```{r print plots}
 
- # figure1a
- # figure1b
- # figure2 
- # figure3 
- # figure4a
- # figure4b
-# figure4_absWIS 
-# figure4_50cov 
-# figs1
+  figure1a
+  figure1b
+  figure2 
+  figure3 
+  figure4a
+  figure4b
+ #figure4_absWIS 
+ #figure4_50cov 
+ #figs1
 
 ```
 
