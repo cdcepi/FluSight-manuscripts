@@ -31,7 +31,7 @@ library(scales)
 library(RSocrata)
 library(arrow)
 
-userid="rpe5"
+userid="nqr2"
 
 '%!in%' <- Negate('%in%')
 
@@ -253,6 +253,7 @@ coverage95_states <- WIS_Season %>% filter(location_name != "National") %>%
             coverage95 = mean(coverage.95)) %>% 
   mutate(model_color = ifelse(model == "Flusight-baseline", "#d6936b", ifelse(model == "Flusight-ensemble", "#6baed6", "#abbfcb"))) %>% ungroup()
 
+
 ```
 
 ##### 50% coverage by model
@@ -419,7 +420,7 @@ figures5 <- inc_scores_overall %>%
   theme_bw()+
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")) )
 
-#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = figures5)
+ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = figures5)
 
 ```
 
@@ -459,7 +460,7 @@ figures6 <- ggplot(abs_flusight, aes(x = target_end_date,
 
 figures6
 
-#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S6.png"), plot = figures6, width = 8, height = 5)
+ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S6.png"), plot = figures6, width = 8, height = 5)
 ```
 ##### Absolute WIS by week table
 
@@ -543,7 +544,7 @@ figures7 <- ggplot(scores,
 figures7
 
 
-#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = figures7, width = 12, height= 8)
+ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = figures7, width = 12, height= 8)
 
 
 modelrankings21ln <- inc.rankings_location21ln %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)

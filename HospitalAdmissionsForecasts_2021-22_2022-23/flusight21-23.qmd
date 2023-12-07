@@ -36,7 +36,7 @@ library(cowplot)
 library(RSocrata)
 
 #CDC UserID goes here
-userid="rpe5"
+userid="nqr2"
 
 #update path to where cloned GitHub repository lives
 githubpath = paste0("C:/Users/", userid, "/Desktop/GitHub")
@@ -242,9 +242,9 @@ figure1b <- forecastsandobservedplt(all_dat23, obs_data23, "b")
 inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel.WIS.skill)
 
 #if log-transformed analysis has been run, lines of code below can be uncommented to include it in table 1 can only be run after the supplemental log transformed analysis 
-#logtable1 <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/logtable1.csv")) 
+logtable1 <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/logtable1.csv")) 
 
-  inc.rankings_all %>% #left_join(., logtable1, join_by("model" == "Model", "season" == "Season")) %>% 
+  inc.rankings_all %>% left_join(., logtable1, join_by("model" == "Model", "season" == "Season")) %>% 
     rename(Model = model,
            `Absolute WIS` = mean.WIS,
            `Relative WIS`= rel.WIS.skill,
@@ -254,22 +254,22 @@ inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), muta
            `% of Locations Forecasted` = frac.locations.submitted,
            `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
            `% of Submitted Locations with All Forecasts` = frac.submitted.locations.fully.forecasted,
-           `Season` = season#, 
-          # `Log Transformed Absolute WIS` = Absolute.WIS, 
-          # `Log Transformed Relative WIS` = Relative.WIS
+           `Season` = season, 
+           `Log Transformed Absolute WIS` = Absolute.WIS, 
+           `Log Transformed Relative WIS` = Relative.WIS
           ) %>% 
     select(Model, `Absolute WIS`, `Relative WIS`,
            MAE, `50% Coverage (%)`, 
            `95% Coverage (%)`, 
-           `% of Forecasts Submitted`#, 
-          # `Log Transformed Absolute WIS`, 
-          # `Log Transformed Relative WIS`
+           `% of Forecasts Submitted`, 
+           `Log Transformed Absolute WIS`, 
+           `Log Transformed Relative WIS`
           ) %>%
     mutate_if(is.numeric, round, digits = 2) %>%  
     knitr::kable(align = c("lcccccccc"), caption = "Table 1",#col.names = c()
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
-    kableExtra::footnote( general_title = "") #%>% 
+    kableExtra::footnote( general_title = "")# %>% 
     #kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/table1.pdf"))
   #need below installed to run save_kable  
   #webshot::install_phantomjs()
