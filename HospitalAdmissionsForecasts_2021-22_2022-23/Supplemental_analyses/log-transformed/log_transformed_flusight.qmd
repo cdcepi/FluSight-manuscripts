@@ -173,9 +173,9 @@ inc.rankings_all %>%
     knitr::kable(align = c("lcccccccccc"), caption = "Table S3",#col.names = c()
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
-    kableExtra::footnote( general_title = "") 
-# %>% 
-#      kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
+    kableExtra::footnote( general_title = "") %>%
+     kableExtra::kable_classic() 
+# %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
 
 # inc.rankings_all %>%
 #     rename(Model = model,
@@ -351,7 +351,7 @@ cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, r
   kableExtra::footnote(general = "Table S4: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
   kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
   kableExtra::kable_classic() 
-# %>% 
+# %>%
 #    kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/tables4.pdf"))
 
 
