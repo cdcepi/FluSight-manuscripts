@@ -93,8 +93,8 @@
   wis_all_function <- function(dat_for_scores){
     WIS_all  =
       left_join(dat_for_scores %>% 
-               #   filter(quantile %in% c(0.025, 0.25, 0.5, 0.75, 0.975)) %>%
-                 filter(type == "quantile") %>%
+                  filter(quantile %in% c(0.025, 0.25, 0.5, 0.75, 0.975)) %>%
+                # filter(type == "quantile") %>%
                   pivot_wider(names_from = c(type, quantile), values_from=value),
                 WIS_calculation(dat_for_scores),
                 by = c("model", "date", "location_name","forecast_date")) %>%
