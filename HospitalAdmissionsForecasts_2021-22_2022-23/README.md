@@ -21,3 +21,30 @@ Table of Contents
 -   generate_figures_and_tables_2021-2023: This script generates the figures and tables found in the manuscript without having to run all of the evaluation code.
 
 -   Model names and colors: This script contains the names of each model submitted during the 2021-22 and 2022-23 seasons along with the colors associated with that model used in the evaluation reports.
+
+
+***Not sure if this should be added into ToC or if it should be its own section. Left redundant lines in, in case it stands alone.***
+
+data_for_figures_2021-2023
+
+This file can be used to generate all relevant data used in the generate_figures_and_tables_2021-2023.R script. The data have been output to the Data_for_Figures folder, so it is not necessary to run this script prior to using the generate_figures_and_tables_2021-2023.R script. All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below. Each subsequent section contains the data manipulation code related to the figure of the same name.
+
+data_for_backfill_figures_2021-2023
+
+This file can be used to generate all relevant data used in the generate_backfill_figures_and_tables_2021-2023.R script. The data have been output to the Data for Backfill Figures folder, so it is not necessary to run this script prior to using the generate_backfill_figures_and_tables_2021-2023.R script. All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below. Each subsequent section contains the data manipulation code related to the figure of the same name.
+
+data_for_log_transformed_figures_2021-2023
+
+This file can be used to generate all relevant data used in the generate_log_transformed_figures_and_tables_2021-2023.R script. The data have been output to the Data for Log-Transformed Figures folder, so it is not necessary to run this script prior to using the generate_log_transformed_figures_and_tables_2021-2023.R script. All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below. Each subsequent section contains the data manipulation code related to the figure of the same name.
+
+generate_figures_and_tables_2021-2023
+
+This file can be used to generate the figures and tables found in the main section of the manuscript using the data output by the data_for_figures_2021-2023.R script. The data have been output to the Data_for_Figures folder, so it is not necessary to run data_for_figures_2021-2023.R prior to using this script. All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below. Each subsequent section contains the visualization code related to the figure of the same name.
+
+generate_backfill_figures_and_tables_2021-2023
+
+This file can be used to generate the figures and tables found in the backfill supplemental section of the manuscript using the data output by the data_for_backfill_figures_2021-2023.R script. The data have been output to the Data for Backfill Figures folder, so it is not necessary to run data_for_backfill_figures_2021-2023.R prior to using this script. All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below. Each subsequent section contains the visualization code related to the figure of the same name.
+
+generate_log_transformed_figures_and_tables_2021-2023
+
+This file can be used to generate the figures and tables found in the log-transformed supplemental section of the manuscript using the data output by the data_for_log_transformed_figures_2021-2023.R script. The data have been output to the Data for Log-Transformed Figures folder, so it is not necessary to run data_for_log_transformed_figures_2021-2023.R prior to using this script. All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below. Each subsequent section contains the visualization code related to the figure of the same name.
