@@ -69,3 +69,9 @@ This file can be used to generate all relevant data and figures for the national
 We are grateful to the teams who built models, generated forecast data and submitted forecasts. The groups have made their public data available under different terms and licenses. You will find the licenses (when provided) within each metadata file in the model-specific folders in the [FluSight-Forecast-Data repo](https://github.com/cdcepi/flusight-forecast-data "https://github.com/cdcepi/flusight-forecast-data") . Please consult these licenses before using these data to ensure that you follow the terms under which these data were released.
 
 All source code that is specific to the overall project is available under an open-source MIT license. We note that this license does NOT cover model code from the various teams or model scenario data (available under specified licenses as described above).
+
+### Software Versions
+
+R: 4.3.0
+RStudio: 2023.03.1+446
+Windows 10: 22H2
