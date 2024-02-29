@@ -312,14 +312,15 @@ locations_23 <- unique(c(grep("National", all_dat23$location_name, value = T)[1]
                          sort(unique(all_dat23$location_name))))
 models <- unique(c(models_21, models_23))
 locations <- unique(c(locations_21, locations_23))
+locations <- ifelse(locations == "National", "US", locations)
 
 models <- c("Flusight-ensemble", "Flusight-baseline")
-locations <- c("US", "Alabama", "Alaska", "Arkansas", "Maine")
+#locations <- c("US", "Alabama", "Alaska", "Arkansas", "Maine")
 
 all_dat_all$forecast_date <- as.Date(all_dat_all$forecast_date)  
 
 
-plot_data_forecast_22 <- all_dat_all %>% filter(forecast_date >= (as.Date(min(all_dat_all$forecast_date)) + 21)) 
+plot_data_forecast_22 <- all_dat_all %>% filter(forecast_date >= (as.Date(min(all_dat_all$forecast_date)) + 21))
 
 # if(nrow(plot_data_forecast22) == 0) {
 #   print(k)
@@ -361,18 +362,24 @@ for (i in models){
   
   while (j <= length(locations)){
     
+    if(length(locations) <= j+3){
+      locs <- c(locations[j:length(locations)])
+    } else{
+      locs <- c(locations[j:(j+3)])
+    }
+    
     plot_forecasts(plot_data_forecast_22,
                    truth_data = obs_22,
                    models = i,
                    truth_source = "HealthData.gov",
-                   locations = ifelse(length(locations) >= j+3, c(locations[j:j+3]), c(locations[j:length(locations)])),
+                   locations = locs,
                    use_median_as_point = T,
                    subtitle = "",
                    title = paste0(i),
                    facet = ~location_name+Season, facet_ncol = 2, facet_nrow = 4, facet_scales = "free") + theme(text = element_text(size = 15))# + ggforce::facet_wrap_paginate(~location_name+Season, ncol = 2, nrow = 3, scales = "free")
     j = j+4
+    
   }
+  dev.off()
 }
-dev.off()
-
-#, facet_ncol = 2, facet_scales = "free"
+#dev.off()
