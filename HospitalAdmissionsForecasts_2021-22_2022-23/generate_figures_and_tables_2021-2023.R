@@ -17,11 +17,8 @@ library(covidHubUtils)
 library(ggridges)
 
 
-#CDC UserID goes here
-#userid="nqr2"
-
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+githubpath = paste0("C:/Users/",Sys.info()["user"],"/Desktop/GitHub")
 
 
 '%!in%' <- Negate('%in%') #previously %notin% possible #update
@@ -293,7 +290,7 @@ figure2 <- inc_scores_overall %>%
   theme(strip.text = element_text(size = 10))
 figure2
 
-##################### Relative WIS by Location Figure 3
+##################### Relative WIS by Location Figure 3 & Supplemental Table X
 
 #uncomment to just run generate this figure
 # inc.rankings_location21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location21.csv"))
@@ -327,6 +324,10 @@ figure3 <- ggplot(scores,
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")))+
   theme(axis.ticks.y = element_blank())
 figure3
+
+# this is the output for this figure as a table 
+data_csv <- scores %>% select(model, location_name, relative_WIS, season) 
+#write.csv(data_csv, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Table_Figure3_a.csv"),row.names = FALSE)
 
 
 ##################### Relative WIS Distribution Figure S 1
