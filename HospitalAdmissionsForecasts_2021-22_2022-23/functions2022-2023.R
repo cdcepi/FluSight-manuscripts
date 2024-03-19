@@ -53,60 +53,60 @@
   }
 
 #WIS calculations
-  WIS_calculation <-function(score_df = dat_for_scores){
-    
-    dat_for_scores <- score_df %>% 
-      mutate(alpha=ifelse(quantile < 0.500, quantile*2, 2*(1-quantile)), # Sets alpha levels for each interval 
-             indicator = ifelse(quantile < 0.500 & report < value | quantile > 0.500 & report > value, 1, 0), #low indicator & high indicator
-             pen = ifelse(indicator==1 & quantile < 0.500, (2/alpha)*(value-report), #low penalty
-                          ifelse(indicator==1 & quantile > 0.500, (2/alpha)*(report-value), 0)) #high penalty
-      ) 
-    
-    IS_per_alpha <- dat_for_scores %>% 
-      mutate(alpha=as.factor(alpha)) %>%
-      group_by(model, date, location_name, forecast_date, alpha) %>%
-      summarize(value_diff=max(value)-min(value), #difference between forecasted value at max quantile and min quantile
-                pen=sum(pen)) %>% #sum of pentaly for both quantiles within intervals
-      ungroup() %>%
-      mutate(alpha=as.numeric(as.character(alpha)),
-             IS=(alpha/2)*(value_diff+pen)) %>% # Create interval scores 
-      filter(alpha!="1.00")
-    
-    IS_sum <- IS_per_alpha %>%
-      group_by(model, date, location_name, forecast_date) %>%
-      summarize(IS_sum=sum(IS)) #Sum IS across all available intervals
-    
-    num_interval<-length(unique(IS_per_alpha$alpha))-1
-    
-    Q50 <-dat_for_scores %>%
-      filter(quantile==0.500) %>%
-      mutate(IS_Q50=(alpha/2)*abs(report-value)) #Previously = (alpha/2)*2*abs(report-value); multiplicative factor of 2 removed per hub update on 01/04 
-    
-    WIS <-IS_sum %>%
-      left_join(., Q50, by=c("model", "date", "location_name", "forecast_date")) %>%
-      mutate(WIS = (1/ (0.5 + num_interval))*(IS_Q50 + IS_sum), #add weights to the sum of all IS across the 11 intervals + the score at the 50% quantile; Previously = (1/ 1 + num_interval)*(IS_Q50 + IS_sum), but updated to per hub on 01/04
-             forecast_date=as.Date(forecast_date)) %>% 
-      dplyr::select(model,date, location_name, forecast_date, WIS) %>%
-      as.data.frame(.)
-  }
-  
-  wis_all_function <- function(dat_for_scores){
-    WIS_all  =
-      left_join(dat_for_scores %>% 
-                 # filter(quantile %in% c(0.025, 0.25, 0.5, 0.75, 0.975)) %>%
-                 filter(type == "quantile") %>%
-                  pivot_wider(names_from = c(type, quantile), values_from=value),
-                WIS_calculation(dat_for_scores),
-                by = c("model", "date", "location_name","forecast_date")) %>%
-      mutate(WIS_rel = ifelse(report==0, WIS/1, WIS/report),
-             abs.error = abs(quantile_0.5 - report),
-             perc.point.error = 100*abs.error/report,
-             coverage.50 = ifelse(report >= quantile_0.25 & report <= quantile_0.75,T,F),
-             coverage.95 = ifelse(report >= quantile_0.025 & report <= quantile_0.975,T,F)
-      ) %>%
-      rename(target_end_date = date)   
-    return(WIS_all)
-  }
+  # WIS_calculation <-function(score_df = dat_for_scores){
+  #   
+  #   dat_for_scores <- score_df %>% 
+  #     mutate(alpha=ifelse(quantile < 0.500, quantile*2, 2*(1-quantile)), # Sets alpha levels for each interval 
+  #            indicator = ifelse(quantile < 0.500 & report < value | quantile > 0.500 & report > value, 1, 0), #low indicator & high indicator
+  #            pen = ifelse(indicator==1 & quantile < 0.500, (2/alpha)*(value-report), #low penalty
+  #                         ifelse(indicator==1 & quantile > 0.500, (2/alpha)*(report-value), 0)) #high penalty
+  #     ) 
+  #   
+  #   IS_per_alpha <- dat_for_scores %>% 
+  #     mutate(alpha=as.factor(alpha)) %>%
+  #     group_by(model, date, location_name, forecast_date, alpha) %>%
+  #     summarize(value_diff=max(value)-min(value), #difference between forecasted value at max quantile and min quantile
+  #               pen=sum(pen)) %>% #sum of pentaly for both quantiles within intervals
+  #     ungroup() %>%
+  #     mutate(alpha=as.numeric(as.character(alpha)),
+  #            IS=(alpha/2)*(value_diff+pen)) %>% # Create interval scores 
+  #     filter(alpha!="1.00")
+  #   
+  #   IS_sum <- IS_per_alpha %>%
+  #     group_by(model, date, location_name, forecast_date) %>%
+  #     summarize(IS_sum=sum(IS)) #Sum IS across all available intervals
+  #   
+  #   num_interval<-length(unique(IS_per_alpha$alpha))-1
+  #   
+  #   Q50 <-dat_for_scores %>%
+  #     filter(quantile==0.500) %>%
+  #     mutate(IS_Q50=(alpha/2)*abs(report-value)) #Previously = (alpha/2)*2*abs(report-value); multiplicative factor of 2 removed per hub update on 01/04 
+  #   
+  #   WIS <-IS_sum %>%
+  #     left_join(., Q50, by=c("model", "date", "location_name", "forecast_date")) %>%
+  #     mutate(WIS = (1/ (0.5 + num_interval))*(IS_Q50 + IS_sum), #add weights to the sum of all IS across the 11 intervals + the score at the 50% quantile; Previously = (1/ 1 + num_interval)*(IS_Q50 + IS_sum), but updated to per hub on 01/04
+  #            forecast_date=as.Date(forecast_date)) %>% 
+  #     dplyr::select(model,date, location_name, forecast_date, WIS) %>%
+  #     as.data.frame(.)
+  # }
+  # 
+  # wis_all_function <- function(dat_for_scores){
+  #   WIS_all  =
+  #     left_join(dat_for_scores %>% 
+  #                # filter(quantile %in% c(0.025, 0.25, 0.5, 0.75, 0.975)) %>%
+  #                filter(type == "quantile") %>%
+  #                 pivot_wider(names_from = c(type, quantile), values_from=value),
+  #               WIS_calculation(dat_for_scores),
+  #               by = c("model", "date", "location_name","forecast_date")) %>%
+  #     mutate(WIS_rel = ifelse(report==0, WIS/1, WIS/report),
+  #            abs.error = abs(quantile_0.5 - report),
+  #            perc.point.error = 100*abs.error/report,
+  #            coverage.50 = ifelse(report >= quantile_0.25 & report <= quantile_0.75,T,F),
+  #            coverage.95 = ifelse(report >= quantile_0.025 & report <= quantile_0.975,T,F)
+  #     ) %>%
+  #     rename(target_end_date = date)   
+  #   return(WIS_all)
+  # }
 
 #Season inc rankings
   inc.rankings_all_func <- function(WIS_Season){
@@ -129,88 +129,88 @@
     return(rankings)
   }
   
-  make_WIS_ranking_baseline = function(df){
-    unique_models = unique(df$model)
-    uniquetargets <- length(unique(df$target_end_date))
-    uniquelocations <- length(unique(df$location_name))
-    
-    ranking_baseline <- data.frame(model = character(), mean.WIS = numeric(), rel.WIS.skill = numeric(), MAE = numeric(), 
-                                   Percent.Cov.50 = numeric(),Percent.Cov.95 = numeric(), frac.forecasts.submitted = numeric(),
-                                   frac.locations.submitted = numeric(), frac.locations.fully.forecasted = numeric(), 
-                                   frac.submitted.locations.fully.forecasted = numeric())
-    
-    for (i in 1:length(unique_models)){
-      step0 = df %>% filter(model == unique_models[i])
-      
-      locations.fully.submitted = step0 %>% group_by(location_name) %>% 
-        summarise(subs = n()) %>% ungroup() %>% 
-        #filter(subs >= 2*uniquetargets) %>% #possibly update if definition of fully submitted changes
-        nrow()
-      
-      step1 = step0 %>% summarise(model = unique(model),
-                                  mean.WIS = mean(WIS), 
-                                  MAE = mean(abs.error, na.rm = TRUE), 
-                                  Percent.Cov.50 = mean(coverage.50, na.rm = TRUE),
-                                  Percent.Cov.95 = mean(coverage.95, na.rm = TRUE))
-      
-      step2 = left_join(x = filter(df, model == unique_models[i]), y = filter(df, model == "Flusight-baseline"), 
-                        by = c("location", "target", "target_end_date")) %>% 
-        summarise(model = unique(model.x),
-                  rel.WIS.skill = mean(WIS.x)/mean(WIS.y))
-      
-      step3 = left_join(step1, step2, by = "model") %>% 
-        mutate(frac.forecasts.submitted = 
-                 nrow(filter(df, model == unique_models[i]))/nrow(filter(df, model == "Flusight-baseline")),
-               frac.locations.submitted = length(unique(step0$location_name))/uniquelocations,
-               frac.locations.fully.forecasted = locations.fully.submitted/uniquelocations, 
-               frac.submitted.locations.fully.forecasted = frac.locations.fully.forecasted/frac.locations.submitted
-        ) %>% 
-        select(model, mean.WIS, rel.WIS.skill, MAE, Percent.Cov.50, Percent.Cov.95, 
-               frac.forecasts.submitted, frac.locations.submitted,
-               frac.locations.fully.forecasted, frac.submitted.locations.fully.forecasted)
-      
-      ranking_baseline <- rbind(ranking_baseline, step3)
-    }
-    return(ranking_baseline)
-  }
+  # make_WIS_ranking_baseline = function(df){
+  #   unique_models = unique(df$model)
+  #   uniquetargets <- length(unique(df$target_end_date))
+  #   uniquelocations <- length(unique(df$location_name))
+  #   
+  #   ranking_baseline <- data.frame(model = character(), mean.WIS = numeric(), rel.WIS.skill = numeric(), MAE = numeric(), 
+  #                                  Percent.Cov.50 = numeric(),Percent.Cov.95 = numeric(), frac.forecasts.submitted = numeric(),
+  #                                  frac.locations.submitted = numeric(), frac.locations.fully.forecasted = numeric(), 
+  #                                  frac.submitted.locations.fully.forecasted = numeric())
+  #   
+  #   for (i in 1:length(unique_models)){
+  #     step0 = df %>% filter(model == unique_models[i])
+  #     
+  #     locations.fully.submitted = step0 %>% group_by(location_name) %>% 
+  #       summarise(subs = n()) %>% ungroup() %>% 
+  #       #filter(subs >= 2*uniquetargets) %>% #possibly update if definition of fully submitted changes
+  #       nrow()
+  #     
+  #     step1 = step0 %>% summarise(model = unique(model),
+  #                                 mean.WIS = mean(WIS), 
+  #                                 MAE = mean(abs.error, na.rm = TRUE), 
+  #                                 Percent.Cov.50 = mean(coverage.50, na.rm = TRUE),
+  #                                 Percent.Cov.95 = mean(coverage.95, na.rm = TRUE))
+  #     
+  #     step2 = left_join(x = filter(df, model == unique_models[i]), y = filter(df, model == "Flusight-baseline"), 
+  #                       by = c("location", "target", "target_end_date")) %>% 
+  #       summarise(model = unique(model.x),
+  #                 rel.WIS.skill = mean(WIS.x)/mean(WIS.y))
+  #     
+  #     step3 = left_join(step1, step2, by = "model") %>% 
+  #       mutate(frac.forecasts.submitted = 
+  #                nrow(filter(df, model == unique_models[i]))/nrow(filter(df, model == "Flusight-baseline")),
+  #              frac.locations.submitted = length(unique(step0$location_name))/uniquelocations,
+  #              frac.locations.fully.forecasted = locations.fully.submitted/uniquelocations, 
+  #              frac.submitted.locations.fully.forecasted = frac.locations.fully.forecasted/frac.locations.submitted
+  #       ) %>% 
+  #       select(model, mean.WIS, rel.WIS.skill, MAE, Percent.Cov.50, Percent.Cov.95, 
+  #              frac.forecasts.submitted, frac.locations.submitted,
+  #              frac.locations.fully.forecasted, frac.submitted.locations.fully.forecasted)
+  #     
+  #     ranking_baseline <- rbind(ranking_baseline, step3)
+  #   }
+  #   return(ranking_baseline)
+  # }
   
-  make_WIS_ranking_location <- function(df){
-    unique_models = unique(df$model)
-    uniquetargets <- length(unique(df$target_end_date))
-    uniquelocations <- length(unique(df$location_name))
-    
-    ranking_baseline <- data.frame(model = character(), location_name = character(), mean.WIS = numeric(), MAE = numeric(), 
-                                   Percent.Cov.50 = numeric(),Percent.Cov.95 = numeric(), relative_WIS = numeric())
-    
-    for (i in 1:length(unique_models)){
-      step0 = df %>% filter(model == unique_models[i])
-      
-      step1 = step0 %>% group_by(location_name) %>% summarise(model = unique(model),
-                                                              mean.WIS = mean(WIS, na.rm = TRUE), 
-                                                              MAE = mean(abs.error, na.rm = TRUE), 
-                                                              Percent.Cov.50 = mean(coverage.50, na.rm = TRUE),
-                                                              Percent.Cov.95 = mean(coverage.95, na.rm = TRUE))
-      
-      step2 = left_join(x = filter(df, model == unique_models[i]), y = filter(df, model == "Flusight-baseline"), 
-                        by = c("location", "target", "target_end_date", "location_name")) %>% group_by(location_name) %>% 
-        summarise(model = unique(model.x),
-                  relative_WIS = mean(WIS.x)/mean(WIS.y))
-      
-      step3 = left_join(step1, step2, by = c("model", "location_name")) %>% 
-        # mutate(frac.forecasts.submitted = 
-        #          nrow(filter(df, model == unique_models[i]))/nrow(filter(df, model == "Flusight-baseline")),
-        #        frac.locations.submitted = length(unique(step0$location_name))/uniquelocations,
-        #        frac.locations.fully.forecasted = locations.fully.submitted/uniquelocations, 
-        #        frac.submitted.locations.fully.forecasted = frac.locations.fully.forecasted/frac.locations.submitted
-        #        ) %>% 
-        select(model, location_name, mean.WIS, MAE, Percent.Cov.50, Percent.Cov.95, relative_WIS)
-      
-      ranking_baseline <- rbind(ranking_baseline, step3)
-    }
-    
-    return(ranking_baseline)
-    
-  }
+  # make_WIS_ranking_location <- function(df){
+  #   unique_models = unique(df$model)
+  #   uniquetargets <- length(unique(df$target_end_date))
+  #   uniquelocations <- length(unique(df$location_name))
+  #   
+  #   ranking_baseline <- data.frame(model = character(), location_name = character(), mean.WIS = numeric(), MAE = numeric(), 
+  #                                  Percent.Cov.50 = numeric(),Percent.Cov.95 = numeric(), relative_WIS = numeric())
+  #   
+  #   for (i in 1:length(unique_models)){
+  #     step0 = df %>% filter(model == unique_models[i])
+  #     
+  #     step1 = step0 %>% group_by(location_name) %>% summarise(model = unique(model),
+  #                                                             mean.WIS = mean(WIS, na.rm = TRUE), 
+  #                                                             MAE = mean(abs.error, na.rm = TRUE), 
+  #                                                             Percent.Cov.50 = mean(coverage.50, na.rm = TRUE),
+  #                                                             Percent.Cov.95 = mean(coverage.95, na.rm = TRUE))
+  #     
+  #     step2 = left_join(x = filter(df, model == unique_models[i]), y = filter(df, model == "Flusight-baseline"), 
+  #                       by = c("location", "target", "target_end_date", "location_name")) %>% group_by(location_name) %>% 
+  #       summarise(model = unique(model.x),
+  #                 relative_WIS = mean(WIS.x)/mean(WIS.y))
+  #     
+  #     step3 = left_join(step1, step2, by = c("model", "location_name")) %>% 
+  #       # mutate(frac.forecasts.submitted = 
+  #       #          nrow(filter(df, model == unique_models[i]))/nrow(filter(df, model == "Flusight-baseline")),
+  #       #        frac.locations.submitted = length(unique(step0$location_name))/uniquelocations,
+  #       #        frac.locations.fully.forecasted = locations.fully.submitted/uniquelocations, 
+  #       #        frac.submitted.locations.fully.forecasted = frac.locations.fully.forecasted/frac.locations.submitted
+  #       #        ) %>% 
+  #       select(model, location_name, mean.WIS, MAE, Percent.Cov.50, Percent.Cov.95, relative_WIS)
+  #     
+  #     ranking_baseline <- rbind(ranking_baseline, step3)
+  #   }
+  #   
+  #   return(ranking_baseline)
+  #   
+  # }
 
   #Forecasts and observed 
   forecastsandobservedplt <- function(all_dat, obs_data, a= "a"){
@@ -261,7 +261,7 @@
       below_baseline_pct = mean(below, na.rm = TRUE)*100
     ) %>% unique()
     
-    Scores_sum = merge(inc.rankings_all, Scores_sum, by = "model") %>% select(model, mean.WIS, rel.WIS.skill, below_baseline_pct) 
+    Scores_sum = merge(inc.rankings_all, Scores_sum, by = "model") %>% select(model, wis, rel_wis, below_baseline_pct) 
     
     weekly_breakdown = WIS_Season %>% group_by(model) %>% summarise(
       model = model,
@@ -269,9 +269,10 @@
       Two_week_Cov = mean(coverage.95[target == "2 wk ahead inc flu hosp"], na.rm = TRUE)*100,
       Three_week_Cov = mean(coverage.95[target == "3 wk ahead inc flu hosp"], na.rm = TRUE)*100,
       Four_week_Cov = mean(coverage.95[target == "4 wk ahead inc flu hosp"], na.rm = TRUE)*100
-    ) %>% unique()
+    ) %>% unique() %>% 
+      ungroup()
     
-    Scores_tab = merge(Scores_sum, weekly_breakdown, by = "model") %>% select(-mean.WIS) %>% rename(Relative_WIS = rel.WIS.skill)
+    Scores_tab = merge(Scores_sum, weekly_breakdown, by = "model") %>% select(-wis) %>% rename(Relative_WIS = rel_wis)
     
     return(Scores_tab)
   }
@@ -281,9 +282,9 @@
   cov95_function <- function(WIS_Season, Scores_tab){
     coverage95_states_horizon = WIS_Season %>% filter(location_name != "National") %>% 
       #  filter(target == "1 wk ahead inc flu hosp") %>% 
-      group_by(model, target_end_date, target) %>% 
+      group_by(model, date, target) %>% 
       summarise(model = model,
-                target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
+                date = as.Date(date, format = "%Y-%m-%d"),
                 target = target,
                 coverage95 = mean(coverage.95)) %>% unique()
     
