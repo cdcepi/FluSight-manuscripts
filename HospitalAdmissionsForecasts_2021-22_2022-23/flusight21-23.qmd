@@ -203,6 +203,7 @@ include23 <- all_dat23 %>%
 
 
 #function for prepping the data for scoring 
+### inclusion criteria were added to dat_for_scores_function 
 dat_for_scores21 <- dat_for_scores_function(all_dat21, obs_data21, include21) 
 dat_for_scores23 <- dat_for_scores_function(all_dat23, obs_data23, include23) 
 
@@ -307,7 +308,6 @@ figure1b <- forecastsandobservedplt(all_dat23, obs_data23, "b")
   # inc.rankings_all23 <- inc.rankings_all_func(WIS_Season23)
   
 
-    
 inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel_wis)
 
 #if log-transformed analysis has been run, lines of code below can be uncommented to include it in table 1 can only be run after the supplemental log transformed analysis 
@@ -375,7 +375,7 @@ inc.rankings_location23 <- raw_scores23 %>%
          mae=round(ae_median,2),
          rel_wis=round(scaled_rel_skill,2))%>%
   select(model, location_name, wis,rel_wis, mae) %>% mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
-  left_join(WIS_and_coverage_21, by = join_by("model" == "model", "location_name" == "location_name"))
+  left_join(WIS_and_coverage_23, by = join_by("model" == "model", "location_name" == "location_name"))
   
 inc.rankings_location <- inc.rankings_location21 %>% mutate(season = "2021-2022") %>% rbind(mutate(inc.rankings_location23, season = "2022-2023"))
   

@@ -5,7 +5,7 @@ format:
   html:
     self-contained: true
     code-background: true
-  docx: default
+  # docx: default
 editor: source
 date: today 
 echo: false
@@ -30,7 +30,7 @@ library(cowplot)
 library(scales)
 library(RSocrata)
 library(arrow)
-
+library(scoringutils)
 
 '%!in%' <- Negate('%in%')
 
@@ -115,7 +115,7 @@ include21 <- all_dat21 %>%
   mutate(n_forecasts = sum(!is.na(value)),
          n_locations = length(unique(location))) %>%
   mutate(per_forecasts = round((n_forecasts/(baseline_n_forecasts))*100,2),
-         per_locations = round((n_locations/length(unique(dat_for_scores21$location)))*100,2)) %>% 
+         per_locations = round((n_locations/length(unique(all_dat21$location)))*100,2)) %>% 
   filter(per_forecasts >= 75) %>%
   select(model,n_forecasts, per_forecasts, n_locations, per_locations) %>% 
   distinct()
@@ -126,17 +126,13 @@ include23 <- all_dat23 %>%
   mutate(n_forecasts = sum(!is.na(value)),
          n_locations = length(unique(location))) %>%
   mutate(per_forecasts = round((n_forecasts/(baseline_n_forecasts))*100,2),
-         per_locations = round((n_locations/length(unique(dat_for_scores23$location)))*100,2)) %>% 
+         per_locations = round((n_locations/length(unique(all_dat23$location)))*100,2)) %>% 
   filter(per_forecasts >= 75) %>%
   select(model,n_forecasts, per_forecasts, n_locations, per_locations) %>% 
   distinct()
 
-dat_for_scores21 <- dat_for_scores_function(all_dat21, obs_data21) %>% 
-  rename("prediction" = "value", "true_value" = "report") %>% 
-  filter(model %in% include21$model)
-dat_for_scores23 <- dat_for_scores_function(all_dat23, obs_data23) %>% 
-  rename("prediction" = "value", "true_value" = "report") %>% 
-  filter(model %in% include23$model)
+dat_for_scores21 <- dat_for_scores_function(all_dat21, obs_data21, include21)
+dat_for_scores23 <- dat_for_scores_function(all_dat23, obs_data23, include23) 
 
 dat_for_scores21ln <- dat_for_scores21 %>% mutate(prediction = log1p(prediction), true_value = log1p(true_value))
 dat_for_scores23ln <- dat_for_scores23 %>% mutate(prediction = log1p(prediction), true_value = log1p(true_value))
@@ -187,7 +183,7 @@ dat_21ln <- dat_for_scores21ln %>% filter(location != "US") %>% pivot_wider(name
 
 WIS_all21ln <- merge(WIS_all21ln, dat_21ln, by = c("target", "model", "forecast_date", "location", "date")) %>% rename("report" = "true_value_quantile_0.5") %>% mutate(coverage.50 = ifelse(report >= prediction_quantile_0.25 & report <= prediction_quantile_0.75,T,F),  coverage.95 = ifelse(report >= prediction_quantile_0.025 & report <= prediction_quantile_0.975,T,F))
 
-WIS_all23ln <- raw_scores23 %>% summarise_scores(na.rm = TRUE) %>% mutate(wis=round(interval_score,2))
+WIS_all23ln <- raw_scores23ln %>% summarise_scores(na.rm = TRUE) %>% mutate(wis=round(interval_score,2))
 dat_23ln <- dat_for_scores23ln %>% filter(location != "US") %>% pivot_wider(names_from = c(type, quantile), values_from=c(prediction, true_value)) %>% select(target, model, forecast_date, location, date, prediction_quantile_0.025, prediction_quantile_0.25, prediction_quantile_0.5, prediction_quantile_0.75, prediction_quantile_0.975, true_value_quantile_0.5)
 
 WIS_all23ln <- merge(WIS_all23ln, dat_23ln, by = c("target", "model", "forecast_date", "location", "date")) %>% rename("report" = "true_value_quantile_0.5") %>% mutate(coverage.50 = ifelse(report >= prediction_quantile_0.25 & report <= prediction_quantile_0.75,T,F),  coverage.95 = ifelse(report >= prediction_quantile_0.025 & report <= prediction_quantile_0.975,T,F))
@@ -254,21 +250,57 @@ inc.rankings_all %>%
 #   {write.csv(., paste0(manuscript_repo, "/Supplemental_analyses/log-transformed/logtable1.csv"), row.names = FALSE)}
 
 #### UPDATES HERE
-WIS_Season21ln <- WIS_Season21ln %>% filter(model %in% inc.rankings_all21ln$model)
-inc.rankings_location21ln <- make_WIS_ranking_location(WIS_Season21ln)
-inc.rankings_location21ln$below <- ifelse(inc.rankings_location21ln$relative_WIS < 1, 1, 0)
-  
-WIS_Season23ln <- WIS_Season23ln %>% filter(model %in% inc.rankings_all23ln$model)
-inc.rankings_location23ln <- make_WIS_ranking_location(WIS_Season23ln)
-inc.rankings_location23ln$below <- ifelse(inc.rankings_location23ln$relative_WIS < 1, 1, 0)
-  
-inc.rankings_location <- inc.rankings_location21ln %>% mutate(season = "2021-2022") %>% rbind(mutate(inc.rankings_location23ln, season = "2022-2023"))
-  
-national21ln <- WIS_alllocations21ln %>% filter(location_name == "National", model != "Flusight-ensemble", model != "Flusight-baseline")
-national21ln <- national21ln %>% group_by(forecast_date) %>% summarise(n = length(unique(model)))
+# WIS_Season21ln <- WIS_Season21ln %>% filter(model %in% inc.rankings_all21ln$model)
+# inc.rankings_location21ln <- make_WIS_ranking_location(WIS_Season21ln)
+# inc.rankings_location21ln$below <- ifelse(inc.rankings_location21ln$relative_WIS < 1, 1, 0)
 
-national23ln <- WIS_alllocations23ln %>% filter(location_name == "National", model != "Flusight-ensemble", model != "Flusight-baseline")
-national23ln <- national23ln %>% group_by(forecast_date) %>% summarise(n = length(unique(model)))
+WIS_and_coverage_21ln <- WIS_Season21ln %>% group_by(model, location_name) %>% summarise(Percent.Cov.50 = mean(coverage.50, na.rm = TRUE), Percent.Cov.95 = mean(coverage.95, na.rm = TRUE)) %>% distinct() %>% ungroup()
+
+inc.rankings_location21ln <- raw_scores21ln %>% 
+  filter(location != "US") %>% 
+  summarise_scores(by = c("model", "location_name"), relative_skill = TRUE,  baseline = "Flusight-baseline", na.rm = TRUE) %>% 
+  mutate(wis=round(interval_score,2),
+         mae=round(ae_median,2),
+         rel_wis=round(scaled_rel_skill,2))%>%
+  select(model, location_name, wis,rel_wis, mae) %>% mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
+  left_join(WIS_and_coverage_21ln, by = join_by("model" == "model", "location_name" == "location_name"))
+  
+# WIS_Season23ln <- WIS_Season23ln %>% filter(model %in% inc.rankings_all23ln$model)
+# inc.rankings_location23ln <- make_WIS_ranking_location(WIS_Season23ln)
+# inc.rankings_location23ln$below <- ifelse(inc.rankings_location23ln$relative_WIS < 1, 1, 0)
+
+WIS_and_coverage_23ln <- WIS_Season23ln %>% 
+  group_by(model, location_name) %>% 
+  summarise(Percent.Cov.50 = mean(coverage.50, na.rm = TRUE), Percent.Cov.95 = mean(coverage.95, na.rm = TRUE)) %>% 
+  distinct() %>% 
+  ungroup()
+
+inc.rankings_location23ln <- raw_scores23ln %>% 
+  filter(location != "US") %>% 
+  summarise_scores(by = c("model", "location_name"), relative_skill = TRUE,  baseline = "Flusight-baseline", na.rm = TRUE) %>% 
+  mutate(wis=round(interval_score,2),
+         mae=round(ae_median,2),
+         rel_wis=round(scaled_rel_skill,2))%>%
+  select(model, location_name, wis,rel_wis, mae) %>% 
+  mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
+  left_join(WIS_and_coverage_23ln, by = join_by("model" == "model", "location_name" == "location_name"))
+  
+inc.rankings_location <- inc.rankings_location21ln %>% 
+  mutate(season = "2021-2022") %>% 
+  rbind(mutate(inc.rankings_location23ln, season = "2022-2023"))
+  
+national21ln <- WIS_alllocations21ln %>% 
+  filter(location_name == "National", model != "Flusight-ensemble", model != "Flusight-baseline")%>%
+  group_by(forecast_date) %>% 
+  summarise(n = length(unique(model))) %>% 
+  ungroup()
+
+
+national23ln <- WIS_alllocations23ln %>% 
+  filter(location_name == "National", model != "Flusight-ensemble", model != "Flusight-baseline") %>%
+  group_by(forecast_date) %>% 
+  summarise(n = length(unique(model))) %>% 
+  ungroup()
 
 
 ```
@@ -295,7 +327,7 @@ obs_data23ln <- obs_data23 %>% mutate(value_inc = sqrt(value_inc))
 WIS_Season21ln$season <- "2021-2022"
 WIS_Season23ln$season <- "2022-2023"
 
-WIS_Season <- rbind(WIS_Season21ln, WIS_Season23ln)
+WIS_Season <- rbind(WIS_Season21ln, WIS_Season23ln) %>% rename("target_end_date" = "date", "WIS" = "wis")
 ```
 
 
@@ -487,7 +519,7 @@ figures5 <- inc_scores_overall %>%
   theme_bw()+
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")) )
 
-ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = figures5)
+# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = figures5)
 
 ```
 
@@ -527,7 +559,7 @@ figures6 <- ggplot(abs_flusight, aes(x = target_end_date,
 
 figures6
 
-ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S6.png"), plot = figures6, width = 8, height = 5)
+# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S6.png"), plot = figures6, width = 8, height = 5)
 ```
 ##### Absolute WIS by week table
 
@@ -583,17 +615,17 @@ abs_breakdown <- WIS_Season %>% group_by(model, season) %>% summarise(
 
 inc.rankings_all_nice <- rbind(mutate(inc.rankings_all21ln, season = "2021-2022"), mutate(inc.rankings_all23ln, season = "2022-2023")) %>% group_by(season) %>% arrange(season, rel_wis) %>% mutate(modelorder = paste(model, season))
 
-scores <- inc.rankings_location %>% filter(is.finite(relative_WIS)) %>% left_join(., y = inc.rankings_all_nice[,c("model","season", "modelorder")], by = c("model", "season"))
+scores <- inc.rankings_location %>% filter(is.finite(rel_wis)) %>% left_join(., y = inc.rankings_all_nice[,c("model","season", "modelorder")], by = c("model", "season"))
 scores_order <- inc.rankings_all_nice
 levels_order <- scores_order$modelorder
 
 figures7 <- ggplot(scores, 
                       aes(x = factor(modelorder, levels = levels_order), y=location_name, 
-                          fill= scales::oob_squish(relative_WIS, range = c(- 2.584963, 2.584963)), 
+                          fill= scales::oob_squish(rel_wis, range = c(- 2.584963, 2.584963)), 
                           group = season)) +
   geom_tile() +
   theme_bw()+
-  geom_text(aes(label = signif(relative_WIS, 2)), size = 2.5) + 
+  geom_text(aes(label = signif(rel_wis, 2)), size = 2.5) + 
   scale_fill_gradient2(low ="#6baed6", high =  "#d6936b", midpoint = 1, na.value = "grey50", 
                        name = "Relative WIS", 
                        breaks = c(-2,-1,0,1,2), 
@@ -611,12 +643,12 @@ figures7 <- ggplot(scores,
 figures7
 
 
-ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = figures7, width = 12, height= 8)
+# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = figures7, width = 12, height= 8)
 
 
-modelrankings21ln <- inc.rankings_location21ln %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
+modelrankings21ln <- inc.rankings_location21ln %>%  ungroup()%>% group_by(model) %>% summarise(low = min(rel_wis), high = max(rel_wis), median = median(rel_wis), mean = mean(rel_wis)) %>% mutate(diff = high - low)
 
-modelrankings23ln <- inc.rankings_location23ln %>%  ungroup()%>% group_by(model) %>% summarise(low = min(relative_WIS), high = max(relative_WIS), median = median(relative_WIS), mean = mean(relative_WIS)) %>% mutate(diff = high - low)
+modelrankings23ln <- inc.rankings_location23ln %>%  ungroup()%>% group_by(model) %>% summarise(low = min(rel_wis), high = max(rel_wis), median = median(rel_wis), mean = mean(rel_wis)) %>% mutate(diff = high - low)
 
 #arrange(filter(Scores_tab21ln,  model != "Flusight-ensemble", below_baseline_pct > 50), desc(below_baseline_pct))
 scores_tab_nice21ln <- Scores_tab21ln %>% mutate(across(where(is.numeric),~round(.x, 2)))
