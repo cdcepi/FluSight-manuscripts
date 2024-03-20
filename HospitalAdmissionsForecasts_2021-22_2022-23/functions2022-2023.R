@@ -22,7 +22,7 @@
   }
   
   
-  dat_for_scores_function <- function(all_dat, obs_data){
+  dat_for_scores_function <- function(all_dat, obs_data, includedf){
     
     all_dat = drop_na(all_dat) #additional confirmation that all quants are present
     
@@ -48,7 +48,9 @@
       filter(!is.na(report))
     
     
-    dat_for_scores = distinct(dat_for_scores)
+    dat_for_scores = distinct(dat_for_scores) %>% 
+      rename("prediction" = "value", "true_value" = "report") %>%
+      filter(model %in% includedf$model)
     return(dat_for_scores)
   }
 
@@ -90,44 +92,44 @@
   #     as.data.frame(.)
   # }
   # 
-  # wis_all_function <- function(dat_for_scores){
-  #   WIS_all  =
-  #     left_join(dat_for_scores %>% 
-  #                # filter(quantile %in% c(0.025, 0.25, 0.5, 0.75, 0.975)) %>%
-  #                filter(type == "quantile") %>%
-  #                 pivot_wider(names_from = c(type, quantile), values_from=value),
-  #               WIS_calculation(dat_for_scores),
-  #               by = c("model", "date", "location_name","forecast_date")) %>%
-  #     mutate(WIS_rel = ifelse(report==0, WIS/1, WIS/report),
-  #            abs.error = abs(quantile_0.5 - report),
-  #            perc.point.error = 100*abs.error/report,
-  #            coverage.50 = ifelse(report >= quantile_0.25 & report <= quantile_0.75,T,F),
-  #            coverage.95 = ifelse(report >= quantile_0.025 & report <= quantile_0.975,T,F)
-  #     ) %>%
-  #     rename(target_end_date = date)   
-  #   return(WIS_all)
-  # }
-
-#Season inc rankings
-  inc.rankings_all_func <- function(WIS_Season){
-    rankings = 
-      make_WIS_ranking_baseline(WIS_Season) %>% 
-      # select(-rank) %>% 
-      filter(frac.forecasts.submitted >= 0.75) %>%
-      
-      mutate(model = model_display_names[as.character(model)],
-             mean.WIS = round(mean.WIS,2),
-             rel.WIS.skill = round(rel.WIS.skill,2),
-             MAE = round(MAE,2),
-             Percent.Cov.50 = round(100*Percent.Cov.50),
-             Percent.Cov.95 = round(100*Percent.Cov.95),
-             frac.forecasts.submitted = round(100*frac.forecasts.submitted),
-             frac.locations.submitted = round(100*frac.locations.submitted),
-             frac.locations.fully.forecasted = round(100*frac.locations.fully.forecasted),
-             frac.submitted.locations.fully.forecasted = round(100*frac.submitted.locations.fully.forecasted)) %>% 
-      arrange(rel.WIS.skill) 
-    return(rankings)
+  wis_all_function <- function(dat_for_scores){
+    WIS_all  = dat_for_scores %>% scoringutils::score()
+      # left_join(dat_for_scores %>%
+      #            # filter(quantile %in% c(0.025, 0.25, 0.5, 0.75, 0.975)) %>%
+      #            filter(type == "quantile") %>%
+      #             pivot_wider(names_from = c(type, quantile), values_from=value),
+      #           WIS_calculation(dat_for_scores),
+      #           by = c("model", "date", "location_name","forecast_date")) %>%
+      # mutate(WIS_rel = ifelse(report==0, WIS/1, WIS/report),
+      #        abs.error = abs(quantile_0.5 - report),
+      #        perc.point.error = 100*abs.error/report,
+      #        coverage.50 = ifelse(report >= quantile_0.25 & report <= quantile_0.75,T,F),
+      #        coverage.95 = ifelse(report >= quantile_0.025 & report <= quantile_0.975,T,F)
+      # ) %>%
+      # rename(target_end_date = date)
+    return(WIS_all)
   }
+
+# #Season inc rankings
+#   inc.rankings_all_func <- function(WIS_Season){
+#     rankings =
+#       make_WIS_ranking_baseline(WIS_Season) %>%
+#       # select(-rank) %>%
+#       filter(frac.forecasts.submitted >= 0.75) %>%
+# 
+#       mutate(model = model_display_names[as.character(model)],
+#              mean.WIS = round(mean.WIS,2),
+#              rel.WIS.skill = round(rel.WIS.skill,2),
+#              MAE = round(MAE,2),
+#              Percent.Cov.50 = round(100*Percent.Cov.50),
+#              Percent.Cov.95 = round(100*Percent.Cov.95),
+#              frac.forecasts.submitted = round(100*frac.forecasts.submitted),
+#              frac.locations.submitted = round(100*frac.locations.submitted),
+#              frac.locations.fully.forecasted = round(100*frac.locations.fully.forecasted),
+#              frac.submitted.locations.fully.forecasted = round(100*frac.submitted.locations.fully.forecasted)) %>%
+#       arrange(rel.WIS.skill)
+#     return(rankings)
+#   }
   
   # make_WIS_ranking_baseline = function(df){
   #   unique_models = unique(df$model)

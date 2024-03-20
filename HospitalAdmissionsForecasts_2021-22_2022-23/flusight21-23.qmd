@@ -5,7 +5,7 @@ format:
   html:
     self-contained: true
     code-background: true
-  docx: default
+  # docx: default
 editor: source
 date: today 
 echo: false
@@ -185,7 +185,7 @@ include21 <- all_dat21 %>%
   mutate(n_forecasts = sum(!is.na(value)),
          n_locations = length(unique(location))) %>%
   mutate(per_forecasts = round((n_forecasts/(baseline_n_forecasts))*100,2),
-         per_locations = round((n_locations/length(unique(dat_for_scores21$location)))*100,2)) %>% 
+         per_locations = round((n_locations/length(unique(all_dat21$location)))*100,2)) %>% 
   filter(per_forecasts >= 75) %>%
   select(model,n_forecasts, per_forecasts, n_locations, per_locations) %>% 
   distinct() %>% ungroup()
@@ -196,19 +196,15 @@ include23 <- all_dat23 %>%
   mutate(n_forecasts = sum(!is.na(value)),
          n_locations = length(unique(location))) %>%
   mutate(per_forecasts = round((n_forecasts/(baseline_n_forecasts))*100,2),
-         per_locations = round((n_locations/length(unique(dat_for_scores23$location)))*100,2)) %>% 
+         per_locations = round((n_locations/length(unique(all_dat23$location)))*100,2)) %>% 
   filter(per_forecasts >= 75) %>%
   select(model,n_forecasts, per_forecasts, n_locations, per_locations) %>% 
   distinct() %>% ungroup()
 
 
 #function for prepping the data for scoring 
-dat_for_scores21 <- dat_for_scores_function(all_dat21, obs_data21) %>% 
-  rename("prediction" = "value", "true_value" = "report") %>%
-  filter(model %in% include21$model)
-dat_for_scores23 <- dat_for_scores_function(all_dat23, obs_data23) %>% 
- rename("prediction" = "value", "true_value" = "report") %>%
-  filter(model %in% include23$model)
+dat_for_scores21 <- dat_for_scores_function(all_dat21, obs_data21, include21) 
+dat_for_scores23 <- dat_for_scores_function(all_dat23, obs_data23, include23) 
 
 
 ```
@@ -315,7 +311,7 @@ figure1b <- forecastsandobservedplt(all_dat23, obs_data23, "b")
 inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel_wis)
 
 #if log-transformed analysis has been run, lines of code below can be uncommented to include it in table 1 can only be run after the supplemental log transformed analysis 
-# logtable1 <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/logtable1.csv")) 
+ logtable1 <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/logtable1.csv")) 
 
   inc.rankings_all %>% 
     left_join(., logtable1, join_by("model" == "Model", "season" == "Season")) %>% 
@@ -740,8 +736,8 @@ abs_breakdown <- WIS_Season %>% group_by(model, season) %>% summarise(
   Four_week_abs = mean(WIS[target == "4 wk ahead inc flu hosp"])
 ) %>% unique() 
 
-#### UPDATE HERE 
-abs_breakdown_WIS <- merge(inc.rankings_all[,c(1,3,11)], abs_breakdown, by= c("model", "season")) %>% arrange(season, rel_wis)
+
+abs_breakdown_WIS <- merge(inc.rankings_all[,c(1,7,11)], abs_breakdown, by= c("model", "season")) %>% arrange(season, rel_wis)
 
 # abs_breakdown %>% filter(season == "2021-2022") %>% {median(.$One_week_abs)}
 # abs_breakdown %>% filter(season == "2022-2023") %>% {median(.$One_week_abs)}
@@ -870,10 +866,10 @@ Over the forecast weeks, the 2021-22 FluSight ensemble had slightly higher overa
 
 ```{r, Relative WIS distribution}
 
-model_order <- merge(inc.rankings_all_nice[,1:3], inc.rankings_location, by = "model", all.y = TRUE) %>% arrange(rel_wis)
+model_order <- merge(inc.rankings_all_nice[,c(1,12)], inc.rankings_location, by = "model", all.y = TRUE) %>% arrange( rel_wis, season)
 
 figs1 <- model_order %>% 
-  ggplot( aes(x = fct_inorder(model), y = relative_WIS))+
+  ggplot( aes(x = fct_inorder(model), y = rel_wis))+
   geom_boxplot()+
   theme_bw() +
   geom_hline(aes(yintercept = 1), color = "#6baed6")+
