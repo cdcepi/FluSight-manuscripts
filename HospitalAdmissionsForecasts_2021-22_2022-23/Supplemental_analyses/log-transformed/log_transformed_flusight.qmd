@@ -237,8 +237,8 @@ inc.rankings_all %>%
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
     kableExtra::footnote( general_title = "") %>%
-     kableExtra::kable_classic() 
-# %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
+     kableExtra::kable_classic() %>% 
+  kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
 
 # inc.rankings_all %>%
 #     rename(Model = model,
@@ -449,9 +449,8 @@ cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, r
   knitr::kable(align = c("lcccccccccc"), caption = "Table S4", col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
   kableExtra::footnote(general = "Table S4: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
   kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
-  kableExtra::kable_classic() 
-# %>%
-#    kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/tables4.pdf"))
+  kableExtra::kable_classic() %>%
+   kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S4.pdf"))
 
 
 ```
@@ -519,7 +518,7 @@ figures5 <- inc_scores_overall %>%
   theme_bw()+
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")) )
 
-# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = figures5)
+ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = figures5)
 
 ```
 
@@ -559,7 +558,7 @@ figures6 <- ggplot(abs_flusight, aes(x = target_end_date,
 
 figures6
 
-# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S6.png"), plot = figures6, width = 8, height = 5)
+ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S6.png"), plot = figures6, width = 8, height = 5)
 ```
 ##### Absolute WIS by week table
 
@@ -643,7 +642,7 @@ figures7 <- ggplot(scores,
 figures7
 
 
-# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = figures7, width = 12, height= 8)
+ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = figures7, width = 12, height= 8)
 
 
 modelrankings21ln <- inc.rankings_location21ln %>%  ungroup()%>% group_by(model) %>% summarise(low = min(rel_wis), high = max(rel_wis), median = median(rel_wis), mean = mean(rel_wis)) %>% mutate(diff = high - low)
