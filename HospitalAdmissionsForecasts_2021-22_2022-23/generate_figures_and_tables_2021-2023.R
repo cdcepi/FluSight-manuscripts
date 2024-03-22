@@ -14,6 +14,7 @@
 library(arrow)
 library(tidyverse)
 library(covidHubUtils)
+library(scoringutils)
 library(ggridges)
 
 
@@ -64,7 +65,7 @@ obs_data23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/obs_data23.csv
 inc.rankings_all21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all21.csv"))
 inc.rankings_all23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all23.csv"))
 
-inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel.WIS.skill)
+inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel_wis)
 
 logtable1 <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/logtable1.csv"))
 
@@ -108,22 +109,23 @@ inc.rankings_all_nice <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc
 #uncomment to just run generate this figure
 # inc.rankings_all21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all21.csv"))
 # inc.rankings_all23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all23.csv"))
-# inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel.WIS.skill)
+# inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel_wis)
 # logtable1 <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/logtable1.csv"))
 
 inc.rankings_all %>% left_join(., logtable1, join_by("model" == "Model", "season" == "Season")) %>% 
   rename(Model = model,
-         `Absolute WIS` = mean.WIS,
-         `Relative WIS`= rel.WIS.skill,
-         `50% Coverage (%)` = Percent.Cov.50,
-         `95% Coverage (%)` = Percent.Cov.95,
-         `% of Forecasts Submitted`  = frac.forecasts.submitted,
-         `% of Locations Forecasted` = frac.locations.submitted,
-         `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
-         `% of Submitted Locations with All Forecasts` = frac.submitted.locations.fully.forecasted,
+         `Absolute WIS` = wis,
+         `Relative WIS`= rel_wis,
+         `50% Coverage (%)` = cov_50,
+         `95% Coverage (%)` = cov_95,
+         `% of Forecasts Submitted`  = per_forecasts,
+         `% of Locations Forecasted` = per_locations,
+         # `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
+         # `% of Submitted Locations with All Forecasts` = frac.submitted.locations.fully.forecasted,
          `Season` = season, 
          `Log Transformed Absolute WIS` = Absolute.WIS, 
-         `Log Transformed Relative WIS` = Relative.WIS) %>% 
+         `Log Transformed Relative WIS` = Relative.WIS,
+         `MAE` = mae) %>% 
   select(Model, `Absolute WIS`, `Relative WIS`,
          MAE, `50% Coverage (%)`, 
          `95% Coverage (%)`, 
@@ -338,7 +340,7 @@ data_csv <- scores %>% select(model, location_name, relative_WIS, season)
 # inc.rankings_location23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location23.csv"))
 # inc.rankings_location <- rbind(mutate(inc.rankings_location21, season = "2021-2022"), mutate(inc.rankings_location23, season = "2022-2023"))
 
-model_order <- merge(inc.rankings_all_nice[,c("model", "rel.WIS.skill")], inc.rankings_location, by = "model", all.y = TRUE) %>% arrange(rel.WIS.skill)
+model_order <- merge(inc.rankings_all_nice[,c("model", "rel_wis")], inc.rankings_location, by = "model", all.y = TRUE) %>% arrange(rel_wis)
 
 figures1 <- model_order %>% 
   ggplot( aes(x = fct_inorder(model), y = relative_WIS))+

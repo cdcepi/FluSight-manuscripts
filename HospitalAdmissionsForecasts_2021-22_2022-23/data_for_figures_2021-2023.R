@@ -1,6 +1,6 @@
 ###PLEASE READ###
 
-# This file can be used to generate all relevent data used in the generate_figures_and_tables_2021-2023.R script.
+# This file can be used to generate all relevant data used in the generate_figures_and_tables_2021-2023.R script.
 # The data have been output to the Data_for_Figures folder, so it is not necessary to run this script prior to using the generate_figures_and_tables_2021-2023.R script.
 # All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below.
 # Each subsequent section contains the data manipulation code related to the figure of the same name.
@@ -11,11 +11,12 @@
 
 library(tidyverse)
 library(arrow)
+library(scoringutils)
 
 '%!in%' <- Negate('%in%') 
 
 last.tuesday21 = as.Date("2022-06-21")
-last.tuesday23 = as.Date("2023-04-11")
+last.tuesday23 = as.Date("2023-05-16")
 
 window.width = c(2, 4, 8)
 
@@ -30,7 +31,7 @@ weeks.to.eval21 =
 
 weeks.to.eval23 = 
   seq(as.Date("2022-10-17"),
-      as.Date("2023-04-10"),
+      as.Date("2023-05-15"),
       by=7) %>% 
   as.character()
 
@@ -165,8 +166,8 @@ all_dat23 = left_join(all_dat23,location.names23, by = c("location"))
 
 #write_parquet(x = all_dat21, sink = paste0(manuscript_repo, "/Data_for_Figures/all_dat21.parquet"))
 #write_parquet(x = all_dat23, sink = paste0(manuscript_repo, "/Data_for_Figures/all_dat23.parquet"))
-#write.csv(obs_data21, paste0(manuscript_repo, "/Data_for_Figures/obs_data21.csv"), row.names = FALSE)
-#write.csv(obs_data23, paste0(manuscript_repo, "/Data_for_Figures/obs_data23.csv"), row.names = FALSE)
+## write.csv(obs_data21, paste0(manuscript_repo, "/Data_for_Figures/obs_data21.csv"), row.names = FALSE)
+## write.csv(obs_data23, paste0(manuscript_repo, "/Data_for_Figures/obs_data23.csv"), row.names = FALSE)
 
 
 #inclusion criteria before scoring
@@ -269,7 +270,11 @@ inc.rankings_location21 <- raw_scores21 %>%
   mutate(wis=round(interval_score,2),
          mae=round(ae_median,2),
          rel_wis=round(scaled_rel_skill,2))%>%
-  select(model, location_name, wis,rel_wis, mae) %>% mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
+  select(model, location_name, wis,rel_wis, mae) %>% # mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
+  group_by(location_name) %>%
+  mutate(baseline_wis = wis[model == "Flusight-baseline"]) %>%
+  ungroup() %>%
+  mutate(below = ifelse(wis < baseline_wis & model != "Flusight-baseline", 1, 0)) %>% select(-baseline_wis) %>% 
   left_join(WIS_and_coverage_21, by = join_by("model" == "model", "location_name" == "location_name"))
 
 WIS_and_coverage_23 <- WIS_Season23 %>% group_by(model, location_name) %>% summarise(Percent.Cov.50 = mean(coverage.50, na.rm = TRUE), Percent.Cov.95 = mean(coverage.95, na.rm = TRUE)) %>% distinct() %>% ungroup()
@@ -280,7 +285,11 @@ inc.rankings_location23 <- raw_scores23 %>%
   mutate(wis=round(interval_score,2),
          mae=round(ae_median,2),
          rel_wis=round(scaled_rel_skill,2))%>%
-  select(model, location_name, wis,rel_wis, mae) %>% mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
+  select(model, location_name, wis,rel_wis, mae) %>% # mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
+  group_by(location_name) %>%
+  mutate(baseline_wis = wis[model == "Flusight-baseline"]) %>%
+  ungroup() %>%
+  mutate(below = ifelse(wis < baseline_wis & model != "Flusight-baseline", 1, 0)) %>% select(-baseline_wis) %>% 
   left_join(WIS_and_coverage_23, by = join_by("model" == "model", "location_name" == "location_name"))
 
 inc.rankings_location <- inc.rankings_location21 %>% mutate(season = "2021-2022") %>% rbind(mutate(inc.rankings_location23, season = "2022-2023"))
@@ -298,14 +307,14 @@ WIS_Season23$season <- "2022-2023"
 WIS_Season <- rbind(WIS_Season21, WIS_Season23) %>% rename("target_end_date" = "date", "WIS" = "wis")
 inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel_wis)
 
-#write.csv(WIS_Season21, paste0(manuscript_repo, "/Data_for_Figures/WIS_Season21.csv"), row.names = FALSE)
-#write.csv(WIS_Season23, paste0(manuscript_repo, "/Data_for_Figures/WIS_Season23.csv"), row.names = FALSE)
-#write.csv(inc.rankings_all21, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all21.csv"), row.names = FALSE)
-#write.csv(inc.rankings_all23, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all23.csv"), row.names = FALSE)
-#write.csv(inc.rankings_location21, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location21.csv"), row.names = FALSE)
-#write.csv(inc.rankings_location23, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location23.csv"), row.names = FALSE)
-
-
+# write.csv(WIS_Season21, paste0(manuscript_repo, "/Data_for_Figures/WIS_Season21.csv"), row.names = FALSE)
+# write.csv(WIS_Season23, paste0(manuscript_repo, "/Data_for_Figures/WIS_Season23.csv"), row.names = FALSE)
+# write.csv(inc.rankings_all21, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all21.csv"), row.names = FALSE)
+# write.csv(inc.rankings_all23, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all23.csv"), row.names = FALSE)
+# write.csv(inc.rankings_location21, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location21.csv"), row.names = FALSE)
+# write.csv(inc.rankings_location23, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location23.csv"), row.names = FALSE)
+# 
+# 
 
 
 
@@ -321,9 +330,9 @@ abs_states <- WIS_Season %>% filter(location_name != "National") %>%
 abs_flusight <- abs_states %>% filter(model %in% c("Flusight-baseline", "Flusight-ensemble"))
 abs_not_flusight <- abs_states %>% filter(model %!in% c("Flusight-baseline", "Flusight-ensemble"))
 
-#write.csv(abs_states, paste0(manuscript_repo, "/Data_for_Figures/abs_states.csv"), row.names = FALSE)
-#write.csv(abs_flusight, paste0(manuscript_repo, "/Data_for_Figures/abs_flusight.csv"), row.names = FALSE)
-#write.csv(abs_not_flusight, paste0(manuscript_repo, "/Data_for_Figures/abs_not_flusight.csv"), row.names = FALSE)
+# write.csv(abs_states, paste0(manuscript_repo, "/Data_for_Figures/abs_states.csv"), row.names = FALSE)
+# write.csv(abs_flusight, paste0(manuscript_repo, "/Data_for_Figures/abs_flusight.csv"), row.names = FALSE)
+# write.csv(abs_not_flusight, paste0(manuscript_repo, "/Data_for_Figures/abs_not_flusight.csv"), row.names = FALSE)
 
 ########### 95% Coverage by Model
 
@@ -336,8 +345,8 @@ coverage95_states <- WIS_Season %>% filter(location_name != "National") %>%
 coverage95_flusight <- coverage95_states %>% filter(model %in% c("Flusight-baseline", "Flusight-ensemble"))
 coverage95_not_flusight <- coverage95_states %>% filter(model %!in% c("Flusight-baseline", "Flusight-ensemble"))
 
-#write.csv(coverage95_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage95_flusight.csv"), row.names = FALSE)
-#write.csv(coverage95_not_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage95_not_flusight.csv"), row.names = FALSE)
+# write.csv(coverage95_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage95_flusight.csv"), row.names = FALSE)
+# write.csv(coverage95_not_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage95_not_flusight.csv"), row.names = FALSE)
 
 ########### 50% Coverage by Model
 
@@ -352,8 +361,8 @@ coverage50_states <- WIS_Season %>% filter(location_name != "National") %>%
 coverage50_flusight <- coverage50_states %>% filter(model %in% c("Flusight-baseline", "Flusight-ensemble"))
 coverage50_not_flusight <- coverage50_states %>% filter(model %!in% c("Flusight-baseline", "Flusight-ensemble"))
 
-#write.csv(coverage50_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage50_flusight.csv"), row.names = FALSE)
-#write.csv(coverage50_not_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage50_not_flusight.csv"), row.names = FALSE)
+# write.csv(coverage50_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage50_flusight.csv"), row.names = FALSE)
+# write.csv(coverage50_not_flusight, paste0(manuscript_repo, "/Data_for_Figures/coverage50_not_flusight.csv"), row.names = FALSE)
 
 ############ Absolute WIS by Week
 
@@ -389,9 +398,9 @@ abs_breakdown <- WIS_Season %>% group_by(model, season) %>% summarise(
   Four_week_abs = mean(WIS[target == "4 wk ahead inc flu hosp"])
 ) %>% unique() 
 
-abs_breakdown_WIS <- merge(inc.rankings_all[,c(1,3,11)], abs_breakdown, by= c("model", "season")) %>% arrange(season, rel.WIS.skill)
+abs_breakdown_WIS <- merge(inc.rankings_all[,c(1,7,11)], abs_breakdown, by= c("model", "season")) %>% arrange(season, rel_wis)
 
-#write.csv(abs_breakdown_WIS, paste0(manuscript_repo, "/Data_for_Figures/abs_breakdown_WIS.csv"), row.names = FALSE)
+# write.csv(abs_breakdown_WIS, paste0(manuscript_repo, "/Data_for_Figures/abs_breakdown_WIS.csv"), row.names = FALSE)
 
 ########## Model Ranks
 
@@ -407,10 +416,10 @@ inc_scores_overall <- WIS_Season %>%
   ungroup() %>%
   mutate(model = reorder(model, rev_rank, FUN=function(x) quantile(x, probs=0.25, na.rm=TRUE)))
 
-#write.csv(inc_scores_overall, paste0(manuscript_repo, "/Data_for_Figures/inc_scores_overall.csv"), row.names = FALSE)
+# write.csv(inc_scores_overall, paste0(manuscript_repo, "/Data_for_Figures/inc_scores_overall.csv"), row.names = FALSE)
 
 ##### Relative WIS by Location
 
-inc.rankings_all_nice <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% group_by(season) %>% arrange(season, rel.WIS.skill) %>% mutate(modelorder = paste(model, season))
+inc.rankings_all_nice <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% group_by(season) %>% arrange(season, rel_wis) %>% mutate(modelorder = paste(model, season))
 
-#write.csv(inc.rankings_all_nice, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all_nice.csv"), row.names = FALSE)
+ # write.csv(inc.rankings_all_nice, paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all_nice.csv"), row.names = FALSE)
