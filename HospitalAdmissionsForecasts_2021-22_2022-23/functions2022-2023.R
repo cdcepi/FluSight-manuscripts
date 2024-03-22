@@ -288,7 +288,7 @@
       summarise(model = model,
                 date = as.Date(date, format = "%Y-%m-%d"),
                 target = target,
-                coverage95 = mean(coverage.95)) %>% unique()
+                coverage95 = mean(coverage.95,na.rm = TRUE)) %>% unique()
     
     cov95_breakdown <- coverage95_states_horizon %>% 
       group_by(model) %>% 

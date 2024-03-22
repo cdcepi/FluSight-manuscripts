@@ -230,12 +230,12 @@ wis_season_by_model_21 <- raw_scores21 %>%
   filter(location != "US", model %in% include21$model) %>% 
   add_coverage(ranges = c(50, 95), by = c("model")) %>%
   scoringutils::summarise_scores(by = c("model"),relative_skill=TRUE,  baseline="Flusight-baseline", na.rm  = TRUE)%>%
-  mutate(cov_50=round(coverage_50*100,2),
-         cov_95=round(coverage_95*100,2),
+  mutate(#cov_50=round(coverage_50*100,2),
+         #cov_95=round(coverage_95*100,2),
          wis=round(interval_score,2),
          mae=round(ae_median,2),
          rel_wis=round(scaled_rel_skill,2))%>%
-  select(model, wis,rel_wis, mae, cov_50, cov_95)
+  select(model, wis,rel_wis, mae)#, cov_50, cov_95
 
 inc.rankings_all21 <- include21 %>%
   left_join(wis_season_by_model_21, by="model")
@@ -245,25 +245,27 @@ wis_season_by_model_23 <- raw_scores23 %>%
   filter(location != "US", model %in% include23$model) %>% 
   add_coverage(ranges = c(50, 95), by = c("model")) %>%
   summarise_scores(by = c("model"),relative_skill=TRUE,  baseline="Flusight-baseline", na.rm  = TRUE)%>%
-  mutate(cov_50=round(coverage_50*100,2),
-         cov_95=round(coverage_95*100,2),
+  mutate(#cov_50=round(coverage_50*100,2),
+         #cov_95=round(coverage_95*100,2),
          wis=round(interval_score,2),
          mae=round(ae_median,2),
          rel_wis=round(scaled_rel_skill,2))%>%
-  select(model, wis,rel_wis, mae, cov_50, cov_95)
+  select(model, wis,rel_wis, mae) #, cov_50, cov_95
 
 inc.rankings_all23 <- include23 %>%
   left_join(wis_season_by_model_23, by="model")
 
+
+
 #coverage in scoringutils isn't exactly what we've been doing so approximating our coverage with data from scoringutils functions 
-WIS_all21 <- raw_scores21 %>% summarise_scores() %>% mutate(wis=round(interval_score,2))
+WIS_all21 <- raw_scores21 %>% summarise_scores(na.rm = TRUE) %>% mutate(wis=round(interval_score,2))
 dat_21 <- dat_for_scores21 %>% 
   pivot_wider(names_from = c(type, quantile), values_from=c(prediction, true_value)) %>% 
   select(target, model, forecast_date, location, date, prediction_quantile_0.025, prediction_quantile_0.25, prediction_quantile_0.5, prediction_quantile_0.75, prediction_quantile_0.975, true_value_quantile_0.5)
 
 WIS_all21 <- merge(WIS_all21, dat_21, by = c("target", "model", "forecast_date", "location", "date")) %>% rename("report" = "true_value_quantile_0.5") %>% mutate(coverage.50 = ifelse(report >= prediction_quantile_0.25 & report <= prediction_quantile_0.75,T,F),  coverage.95 = ifelse(report >= prediction_quantile_0.025 & report <= prediction_quantile_0.975,T,F))
 
-WIS_all23 <- raw_scores23 %>% summarise_scores() %>% mutate(wis=round(interval_score,2))
+WIS_all23 <- raw_scores23 %>% summarise_scores(na.rm = TRUE) %>% mutate(wis=round(interval_score,2))
 dat_23 <- dat_for_scores23 %>% 
   pivot_wider(names_from = c(type, quantile), values_from=c(prediction, true_value)) %>% 
   select(target, model, forecast_date, location, date, prediction_quantile_0.025, prediction_quantile_0.25, prediction_quantile_0.5, prediction_quantile_0.75, prediction_quantile_0.975, true_value_quantile_0.5)
@@ -279,6 +281,13 @@ WIS_all23 <- merge(WIS_all23, dat_23, by = c("target", "model", "forecast_date",
   
   WIS_Season21 <- filter(WIS_all21, as.Date(forecast_date) >= as.Date("2022-02-19"), as.Date(forecast_date) <= as.Date(last.tuesday21+4)) %>% {unique(.)}
   WIS_Season23 <- filter(WIS_all23, as.Date(forecast_date) >= as.Date("2022-10-17"), as.Date(forecast_date) <= as.Date(last.tuesday23+4)) %>% {unique(.)}
+  
+  and_coverage_21 <- WIS_Season21 %>% group_by(model) %>% summarise(Percent.Cov.50 = mean(coverage.50, na.rm = TRUE), Percent.Cov.95 = mean(coverage.95, na.rm = TRUE)) %>% distinct() %>% ungroup()
+  
+  inc.rankings_all21 <- inc.rankings_all21 %>%  left_join(and_coverage_21, by = "model")
+  
+  and_coverage_23 <- WIS_Season23 %>% group_by(model) %>% summarise(Percent.Cov.50 = mean(coverage.50, na.rm = TRUE), Percent.Cov.95 = mean(coverage.95, na.rm = TRUE)) %>% distinct() %>% ungroup()
+  inc.rankings_all23 <- left_join(inc.rankings_all23, and_coverage_23, by = "model")
 
 ```
 
@@ -318,8 +327,8 @@ inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), muta
     rename(Model = model,
            `Absolute WIS` = wis,
            `Relative WIS`= rel_wis,
-           `50% Coverage (%)` = cov_50,
-           `95% Coverage (%)` = cov_95,
+           `50% Coverage (%)` = Percent.Cov.50,
+           `95% Coverage (%)` = Percent.Cov.95,
            `% of Forecasts Submitted`  = per_forecasts,
            `% of Locations Forecasted` = per_locations,
            # `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
@@ -339,7 +348,9 @@ inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), muta
     knitr::kable(align = c("lcccccccc"), caption = "Table 1",#col.names = c()
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
-    kableExtra::footnote( general_title = "")# %>%     kableExtra::kable_classic() #%>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/Table1.pdf"))
+    kableExtra::footnote( general_title = "") %>%
+    kableExtra::kable_classic() #%>% 
+    #kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/Table1.pdf"))
  
   
    #need below installed to run save_kable  
@@ -549,7 +560,7 @@ Model performance varied by spatial jurisdiction, with state-specific relative W
 abs_states <- WIS_Season %>% filter(location_name != "National") %>% 
   filter(target == "1 wk ahead inc flu hosp" | target == "4 wk ahead inc flu hosp") %>% 
   group_by(model, target_end_date, target, season) %>% 
-  summarise(abs_WIS = mean(WIS)) %>% 
+  summarise(abs_WIS = mean(WIS,na.rm = TRUE)) %>% 
   ungroup() %>% mutate(log_WIS = log10(abs_WIS)) 
 
 abs_flusight <- abs_states %>% filter(model %in% c("Flusight-baseline", "Flusight-ensemble"))
@@ -612,20 +623,20 @@ coverage95_summary <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% f
   group_by(forecast_date, season) %>% 
   summarise(model = model,
             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% ungroup() %>% unique()
+            coverage95 = sum(coverage.95, na.rm =TRUE)/locationcount) %>% ungroup() %>% unique()
 
 coverage95_summary_4 <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
   filter(target == "4 wk ahead inc flu hosp") %>% 
   group_by(forecast_date, season) %>% 
   summarise(model = model,
             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% ungroup() %>%  unique()
+            coverage95 = sum(coverage.95, na.rm =TRUE)/locationcount) %>% ungroup() %>%  unique()
 coverage50_summary_4 <- WIS_Season %>%  filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
   filter(target == "4 wk ahead inc flu hosp") %>% 
   group_by(forecast_date, season) %>% 
   summarise(model = model,
             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage50 = sum(coverage.50)/locationcount) %>% unique()
+            coverage50 = sum(coverage.50, na.rm = TRUE)/locationcount) %>% unique()
 
 
 coverage50_summary <- WIS_Season %>% filter(model == "Flusight-ensemble") %>% filter(location_name != "National") %>%
@@ -633,7 +644,7 @@ coverage50_summary <- WIS_Season %>% filter(model == "Flusight-ensemble") %>% fi
   group_by(forecast_date, season) %>% 
   summarise(model = model,
             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage50 = sum(coverage.50)/locationcount) %>% ungroup() %>% unique()
+            coverage50 = sum(coverage.50, na.rm = TRUE)/locationcount) %>% ungroup() %>% unique()
 
 ## 4 week ahead 50 and 95% coverage summaries
 # coverage95_summary_4 %>% filter(season == "2021-2022") %>% {summary(.$coverage95)}
@@ -653,7 +664,7 @@ coverage95_summary_all <- WIS_Season %>%  filter(model != "Flusight-ensemble") %
   group_by(model, forecast_date, season) %>% 
   summarise(model = model,
             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% unique() %>% 
+            coverage95 = sum(coverage.95, na.rm =TRUE)/locationcount) %>% unique() %>% 
   group_by(model) %>% summarise(model = model,
                                 avg = mean(coverage95)) %>% unique()
 
@@ -663,7 +674,7 @@ coverage50_summary_all <- WIS_Season %>% filter(model != "Flusight-ensemble") %>
   group_by(model, forecast_date, season) %>% 
   summarise(model = model,
             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage50 = sum(coverage.50)/locationcount)
+            coverage50 = sum(coverage.50, na.rm = TRUE)/locationcount)
 
 
 coverage95_summary_all2 <- WIS_Season %>%  filter(model != "Flusight-ensemble") %>% filter(location_name != "National") %>%
@@ -671,7 +682,7 @@ coverage95_summary_all2 <- WIS_Season %>%  filter(model != "Flusight-ensemble") 
   group_by(model, forecast_date, season) %>% 
   summarise(model = model,
             forecast_date = as.Date(forecast_date, format = "%Y-%m-%d"),
-            coverage95 = sum(coverage.95)/locationcount) %>% unique() %>% 
+            coverage95 = sum(coverage.95, na.rm =TRUE)/locationcount) %>% unique() %>% 
   group_by(model) %>% summarise(model = model,
                                   avg = mean(coverage95)) %>% unique()
 
@@ -694,9 +705,9 @@ cov95_breakdownall <- rbind(mutate(cov95_breakdown21, season = "2021-2022"), mut
 cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, round, digits = 2) %>% select(-season) %>%  
   knitr::kable(align = c("lcccccccccc"), caption = "Table 2", col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
   kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
-  kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
+  kableExtra::pack_rows(index = table(cov95_breakdownall$season))# %>% 
 
-  kableExtra::kable_classic()  %>%    kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
+ # kableExtra::kable_classic()  %>%    kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
 
 # length(unique(coverage95_states$target_end_date[coverage95_states$target == "1 wk ahead inc flu hosp"]))
 # length(unique(coverage95_states$target_end_date))
@@ -724,24 +735,24 @@ abs_states_all <- WIS_Season %>% filter(location_name != "National") %>%
   group_by(model, target_end_date, target, season) %>% 
   summarise(model = model,
             target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
-            abs_WIS = mean(WIS)) %>% 
+            abs_WIS = mean(WIS,na.rm = TRUE)) %>% 
   mutate(model_color = ifelse(model == "Flusight-baseline", "red", ifelse(model == "Flusight-ensemble", "green", "gray")))
 
 
 model_abs_all <- abs_states_all %>% unique() %>% group_by(model, target, season) %>% summarise(
   model = model,
   target = target,
-  minimum = min(abs_WIS),
-  maximum = max(abs_WIS),
-  Median = median(abs_WIS)
+  minimum = min(abs_WIS,na.rm = TRUE),
+  maximum = max(abs_WIS,na.rm = TRUE),
+  Median = median(abs_WIS,na.rm = TRUE)
 ) %>% unique()
 
 abs_breakdown <- WIS_Season %>% group_by(model, season) %>% summarise(
   model = model,
-  One_week_abs = mean(WIS[target == "1 wk ahead inc flu hosp"]),
-  Two_week_abs = mean(WIS[target == "2 wk ahead inc flu hosp"]),
-  Three_week_abs = mean(WIS[target == "3 wk ahead inc flu hosp"]),
-  Four_week_abs = mean(WIS[target == "4 wk ahead inc flu hosp"])
+  One_week_abs = mean(WIS[target == "1 wk ahead inc flu hosp"],na.rm = TRUE),
+  Two_week_abs = mean(WIS[target == "2 wk ahead inc flu hosp"],na.rm = TRUE),
+  Three_week_abs = mean(WIS[target == "3 wk ahead inc flu hosp"],na.rm = TRUE),
+  Four_week_abs = mean(WIS[target == "4 wk ahead inc flu hosp"],na.rm = TRUE)
 ) %>% unique() 
 
 

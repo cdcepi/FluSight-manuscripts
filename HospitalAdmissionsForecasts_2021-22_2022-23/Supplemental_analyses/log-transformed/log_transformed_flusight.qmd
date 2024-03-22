@@ -152,12 +152,12 @@ wis_season_by_model_21ln <- raw_scores21ln %>%
   filter(location != "US", model %in% include21$model) %>% 
   add_coverage(ranges = c(50, 95), by = c("model")) %>%
   scoringutils::summarise_scores(by = c("model"),relative_skill=TRUE,  baseline="Flusight-baseline", na.rm  = TRUE)%>%
-  mutate(cov_50=round(coverage_50*100,2),
-         cov_95=round(coverage_95*100,2),
+  mutate(#cov_50=round(coverage_50*100,2),
+         #cov_95=round(coverage_95*100,2),
          wis=round(interval_score,2),
          mae=round(ae_median,2),
          rel_wis=round(scaled_rel_skill,2))%>%
-  select(model, wis,rel_wis, mae, cov_50, cov_95)
+  select(model, wis,rel_wis, mae) #, cov_50, cov_95
 
 inc.rankings_all21ln <- include21 %>%
   left_join(wis_season_by_model_21ln, by="model")
@@ -167,12 +167,12 @@ wis_season_by_model_23ln <- raw_scores23ln %>%
   filter(location != "US", model %in% include23$model) %>% 
   add_coverage(ranges = c(50, 95), by = c("model")) %>%
   summarise_scores(by = c("model"),relative_skill=TRUE,  baseline="Flusight-baseline", na.rm  = TRUE)%>%
-  mutate(cov_50=round(coverage_50*100,2),
-         cov_95=round(coverage_95*100,2),
+  mutate(#cov_50=round(coverage_50*100,2),
+         #cov_95=round(coverage_95*100,2),
          wis=round(interval_score,2),
          mae=round(ae_median,2),
          rel_wis=round(scaled_rel_skill,2))%>%
-  select(model, wis,rel_wis, mae, cov_50, cov_95)
+  select(model, wis,rel_wis, mae) #, cov_50, cov_95
 
 inc.rankings_all23ln <- include23 %>%
   left_join(wis_season_by_model_23ln, by="model")
@@ -202,6 +202,13 @@ WIS_all23ln = filter(WIS_all23ln, location_name != "National")
 WIS_Season21ln <- filter(WIS_all21ln, as.Date(forecast_date) >= as.Date("2022-02-19"), as.Date(forecast_date) <= as.Date(last.tuesday21+4)) %>% {unique(.)}
 WIS_Season23ln <- filter(WIS_all23ln, as.Date(forecast_date) >= as.Date("2022-10-17"), as.Date(forecast_date) <= as.Date(last.tuesday23+4)) %>% {unique(.)}
 
+  and_coverage_21 <- WIS_Season21ln %>% group_by(model) %>% summarise(Percent.Cov.50 = mean(coverage.50, na.rm = TRUE), Percent.Cov.95 = mean(coverage.95, na.rm = TRUE)) %>% distinct() %>% ungroup()
+  
+  inc.rankings_all21ln <- inc.rankings_all21ln %>%  left_join(and_coverage_21, by = "model")
+  
+  and_coverage_23 <- WIS_Season23ln %>% group_by(model) %>% summarise(Percent.Cov.50 = mean(coverage.50, na.rm = TRUE), Percent.Cov.95 = mean(coverage.95, na.rm = TRUE)) %>% distinct() %>% ungroup()
+  inc.rankings_all23ln <- left_join(inc.rankings_all23ln, and_coverage_23, by = "model")
+
 ```
 
 ##### Season inc rankings: Table S3
@@ -218,8 +225,8 @@ inc.rankings_all %>%
     rename(Model = model,
            `Absolute WIS` = wis,
            `Relative WIS`= rel_wis,
-           `50% Coverage (%)` = cov_50,
-           `95% Coverage (%)` = cov_95,
+           `50% Coverage (%)` = Percent.Cov.50,
+           `95% Coverage (%)` = Percent.Cov.95,
            `% of Forecasts Submitted`  = per_forecasts,
            `% of Locations Forecasted` = per_locations,
           # `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
@@ -237,8 +244,8 @@ inc.rankings_all %>%
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
     kableExtra::footnote( general_title = "") %>%
-     kableExtra::kable_classic() #%>% 
- # kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
+     kableExtra::kable_classic()#%>% 
+  kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
 
 # inc.rankings_all %>%
 #     rename(Model = model,
