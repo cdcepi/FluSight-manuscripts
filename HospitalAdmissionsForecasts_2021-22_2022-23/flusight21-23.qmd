@@ -359,7 +359,11 @@ inc.rankings_location21 <- raw_scores21 %>%
   mutate(wis=round(interval_score,2),
          mae=round(ae_median,2),
          rel_wis=round(scaled_rel_skill,2))%>%
-  select(model, location_name, wis,rel_wis, mae) %>% mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
+  select(model, location_name, wis,rel_wis, mae) %>%# mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
+group_by(location_name) %>%
+  mutate(baseline_wis = wis[model == "Flusight-baseline"]) %>%
+  ungroup() %>%
+  mutate(below = ifelse(wis < baseline_wis & model != "Flusight-baseline", 1, 0)) %>% select(-baseline_wis) %>% 
   left_join(WIS_and_coverage_21, by = join_by("model" == "model", "location_name" == "location_name"))
 
   
@@ -375,7 +379,11 @@ inc.rankings_location23 <- raw_scores23 %>%
   mutate(wis=round(interval_score,2),
          mae=round(ae_median,2),
          rel_wis=round(scaled_rel_skill,2))%>%
-  select(model, location_name, wis,rel_wis, mae) %>% mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
+  select(model, location_name, wis,rel_wis, mae) %>%# mutate(below = ifelse(rel_wis < 1, 1, 0)) %>% 
+group_by(location_name) %>%
+  mutate(baseline_wis = wis[model == "Flusight-baseline"]) %>%
+  ungroup() %>%
+  mutate(below = ifelse(wis < baseline_wis & model != "Flusight-baseline", 1, 0)) %>% select(-baseline_wis) %>% 
   left_join(WIS_and_coverage_23, by = join_by("model" == "model", "location_name" == "location_name"))
   
 inc.rankings_location <- inc.rankings_location21 %>% mutate(season = "2021-2022") %>% rbind(mutate(inc.rankings_location23, season = "2022-2023"))
@@ -688,7 +696,7 @@ cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, r
   kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
   kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
 
-  kableExtra::kable_classic() # %>%    kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
+  kableExtra::kable_classic()  %>%    kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
 
 # length(unique(coverage95_states$target_end_date[coverage95_states$target == "1 wk ahead inc flu hosp"]))
 # length(unique(coverage95_states$target_end_date))
