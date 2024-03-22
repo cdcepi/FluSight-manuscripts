@@ -201,7 +201,7 @@ inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), muta
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
     kableExtra::footnote( general_title = "") %>% 
-    kableExtra::kable_classic() %>% 
-    kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Table_S5.pdf"))
+    kableExtra::kable_classic() # %>% 
+    # kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Table_S5.pdf"))
 
 ```
