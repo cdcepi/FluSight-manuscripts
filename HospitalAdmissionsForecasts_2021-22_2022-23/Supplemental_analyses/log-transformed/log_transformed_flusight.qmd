@@ -244,8 +244,7 @@ inc.rankings_all %>%
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
     kableExtra::footnote( general_title = "") %>%
-     kableExtra::kable_classic()#%>% 
-  kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
+     kableExtra::kable_classic() #%>%  kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
 
 # inc.rankings_all %>%
 #     rename(Model = model,
