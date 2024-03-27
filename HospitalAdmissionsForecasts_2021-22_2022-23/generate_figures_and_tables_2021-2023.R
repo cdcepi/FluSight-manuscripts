@@ -339,12 +339,12 @@ figure3 <- ggplot(scores,
   theme(axis.ticks.y = element_blank())
 figure3
 
-# ggsave(paste0(manuscript_repo,"/Output/figure3.png"), plot = figure3, width = 12, height= 8)
+ # ggsave(paste0(manuscript_repo,"/Output/figure3.png"), plot = figure3, width = 12, height= 8)
 
 
 # this is the output for this figure as a table 
-data_csv <- scores %>% select(model, location_name, rel_wis, season) 
-write.csv(data_csv, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Table_Figure3_a.csv"),row.names = FALSE)
+# data_csv <- scores %>% select(model, location_name, rel_wis, season) 
+# write.csv(data_csv, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Table_Figure3_a.csv"),row.names = FALSE)
 
 
 ##################### Relative WIS Distribution Figure S 1
@@ -368,4 +368,4 @@ figures1 <- model_order %>%
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022", `2022-2023` = "B) 2022-2023")))
 
 figures1
-# ggsave(paste0(manuscript_repo,"/Output/figures1.jpg"), plot = figs1, width=10, height=8)
+# ggsave(paste0(manuscript_repo,"/Output/figures1.jpg"), plot = figures1, width=10, height=8)
