@@ -32,6 +32,7 @@
 "CU-ensemble",0.51,0.85,"2022-2023"
 "SGroup-RandomForest",0.52,0.87,"2022-2023"
 "GT-FluFNP",0.53,0.9,"2022-2023"
+"UNC_IDD-InfluPaint",0.52,0.96,"2022-2023"
 "Flusight-baseline",0.59,1,"2022-2023"
 "UGA_flucast-OKeeffe",0.61,1.02,"2022-2023"
 "UVAFluX-Ensemble",0.61,1.02,"2022-2023"

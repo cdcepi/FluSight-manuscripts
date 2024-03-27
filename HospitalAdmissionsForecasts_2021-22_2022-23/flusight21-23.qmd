@@ -179,7 +179,7 @@ location.names23 = obs_data23 %>% select(location, location_name) %>% unique()
 all_dat23 = left_join(all_dat23,location.names23, by = c("location"))
 
 #inclusion criteria before scoring
-include21 <- all_dat21 %>% 
+include21 <- all_dat21 %>% filter(type == "quantile", location != "US") %>% 
   mutate(baseline_n_forecasts = sum(!is.na(value[model == "Flusight-baseline"]))) %>% 
   group_by(model) %>% 
   mutate(n_forecasts = sum(!is.na(value)),
@@ -345,6 +345,7 @@ inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), muta
            `Log Transformed Relative WIS`
           ) %>%
     mutate_if(is.numeric, round, digits = 2) %>%  
+    mutate(`% of Forecasts Submitted` = round(`% of Forecasts Submitted`)) %>% 
     knitr::kable(align = c("lcccccccc"), caption = "Table 1",#col.names = c()
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 

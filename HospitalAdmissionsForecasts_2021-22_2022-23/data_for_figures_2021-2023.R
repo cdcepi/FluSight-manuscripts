@@ -171,7 +171,7 @@ all_dat23 = left_join(all_dat23,location.names23, by = c("location"))
 
 
 #inclusion criteria before scoring
-include21 <- all_dat21 %>% 
+include21 <- all_dat21 %>%  filter(type == "quantile", location != "US") %>% 
   mutate(baseline_n_forecasts = sum(!is.na(value[model == "Flusight-baseline"]))) %>% 
   group_by(model) %>% 
   mutate(n_forecasts = sum(!is.na(value)),
@@ -182,7 +182,7 @@ include21 <- all_dat21 %>%
   select(model,n_forecasts, per_forecasts, n_locations, per_locations) %>% 
   distinct() %>% ungroup()
 
-include23 <- all_dat23 %>% 
+include23 <- all_dat23 %>%  filter(type == "quantile", location != "US") %>% 
   mutate(baseline_n_forecasts = sum(!is.na(value[model == "Flusight-baseline"]))) %>% 
   group_by(model) %>% 
   mutate(n_forecasts = sum(!is.na(value)),

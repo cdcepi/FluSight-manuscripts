@@ -1,0 +1,214 @@
+---
+title: "FluSight National Analysis 2021-2023"
+author: "CDC FluSight Team"
+format: 
+  html:
+    self-contained: true
+    code-background: true
+  # docx: default
+editor: source
+date: today 
+echo: false
+warning: false
+message: false
+always_allow_html: true
+---
+
+```{r setup}
+
+#FluSight 2021-2022 -- 2022-23 
+
+library(tidyverse)
+library(epiDisplay)
+library(MMWRweek)
+library(DT)
+library(gridExtra)
+library(covidHubUtils)
+library(arrow)
+library(scoringutils)
+
+
+
+'%!in%' <- Negate('%in%') #previously %notin% possible #update
+
+last.tuesday21 = as.Date("2022-06-21")
+last.tuesday23 = as.Date("2023-04-11")
+
+window.width = c(2, 4, 8)
+
+eval.weeks = 8
+
+#updated to reflect inclusion criteria for 21-22 of Feb 21, 2022 to June 20, 2022 and Oct 17, 2022 to May 15, 2023 for 22-23
+weeks.to.eval21 = 
+  seq(as.Date("2022-02-21"),
+      as.Date("2022-06-20"),
+      by=7) %>% 
+  as.character()
+
+weeks.to.eval23 = 
+  seq(as.Date("2022-10-17"),
+      as.Date("2023-04-10"),
+      by=7) %>% 
+  as.character()
+
+githubpath = paste0("C:/Users/",Sys.info()["user"],"/Desktop/GitHub")
+manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
+flusight_forecast_data <-paste0("C:/Users/",Sys.info()["user"],"/Desktop/GitHub/Flusight-forecast-data")
+
+suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
+source(paste0(manuscript_repo,"/functions2022-2023.R"))
+
+select = dplyr::select
+filter = dplyr::filter
+
+```
+
+
+#### Get data
+
+
+```{r, read data}
+
+all_dat21 <- read_parquet(paste0(manuscript_repo, "/Data_for_Figures/all_dat21.parquet")) %>% 
+  mutate(target_end_date = as.Date(target_end_date), forecast_date = as.Date(forecast_date))
+all_dat23 <- read_parquet(paste0(manuscript_repo, "/Data_for_Figures/all_dat23.parquet"))  %>% 
+  mutate(target_end_date = as.Date(target_end_date), forecast_date = as.Date(forecast_date))
+
+
+##Observed Data
+obs_data21 <- read.csv(paste0(manuscript_repo,"/Data_for_Figures/obs_data21.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+obs_data23 <- read.csv(paste0(manuscript_repo,"/Data_for_Figures/obs_data23.csv")) %>% mutate(target_end_date = as.Date(target_end_date)) 
+
+
+#inclusion criteria before scoring
+include21 <- all_dat21 %>% filter(type == "quantile") %>% 
+  mutate(baseline_n_forecasts = sum(!is.na(value[model == "Flusight-baseline"]))) %>% 
+  group_by(model) %>% 
+  mutate(n_forecasts = sum(!is.na(value)),
+         n_locations = length(unique(location))) %>%
+  mutate(per_forecasts = round((n_forecasts/(baseline_n_forecasts))*100,2),
+         per_locations = round((n_locations/length(unique(all_dat21$location)))*100,2)) %>% 
+  filter(per_forecasts >= 75) %>%
+  select(model,n_forecasts, per_forecasts, n_locations, per_locations) %>% 
+  distinct() %>% ungroup()
+
+include23 <- all_dat23 %>% filter(type == "quantile") %>% 
+  mutate(baseline_n_forecasts = sum(!is.na(value[model == "Flusight-baseline"]))) %>% 
+  group_by(model) %>% 
+  mutate(n_forecasts = sum(!is.na(value)),
+         n_locations = length(unique(location))) %>%
+  mutate(per_forecasts = round((n_forecasts/(baseline_n_forecasts))*100,2),
+         per_locations = round((n_locations/length(unique(all_dat23$location)))*100,2)) %>% 
+  filter(per_forecasts >= 75) %>%
+  select(model,n_forecasts, per_forecasts, n_locations, per_locations) %>% 
+  distinct() %>% ungroup()
+
+
+dat_for_scores21 <- dat_for_scores_function(all_dat21, obs_data21, include21)
+dat_for_scores23 <- dat_for_scores_function(all_dat23, obs_data23, include23)
+
+```
+
+
+## Results
+
+##### WIS Calculations
+
+
+```{R, Wis Calculations}
+
+# WIS_all21 <- wis_all_function(dat_for_scores21) %>% filter(location_name == "National")
+# WIS_all23 <- wis_all_function(dat_for_scores23) %>% filter(location_name == "National")
+raw_scores21 <- dat_for_scores21 %>% scoringutils::score()
+raw_scores23 <- dat_for_scores23 %>% scoringutils::score()
+
+wis_season_by_model_21 <- raw_scores21 %>%
+  filter(location == "US", model %in% include21$model) %>% 
+  add_coverage(ranges = c(50, 95), by = c("model")) %>%
+  scoringutils::summarise_scores(by = c("model"),relative_skill=TRUE,  baseline="Flusight-baseline", na.rm  = TRUE)%>%
+  mutate(cov_50=round(coverage_50*100,2),
+         cov_95=round(coverage_95*100,2),
+         wis=round(interval_score,2),
+         mae=round(ae_median,2),
+         rel_wis=round(scaled_rel_skill,2))%>%
+  select(model, wis,rel_wis, mae, cov_50, cov_95)
+
+inc.rankings_all21 <- include21 %>%
+  left_join(wis_season_by_model_21, by="model")
+
+WIS_all21 <- raw_scores21 %>% summarise_scores() %>% mutate(wis=round(interval_score,2))
+dat_21 <- dat_for_scores21 %>% 
+  pivot_wider(names_from = c(type, quantile), values_from=c(prediction, true_value)) %>% 
+  select(target, model, forecast_date, location, date, prediction_quantile_0.025, prediction_quantile_0.25, prediction_quantile_0.5, prediction_quantile_0.75, prediction_quantile_0.975, true_value_quantile_0.5)
+
+WIS_all21 <- merge(WIS_all21, dat_21, by = c("target", "model", "forecast_date", "location", "date")) %>% rename("report" = "true_value_quantile_0.5") %>% mutate(coverage.50 = ifelse(report >= prediction_quantile_0.25 & report <= prediction_quantile_0.75,T,F),  coverage.95 = ifelse(report >= prediction_quantile_0.025 & report <= prediction_quantile_0.975,T,F))
+
+# 23
+wis_season_by_model_23 <- raw_scores23 %>%
+  filter(location == "US", model %in% include23$model) %>% 
+  add_coverage(ranges = c(50, 95), by = c("model")) %>%
+  summarise_scores(by = c("model"),relative_skill=TRUE,  baseline="Flusight-baseline", na.rm  = TRUE)%>%
+  mutate(cov_50=round(coverage_50*100,2),
+         cov_95=round(coverage_95*100,2),
+         wis=round(interval_score,2),
+         mae=round(ae_median,2),
+         rel_wis=round(scaled_rel_skill,2))%>%
+  select(model, wis,rel_wis, mae, cov_50, cov_95)
+
+inc.rankings_all23 <- include23 %>%
+  left_join(wis_season_by_model_23, by="model")
+
+
+WIS_all23 <- raw_scores23 %>% summarise_scores() %>% mutate(wis=round(interval_score,2))
+dat_23 <- dat_for_scores23 %>% 
+  pivot_wider(names_from = c(type, quantile), values_from=c(prediction, true_value)) %>% 
+  select(target, model, forecast_date, location, date, prediction_quantile_0.025, prediction_quantile_0.25, prediction_quantile_0.5, prediction_quantile_0.75, prediction_quantile_0.975, true_value_quantile_0.5)
+
+WIS_all23 <- merge(WIS_all23, dat_23, by = c("target", "model", "forecast_date", "location", "date")) %>% rename("report" = "true_value_quantile_0.5") %>% mutate(coverage.50 = ifelse(report >= prediction_quantile_0.25 & report <= prediction_quantile_0.75,T,F),  coverage.95 = ifelse(report >= prediction_quantile_0.025 & report <= prediction_quantile_0.975,T,F))
+
+WIS_Season21 <- filter(WIS_all21, as.Date(forecast_date) >= as.Date("2022-02-19"), as.Date(forecast_date) <= as.Date(last.tuesday21+4)) %>% {unique(.)}
+WIS_Season23 <- filter(WIS_all23, as.Date(forecast_date) >= as.Date("2022-10-17"), as.Date(forecast_date) <= as.Date(last.tuesday23+4)) %>% {unique(.)}
+
+```
+
+
+##### Season inc rankings: Table S5
+
+
+```{r, Season}
+
+#   updating methods
+# inc.rankings_all21 <- inc.rankings_all_func(WIS_Season21)
+# inc.rankings_all23 <- inc.rankings_all_func(WIS_Season23)
+  
+    
+inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), mutate(inc.rankings_all23, season = "2022-2023")) %>% arrange(season, rel_wis)
+
+  inc.rankings_all %>% 
+    rename(Model = model,
+           `Absolute WIS` = wis,
+           `Relative WIS`= rel_wis,
+           `50% Coverage (%)` = cov_50 ,
+           `95% Coverage (%)` = cov_95 ,
+           `% of Forecasts Submitted`  = per_forecasts ,
+           `% of Locations Forecasted` = per_locations   ,
+           # `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
+           # `% of Submitted Locations with All Forecasts` = frac.submitted.locations.fully.forecasted,
+           `Season` = season, 
+           `MAE` = mae) %>% 
+    select(Model, `Absolute WIS`, `Relative WIS`,
+           MAE, `50% Coverage (%)`, 
+           `95% Coverage (%)`, 
+           `% of Forecasts Submitted`) %>%
+    #datatable()
+    #arrange(`Season`, `Relative WIS`) %>% 
+    mutate_if(is.numeric, round, digits = 2) %>%  
+    knitr::kable(align = c("lcccccccc"), caption = "Table S5",#col.names = c()
+    ) %>% 
+    kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
+    kableExtra::footnote( general_title = "") %>% 
+    kableExtra::kable_classic() # %>% 
+    # kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Table_S5.pdf"))
+
+```
+

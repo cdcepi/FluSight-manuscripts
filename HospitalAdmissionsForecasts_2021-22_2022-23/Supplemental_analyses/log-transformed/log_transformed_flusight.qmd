@@ -109,7 +109,7 @@ obs_data23 <- obs_data23 %>%
 
 location.names23 = obs_data23 %>% select(location, location_name) %>% unique()
 # Adding in inclusion criteria here 
-include21 <- all_dat21 %>% 
+include21 <- all_dat21 %>%  filter(type == "quantile", location != "US") %>% 
   mutate(baseline_n_forecasts = sum(!is.na(value[model == "Flusight-baseline"]))) %>% 
   group_by(model) %>% 
   mutate(n_forecasts = sum(!is.na(value)),
@@ -120,7 +120,7 @@ include21 <- all_dat21 %>%
   select(model,n_forecasts, per_forecasts, n_locations, per_locations) %>% 
   distinct()
 
-include23 <- all_dat23 %>% 
+include23 <- all_dat23 %>%  filter(type == "quantile", location != "US") %>% 
   mutate(baseline_n_forecasts = sum(!is.na(value[model == "Flusight-baseline"]))) %>% 
   group_by(model) %>% 
   mutate(n_forecasts = sum(!is.na(value)),
@@ -244,7 +244,7 @@ inc.rankings_all %>%
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
     kableExtra::footnote( general_title = "") %>%
-     kableExtra::kable_classic() #%>%  kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
+     kableExtra::kable_classic()# %>%  kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
 
 # inc.rankings_all %>%
 #     rename(Model = model,
