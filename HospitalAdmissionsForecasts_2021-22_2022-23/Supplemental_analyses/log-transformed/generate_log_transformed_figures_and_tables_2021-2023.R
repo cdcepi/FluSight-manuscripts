@@ -45,15 +45,16 @@ inc.rankings_all <- read.csv(paste0(manuscript_repo, "/Supplemental_analyses/log
 
 inc.rankings_all %>%
   rename(Model = model,
-         `Absolute WIS` = mean.WIS,
-         `Relative WIS`= rel.WIS.skill,
+         `Absolute WIS` = wis,
+         `Relative WIS`= rel_wis,
          `50% Coverage (%)` = Percent.Cov.50,
          `95% Coverage (%)` = Percent.Cov.95,
-         `% of Forecasts Submitted`  = frac.forecasts.submitted,
-         `% of Locations Forecasted` = frac.locations.submitted,
-         `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
-         `% of Submitted Locations with All Forecasts` = frac.submitted.locations.fully.forecasted,
-         `Season` = season) %>% 
+         `% of Forecasts Submitted`  = per_forecasts,
+         `% of Locations Forecasted` = per_locations,
+         # `% of Locations Fully Forecasted` = frac.locations.fully.forecasted,
+         # `% of Submitted Locations with All Forecasts` = frac.submitted.locations.fully.forecasted,
+         `Season` = season, 
+         `MAE` = mae) %>% 
   select(Model, `Absolute WIS`, `Relative WIS`,
          MAE, `50% Coverage (%)`, 
          `95% Coverage (%)`, 
@@ -64,8 +65,8 @@ inc.rankings_all %>%
   knitr::kable(align = c("lcccccccccc"), caption = "Table S3",#col.names = c()
   ) %>% 
   kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
-  kableExtra::footnote( general_title = "") #%>% 
-#kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
+  kableExtra::footnote( general_title = "") %>% 
+kableExtra::kable_classic() %>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S3.pdf"))
 
 
 
@@ -77,12 +78,26 @@ cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, r
   knitr::kable(align = c("lcccccccccc"), caption = "Table S4", col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
   kableExtra::footnote(general = "Table S4: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
   kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
-  kableExtra::kable_classic() # %>% 
-# kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/tables4.pdf"))
+  kableExtra::kable_classic()  %>% 
+kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/table_S4.pdf"))
 
 ##### Model rank plot: Figure S5
 
-inc_scores_overall <- read.csv(paste0(manuscript_repo, "/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/inc_scores_overall.csv"))
+WIS_Season <- read.csv(paste0(manuscript_repo, "/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/WIS_Season.csv"))
+
+inc_scores_overall <- WIS_Season %>%
+  # filter(include_overall == "TRUE") %>%
+  group_by(target_end_date, target, location_name, season) %>%
+  mutate(n_models = n()) %>%
+  ##filter(n_models >= 15) %>%
+  arrange(WIS) %>%
+  mutate(model_rank = row_number(), rank_percentile = model_rank/n_models) %>%
+  arrange(-WIS) %>%
+  mutate(rev_rank = (row_number()-1)/(n_models-1)) %>%
+  ungroup() %>%
+  mutate(model = reorder(model, rev_rank, FUN=function(x) quantile(x, probs=0.25, na.rm=TRUE)))
+
+
 
 figures5 <- inc_scores_overall %>% 
   ggplot(aes(y=model, x=rev_rank, fill = factor(after_stat(quantile)))) +
@@ -96,7 +111,7 @@ figures5 <- inc_scores_overall %>%
   theme_bw()+
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")))
 
-
+#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = figures5)
 
 ##### Absolute WIS by model: Figure S6
 
@@ -127,11 +142,11 @@ figures6 <- ggplot(abs_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 
-
+ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S6.png"), plot = figures6, width = 8, height = 5)
 
 ##### Relative WIS by Location Figure S7
 
-inc.rankings_all_nice <- read.csv(paste0(manuscript_repo, "/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/inc.rankings_all.csv")) %>% group_by(season) %>% arrange(season, rel.WIS.skill) %>% mutate(modelorder = paste(model, season))
+inc.rankings_all_nice <- rbind(mutate(inc.rankings_all21ln, season = "2021-2022"), mutate(inc.rankings_all23ln, season = "2022-2023")) %>% group_by(season) %>% arrange(season, rel_wis) %>% mutate(modelorder = paste(model, season))
 
 scores <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/scores.csv"))
 
@@ -140,11 +155,11 @@ levels_order <- scores_order$modelorder
 
 figures7 <- ggplot(scores, 
                       aes(x = factor(modelorder, levels = levels_order), y=location_name, 
-                          fill= scales::oob_squish(relative_WIS, range = c(- 2.584963, 2.584963)), 
+                          fill= scales::oob_squish(rel_wis, range = c(- 2.584963, 2.584963)), 
                           group = season)) +
   geom_tile() +
   theme_bw()+
-  geom_text(aes(label = signif(relative_WIS, 2)), size = 2.5) + # I adapted the rounding 
+  geom_text(aes(label = signif(rel_wis, 2)), size = 2.5) + # I adapted the rounding 
   scale_fill_gradient2(low ="#6baed6", high =  "#d6936b", midpoint = 1, na.value = "grey50", 
                        name = "Relative WIS", 
                        breaks = c(-2,-1,0,1,2), 
@@ -160,4 +175,5 @@ figures7 <- ggplot(scores,
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")))+
   theme(axis.ticks.y = element_blank())
 
+ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = figures7, width = 12, height= 8)
 
