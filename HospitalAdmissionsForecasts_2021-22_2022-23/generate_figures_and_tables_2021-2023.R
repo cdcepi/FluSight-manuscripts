@@ -156,8 +156,89 @@ Figure_1a <- forecastsandobservedplt(all_dat21, obs_data21, "a")
 
 Figure_1b <- forecastsandobservedplt(all_dat23, obs_data23, "b")
 
-# ggsave(paste0(manuscript_repo,"/Output/Figure_1a.png"), plot = Figure_1a, width=10, height=8)
-# ggsave(paste0(manuscript_repo,"/Output/Figure_1b.png"), plot = Figure_1b, width=10, height=8)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_1a.pdf"), plot = Figure_1a, width=10, height=8)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_1b.pdf"), plot = Figure_1b, width=10, height=8)
+
+##################### Model Ranks Figure 2
+
+#uncomment to just run generate this figure
+# WIS_Season21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season21.csv"))
+# WIS_Season23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season23.csv"))
+# WIS_Season <- rbind(mutate(WIS_Season21, season = "2021-2022"), mutate(WIS_Season23, season = "2022-2023")) %>% rename("target_end_date" = "date", "WIS" = "wis")
+
+inc_scores_overall <- WIS_Season %>%
+  # filter(include_overall == "TRUE") %>%
+  group_by(target_end_date, target, location_name, season) %>%
+  mutate(n_models = n()) %>%
+  ##filter(n_models >= 15) %>%
+  arrange(WIS) %>%
+  mutate(model_rank = row_number(), rank_percentile = model_rank/n_models) %>%
+  arrange(-WIS) %>%
+  mutate(rev_rank = (row_number()-1)/(n_models-1)) %>%
+  ungroup() %>%
+  mutate(model = reorder(model, rev_rank, FUN=function(x) quantile(x, probs=0.25, na.rm=TRUE)))
+
+Figure_2 <- inc_scores_overall %>% 
+  ggplot(aes(y = model, x=rev_rank, fill = factor(after_stat(quantile)))) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient", calc_ecdf = TRUE,
+    quantiles = 4, quantile_lines = TRUE, color = "gray30"
+  ) +
+  scale_fill_manual(values = c("#6baed6", "#c86bd6","#d6936b","#78d66b"), name = "Quartiles")+
+  labs(x = "Standardized Rank", y = "Model", color = "Quartiles")+
+  scale_x_continuous(limits=c(0,1)) + 
+  theme_bw()+
+  facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")) )+
+  theme(strip.text = element_text(size = 10))
+Figure_2
+
+
+ # ggsave(paste0(manuscript_repo,"/Output/Figure_2.pdf"), width=8, height=8, units="in", plot = Figure_2)
+
+##################### Relative WIS by Location Figure 3 & Supplemental Table X
+
+#uncomment to just run generate this figure
+# inc.rankings_location21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location21.csv"))
+# inc.rankings_location23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location23.csv"))
+# inc.rankings_location <- rbind(mutate(inc.rankings_location21, season = "2021-2022"), mutate(inc.rankings_location23, season = "2022-2023"))
+# inc.rankings_all_nice <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all_nice.csv"))
+
+scores <- inc.rankings_location %>% filter(is.finite(rel_wis)) %>% left_join(., y = inc.rankings_all_nice[,c("model","season", "modelorder")], by = c("model", "season"))
+scores_order <- inc.rankings_all_nice
+levels_order <- scores_order$modelorder
+
+Figure_3 <- ggplot(scores, 
+                   aes(x = factor(modelorder, levels = levels_order), y=location_name, 
+                       fill= scales::oob_squish(rel_wis, range = c(- 2.584963, 2.584963)), 
+                       group = season)) +
+  geom_tile() +
+  theme_bw()+
+  geom_text(aes(label = signif(rel_wis, 2)), size = 2.5) + # I adapted the rounding 
+  scale_fill_gradient2(low ="#6baed6", high =  "#d6936b", midpoint = 1, na.value = "grey50", 
+                       name = "Relative WIS", 
+                       breaks = c(-2,-1,0,1,2), 
+                       labels =c("0.25", 0.5, 1, 2, 4)) + 
+  labs(x = NULL, y = NULL)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
+        axis.title.x = element_text(size = 9),
+        axis.text.y = element_text(size = 7),
+        title = element_text(size = 9)
+  ) +
+  scale_y_discrete(limits = rev) +
+  scale_x_discrete(labels = function(x) substring(x, 1, nchar(x)-10))+
+  facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")))+
+  theme(axis.ticks.y = element_blank())
+Figure_3
+
+ # ggsave(paste0(manuscript_repo,"/Output/Figure_3.pdf"), plot = Figure_3, width = 12, height= 8)
+
+
+# this is the output for this figure as a table 
+# data_csv <- scores %>% select(model, location_name, rel_wis, season)
+# write.csv(data_csv, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Figure_3_Table.csv"),row.names = FALSE)
+
+
+
 
 ##################### Absolute WIS by Model
 
@@ -189,7 +270,7 @@ Figure_4a <-  ggplot(abs_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 
-# ggsave(paste0(manuscript_repo,"/Output/Figure_4a.png"), plot = Figure_4a, width = 8, height = 5)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_4a.pdf"), plot = Figure_4a, width = 8, height = 5)
 
 ##################### Coverage and Scores
 
@@ -198,8 +279,8 @@ Figure_4a <-  ggplot(abs_flusight, aes(x = target_end_date,
 ##################### 95% Coverage by Models Figure 4b
 
 #uncomment to just run generate this figure
-coverage95_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
-coverage95_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_not_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+# coverage95_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
+# coverage95_not_flusight <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/coverage95_not_flusight.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
 
 
 coverage_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead", 
@@ -224,7 +305,7 @@ Figure_4b <- ggplot(coverage95_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
 
-# ggsave(paste0(manuscript_repo,"/Output/Figure_4b.png"), width=8, height=6, plot = Figure_4b)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_4b.pdf"), width=8, height=6, plot = Figure_4b)
 
 ##################### Coverage Tables Table 2
 
@@ -268,83 +349,7 @@ abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 
 
 
 
-##################### Model Ranks Figure 2
 
-#uncomment to just run generate this figure
-# WIS_Season21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season21.csv"))
-# WIS_Season23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/WIS_Season23.csv"))
-# WIS_Season <- rbind(mutate(WIS_Season21, season = "2021-2022"), mutate(WIS_Season23, season = "2022-2023")) %>% rename("target_end_date" = "date", "WIS" = "wis")
-
-inc_scores_overall <- WIS_Season %>%
-  # filter(include_overall == "TRUE") %>%
-  group_by(target_end_date, target, location_name, season) %>%
-  mutate(n_models = n()) %>%
-  ##filter(n_models >= 15) %>%
-  arrange(WIS) %>%
-  mutate(model_rank = row_number(), rank_percentile = model_rank/n_models) %>%
-  arrange(-WIS) %>%
-  mutate(rev_rank = (row_number()-1)/(n_models-1)) %>%
-  ungroup() %>%
-  mutate(model = reorder(model, rev_rank, FUN=function(x) quantile(x, probs=0.25, na.rm=TRUE)))
-
-Figure_2 <- inc_scores_overall %>% 
-  ggplot(aes(y = model, x=rev_rank, fill = factor(after_stat(quantile)))) +
-  stat_density_ridges(
-    geom = "density_ridges_gradient", calc_ecdf = TRUE,
-    quantiles = 4, quantile_lines = TRUE, color = "gray30"
-  ) +
-  scale_fill_manual(values = c("#6baed6", "#c86bd6","#d6936b","#78d66b"), name = "Quartiles")+
-  labs(x = "Standardized Rank", y = "Model", color = "Quartiles")+
-  scale_x_continuous(limits=c(0,1)) + 
-  theme_bw()+
-  facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")) )+
-  theme(strip.text = element_text(size = 10))
-Figure_2
-
-
-# ggsave(paste0(manuscript_repo,"/Output/Figure2.png"), width=8, height=8, units="in", plot = Figure_2)
-
-##################### Relative WIS by Location Figure 3 & Supplemental Table X
-
-#uncomment to just run generate this figure
-# inc.rankings_location21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location21.csv"))
-# inc.rankings_location23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_location23.csv"))
-# inc.rankings_location <- rbind(mutate(inc.rankings_location21, season = "2021-2022"), mutate(inc.rankings_location23, season = "2022-2023"))
-# inc.rankings_all_nice <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/inc.rankings_all_nice.csv"))
-
-scores <- inc.rankings_location %>% filter(is.finite(rel_wis)) %>% left_join(., y = inc.rankings_all_nice[,c("model","season", "modelorder")], by = c("model", "season"))
-scores_order <- inc.rankings_all_nice
-levels_order <- scores_order$modelorder
-
-Figure_3 <- ggplot(scores, 
-                      aes(x = factor(modelorder, levels = levels_order), y=location_name, 
-                          fill= scales::oob_squish(rel_wis, range = c(- 2.584963, 2.584963)), 
-                          group = season)) +
-  geom_tile() +
-  theme_bw()+
-  geom_text(aes(label = signif(rel_wis, 2)), size = 2.5) + # I adapted the rounding 
-  scale_fill_gradient2(low ="#6baed6", high =  "#d6936b", midpoint = 1, na.value = "grey50", 
-                       name = "Relative WIS", 
-                       breaks = c(-2,-1,0,1,2), 
-                       labels =c("0.25", 0.5, 1, 2, 4)) + 
-  labs(x = NULL, y = NULL)+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
-        axis.title.x = element_text(size = 9),
-        axis.text.y = element_text(size = 7),
-        title = element_text(size = 9)
-  ) +
-  scale_y_discrete(limits = rev) +
-  scale_x_discrete(labels = function(x) substring(x, 1, nchar(x)-10))+
-  facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")))+
-  theme(axis.ticks.y = element_blank())
-Figure_3
-
- # ggsave(paste0(manuscript_repo,"/Output/Figure_3.png"), plot = Figure_3, width = 12, height= 8)
-
-
-# this is the output for this figure as a table 
-# data_csv <- scores %>% select(model, location_name, rel_wis, season)
-# write.csv(data_csv, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Figure_3_Table.csv"),row.names = FALSE)
 
 
 ##################### Relative WIS Distribution Figure S 1
