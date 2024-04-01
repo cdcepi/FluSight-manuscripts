@@ -139,7 +139,7 @@ inc.rankings_all %>% left_join(., logtable1, join_by("model" == "Model", "season
   ) %>% 
   kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
   kableExtra::footnote( general_title = "") %>% 
-kableExtra::kable_classic() #%>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/table1.pdf"))
+kableExtra::kable_classic() #%>% kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/Table_1.pdf"))
 
 
 
@@ -151,13 +151,13 @@ kableExtra::kable_classic() #%>% kableExtra::save_kable(file = paste0(manuscript
 # obs_data21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/obs_data21.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
 # obs_data23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/obs_data23.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
 
-figure1a <- forecastsandobservedplt(all_dat21, obs_data21, "a")
+Figure_1a <- forecastsandobservedplt(all_dat21, obs_data21, "a")
 
 
-figure1b <- forecastsandobservedplt(all_dat23, obs_data23, "b")
+Figure_1b <- forecastsandobservedplt(all_dat23, obs_data23, "b")
 
-# ggsave(paste0(manuscript_repo,"/Output/figure1a.png"), plot = figure1a, width=10, height=8)
-# ggsave(paste0(manuscript_repo,"/Output/figure1b.png"), plot = figure1b, width=10, height=8)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_1a.png"), plot = Figure_1a, width=10, height=8)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_1b.png"), plot = Figure_1b, width=10, height=8)
 
 ##################### Absolute WIS by Model
 
@@ -172,7 +172,7 @@ wis_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
 
 
 ##################### Figure 4a Absolute (log) WIS by model
-figure4a <-  ggplot(abs_flusight, aes(x = target_end_date,
+Figure_4a <-  ggplot(abs_flusight, aes(x = target_end_date,
                                 y = log_WIS, group = model,
                                 col = model)) +
   geom_line(linewidth = 1) + geom_point(size = 2) +
@@ -189,7 +189,7 @@ figure4a <-  ggplot(abs_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 
-# ggsave(paste0(manuscript_repo,"/Output/figure4a.png"), plot = figure4a, width = 8, height = 5)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_4a.png"), plot = Figure_4a, width = 8, height = 5)
 
 ##################### Coverage and Scores
 
@@ -209,7 +209,7 @@ coverage_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
 
 
 
-figure4b <- ggplot(coverage95_flusight, aes(x = target_end_date, 
+Figure_4b <- ggplot(coverage95_flusight, aes(x = target_end_date, 
                                      y = coverage95, group = model,
                                      col = model)) +
   geom_line(linewidth = 1) + geom_point(size = 2) +
@@ -224,7 +224,7 @@ figure4b <- ggplot(coverage95_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
 
-# ggsave(paste0(manuscript_repo,"/Output/figure4b.png"), width=8, height=6, plot = figure4b)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_4b.png"), width=8, height=6, plot = Figure_4b)
 
 ##################### Coverage Tables Table 2
 
@@ -251,7 +251,7 @@ cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, r
   kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
   kableExtra::pack_rows(index = table(cov95_breakdownall$season)) %>% 
   kableExtra::kable_classic()#  %>% 
- #kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/","table2.pdf"))
+ #kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/","Table_2.pdf"))
 
 
 ##################### Absolute WIS by Week / Table 3
@@ -264,7 +264,7 @@ abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 
   kableExtra::footnote(general = "Table 3", general_title = "")%>% 
   kableExtra::pack_rows(index = table(abs_breakdown_WIS$season)) %>% 
   kableExtra::kable_classic()# %>% 
- #kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/","table3.pdf"))
+ #kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/","Table_3.pdf"))
 
 
 
@@ -287,7 +287,7 @@ inc_scores_overall <- WIS_Season %>%
   ungroup() %>%
   mutate(model = reorder(model, rev_rank, FUN=function(x) quantile(x, probs=0.25, na.rm=TRUE)))
 
-figure2 <- inc_scores_overall %>% 
+Figure_2 <- inc_scores_overall %>% 
   ggplot(aes(y = model, x=rev_rank, fill = factor(after_stat(quantile)))) +
   stat_density_ridges(
     geom = "density_ridges_gradient", calc_ecdf = TRUE,
@@ -299,10 +299,10 @@ figure2 <- inc_scores_overall %>%
   theme_bw()+
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")) )+
   theme(strip.text = element_text(size = 10))
-figure2
+Figure_2
 
 
-# ggsave(paste0(manuscript_repo,"/Output/Figure2.png"), width=8, height=8, units="in", plot = figure2)
+# ggsave(paste0(manuscript_repo,"/Output/Figure2.png"), width=8, height=8, units="in", plot = Figure_2)
 
 ##################### Relative WIS by Location Figure 3 & Supplemental Table X
 
@@ -316,7 +316,7 @@ scores <- inc.rankings_location %>% filter(is.finite(rel_wis)) %>% left_join(., 
 scores_order <- inc.rankings_all_nice
 levels_order <- scores_order$modelorder
 
-figure3 <- ggplot(scores, 
+Figure_3 <- ggplot(scores, 
                       aes(x = factor(modelorder, levels = levels_order), y=location_name, 
                           fill= scales::oob_squish(rel_wis, range = c(- 2.584963, 2.584963)), 
                           group = season)) +
@@ -337,14 +337,14 @@ figure3 <- ggplot(scores,
   scale_x_discrete(labels = function(x) substring(x, 1, nchar(x)-10))+
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")))+
   theme(axis.ticks.y = element_blank())
-figure3
+Figure_3
 
- # ggsave(paste0(manuscript_repo,"/Output/figure3.png"), plot = figure3, width = 12, height= 8)
+ # ggsave(paste0(manuscript_repo,"/Output/Figure_3.png"), plot = Figure_3, width = 12, height= 8)
 
 
 # this is the output for this figure as a table 
-# data_csv <- scores %>% select(model, location_name, rel_wis, season) 
-# write.csv(data_csv, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Table_Figure3_a.csv"),row.names = FALSE)
+# data_csv <- scores %>% select(model, location_name, rel_wis, season)
+# write.csv(data_csv, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Figure_3_Table.csv"),row.names = FALSE)
 
 
 ##################### Relative WIS Distribution Figure S 1
@@ -357,7 +357,7 @@ figure3
 
 model_order <- merge(inc.rankings_all_nice[,c("model", "rel_wis")], inc.rankings_location, by = "model", all.y = TRUE) %>% arrange(rel_wis.x)
 
-figures1 <- model_order %>% 
+Figure_S1 <- model_order %>% 
   ggplot( aes(x = fct_inorder(model), y = rel_wis.y))+
   geom_boxplot()+
   theme_bw() +
@@ -367,5 +367,5 @@ figures1 <- model_order %>%
   labs(x = "Model", y = "Relative WIS")+
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022", `2022-2023` = "B) 2022-2023")))
 
-figures1
-# ggsave(paste0(manuscript_repo,"/Output/figures1.jpg"), plot = figures1, width=10, height=8)
+Figure_S1
+# ggsave(paste0(manuscript_repo,"/Output/Figure_S1.jpg"), plot = Figure_S1, width=10, height=8)
