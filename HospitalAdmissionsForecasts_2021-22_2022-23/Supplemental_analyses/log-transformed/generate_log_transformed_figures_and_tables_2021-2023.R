@@ -23,15 +23,13 @@ library(ggridges)
 #library(RSocrata)
 library(arrow)
 
-#CDC userid
-userid="nqr2"
 
 '%!in%' <- Negate('%in%')
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+githubpath = paste0("C:/Users/",Sys.info()["user"],"/Desktop/GitHub")
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
-flusight_forecast_data <-paste0("C:/Users/",userid,"/Desktop/GitHub/Flusight-forecast-data")
+flusight_forecast_data <-paste0("C:/Users/",Sys.info()["user"],"/Desktop/GitHub/Flusight-forecast-data")
 
 suppressMessages(invisible(source(paste0(manuscript_repo,"/Model names and colors.R"))))
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
@@ -111,7 +109,7 @@ figures5 <- inc_scores_overall %>%
   theme_bw()+
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")))
 
-#ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = figures5)
+# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = figures5)
 
 ##### Absolute WIS by model: Figure S6
 
@@ -142,11 +140,12 @@ figures6 <- ggplot(abs_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 
-ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S6.png"), plot = figures6, width = 8, height = 5)
+# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S6.png"), plot = figures6, width = 8, height = 5)
 
 ##### Relative WIS by Location Figure S7
+inc.rankings_all <- read.csv(paste0(manuscript_repo, "/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/inc.rankings_all.csv"))
 
-inc.rankings_all_nice <- rbind(mutate(inc.rankings_all21ln, season = "2021-2022"), mutate(inc.rankings_all23ln, season = "2022-2023")) %>% group_by(season) %>% arrange(season, rel_wis) %>% mutate(modelorder = paste(model, season))
+inc.rankings_all_nice <- inc.rankings_all %>% group_by(season) %>% arrange(season, rel_wis) %>% mutate(modelorder = paste(model, season))
 
 scores <- read.csv(paste0(manuscript_repo,"/Supplemental_analyses/log-transformed/Data for Log-Transformed Figures/scores.csv"))
 
@@ -175,5 +174,5 @@ figures7 <- ggplot(scores,
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")))+
   theme(axis.ticks.y = element_blank())
 
-ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = figures7, width = 12, height= 8)
+# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = figures7, width = 12, height= 8)
 
