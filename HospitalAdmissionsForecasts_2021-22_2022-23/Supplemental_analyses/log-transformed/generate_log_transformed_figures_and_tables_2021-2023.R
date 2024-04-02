@@ -18,7 +18,7 @@ library(gridExtra)
 library(covidHubUtils)
 library(ggridges)
 #library(viridis)
-#library(cowplot)
+library(cowplot)
 #library(scales)
 #library(RSocrata)
 library(arrow)
@@ -104,12 +104,20 @@ figures5 <- inc_scores_overall %>%
     quantiles = 4, quantile_lines = TRUE, color = "gray30"
   ) +
   scale_fill_manual(values = c("#6baed6", "#c86bd6","#d6936b","#78d66b"), name = "Quartiles")+
-  labs(x = "Standardized Rank", y = "Model", color = "Quartiles")+
+  labs(x = "Standardized Rank", y = "Model", color = "Quartiles", caption = "18" )+
   scale_x_continuous(limits=c(0,1)) + 
   theme_bw()+
   facet_grid(rows = vars(season), scales = "free_y", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")))
+figures5
 
-# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.png"), width=8, height=8, units="in", plot = figures5)
+plttitle <- ggdraw() + 
+  draw_label( "Supplementary Figure 5: Standardized rank of weighted interval score (WIS) for log-transformed hospital admission forecasts \nover all forecast jurisdictions and horizons (1- to 4-week ahead), for the FluSight ensemble and each team submitting at least \n75% of the forecast targets (see Supplementary Table 3 for qualifying teams and season metrics).")
+
+figures5_title <-  plot_grid(plttitle, figures5, ncol = 1, rel_heights = c(.08, .92))
+
+
+
+ # ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S5.pdf"), width=11, height=8, units="in", plot = figures5_title)
 
 ##### Absolute WIS by model: Figure S6
 
@@ -163,7 +171,7 @@ figures7 <- ggplot(scores,
                        name = "Relative WIS", 
                        breaks = c(-2,-1,0,1,2), 
                        labels =c("0.25", 0.5, 1, 2, 4)) + 
-  labs(x = NULL, y = NULL)+
+  labs(x = NULL, y = NULL, caption = "20", title = "Supplementary Figure 7: State-level WIS values for each team relative to the FluSight baseline model using log-transformed \nhospitalization counts. The range of Relative WIS values below 1, in blue, indicate better performance than the FluSight baseline \n(white). Relative WIS values above 1, in red, indicate poor performance relative to the FluSight baseline. Teams are ordered on \nthe horizontal axis from lowest to highest Relative WIS values for each season.")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
         axis.title.x = element_text(size = 9),
         axis.text.y = element_text(size = 7),
@@ -174,5 +182,5 @@ figures7 <- ggplot(scores,
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022",`2022-2023` = "B) 2022-2023")))+
   theme(axis.ticks.y = element_blank())
 
-# ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.png"), plot = figures7, width = 12, height= 8)
+ # ggsave(paste0(manuscript_repo, "/Supplemental_analyses/Supplemental Output/Figure_S7.pdf"), plot = figures7, width = 11.69, height= 8.27)
 

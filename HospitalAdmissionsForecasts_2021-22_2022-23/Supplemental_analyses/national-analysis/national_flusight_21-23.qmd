@@ -5,7 +5,7 @@ format:
   html:
     self-contained: true
     code-background: true
-  # docx: default
+  docx: default
 editor: source
 date: today 
 echo: false
@@ -79,7 +79,7 @@ obs_data23 <- read.csv(paste0(manuscript_repo,"/Data_for_Figures/obs_data23.csv"
 
 
 #inclusion criteria before scoring
-include21 <- all_dat21 %>% filter(type == "quantile") %>% 
+include21 <- all_dat21 %>% filter(type == "quantile", location == "US") %>% 
   mutate(baseline_n_forecasts = sum(!is.na(value[model == "Flusight-baseline"]))) %>% 
   group_by(model) %>% 
   mutate(n_forecasts = sum(!is.na(value)),
@@ -90,7 +90,7 @@ include21 <- all_dat21 %>% filter(type == "quantile") %>%
   select(model,n_forecasts, per_forecasts, n_locations, per_locations) %>% 
   distinct() %>% ungroup()
 
-include23 <- all_dat23 %>% filter(type == "quantile") %>% 
+include23 <- all_dat23 %>% filter(type == "quantile", location == "US") %>% 
   mutate(baseline_n_forecasts = sum(!is.na(value[model == "Flusight-baseline"]))) %>% 
   group_by(model) %>% 
   mutate(n_forecasts = sum(!is.na(value)),
@@ -201,7 +201,7 @@ inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), muta
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
     kableExtra::footnote( general_title = "") %>% 
-    kableExtra::kable_classic() # %>% 
-    # kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Table_S5.pdf"))
+    kableExtra::kable_classic()# %>% 
+    #kableExtra::save_kable(file = paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Table_S5.pdf"))
 
 ```

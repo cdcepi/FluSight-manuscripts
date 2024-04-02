@@ -14,11 +14,9 @@ library(stringr)
 select = dplyr::select
 filter = dplyr::filter
 
-#CDC UserID goes here
-userid="nqr2"
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+githubpath = paste0("C:/Users/",Sys.info()["user"],"/Desktop/GitHub")
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
 backfill_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23/Supplemental_analyses/backfill-analysis")
 flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")

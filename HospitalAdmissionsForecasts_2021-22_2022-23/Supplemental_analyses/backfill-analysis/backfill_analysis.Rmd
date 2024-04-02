@@ -15,11 +15,9 @@ library(stringr)
 select = dplyr::select
 filter = dplyr::filter
 
-#CDC UserID goes here
-userid="nqr2"
 
 #update path to where cloned GitHub repository lives
-githubpath = paste0("C:/Users/",userid,"/Desktop/GitHub")
+githubpath = paste0("C:/Users/",Sys.info()["user"],"/Desktop/GitHub")
 manuscript_repo <- paste0(githubpath, "/FluSight-manuscripts/HospitalAdmissionsForecasts_2021-22_2022-23")
 flusight_forecast_data <-paste0(githubpath, "/Flusight-forecast-data")
 source(paste0(manuscript_repo,"/functions2022-2023.R"))
@@ -203,13 +201,13 @@ figures3a <- diffdf %>% filter(location_name != "US") %>%
   ggplot(aes(x = absolutediff, y = location_name))+
   geom_boxplot(color = "#d6936b", outlier.color = "black")+
   scale_y_discrete( limits = rev) +
-  labs(x = "Difference", y = "", title = "Absolute Changes")+
+  labs(x = "Difference", y = "", title = "Supplementary Figure 3: state-specific distributions of absolute (panel a) and \nrelative changes (panel b) in HHS-Protect reported hospitalizations as of the \ninitial report date and the final evaluation date. ", caption = "10")+
   theme_bw()+
   facet_grid(cols = vars(season))
 
 figures3a
 
-ggsave(plot = figures3a,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures3a.png"), width = 6, height = 8, dpi = 300)
+ggsave(plot = figures3a,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Figure_S3a.pdf"), width = 8, height = 10)
 
 ```
 
@@ -221,12 +219,12 @@ figures3b <- diffdf %>% filter(location_name != "US") %>% #can take out != Natio
   ggplot(aes(x = final_perc_change*100, y = location_name))+
   geom_boxplot(color = "#6baed6", outlier.color = "black")+
   scale_y_discrete( limits = rev) +
-  labs(x = "Percent Difference", y = "", title = "Relative Changes")+
+  labs(x = "Percent Difference", y = "", caption = "11")+
   theme_bw()+
 facet_grid(cols = vars(season))
 figures3b
 
-ggsave(plot = figures3b, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures3b.png"), width = 6, height = 8, dpi = 300)
+ggsave(plot = figures3b, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Figure_S3b.pdf"), width = 8, height = 10.1, dpi = 300)
 
 ```
 
@@ -243,8 +241,32 @@ weeklydat23a <- hosp_data_read_func(from = as.Date("2022-10-11"), to = as.Date("
 weeklydat23 <- rbind(weeklydat23, weeklydat23a)
 
 ####check start date
-stairstep_function <- function(weeklydat, fromdate, todate){
-matrixset <-  weeklydat %>% group_by(report_date, epiweek) %>%
+# stairstep_function <- function(weeklydat, fromdate, todate){
+# matrixset <-  weeklydat %>% group_by(report_date, epiweek) %>%
+#   summarise(value = sum(value, na.rm = TRUE), date = as.Date(max(date)), asof = as.Date(date + 2)) %>%
+#   ungroup() %>% #filter(date > as.Date("2022-01-29"), date < as.Date("2022-06-21")) %>%
+#   select(-epiweek)
+# 
+# 
+# log10limlow <- min(log10(matrixset$value))
+# log10limhigh <- max(log10(matrixset$value))
+# 
+# stairplt <- 
+# matrixset %>% 
+#   ggplot(aes(y = date,x= report_date))+
+#   geom_tile(aes( fill = log10(value)))+
+#   theme_bw()+
+#   geom_label(aes(label = scales::comma(value)), label.padding = unit(.09, "lines"), size = 2.5)+
+#   scale_fill_gradient(name = NULL,low = "#6baed6", high = "#d6936b", limits = c(log10limlow, log10limhigh)) +
+#   scale_y_date(date_breaks = "1 week", date_labels = "%b %d", expand = c(0.01,0.01))+
+#   scale_x_date(date_breaks = "1 week", date_labels = "%b %d", expand = c(0.01,0.01))+
+#   labs(x = "Week Reported", y = "Initial Admission Week")+
+#   theme(legend.position = "none", 
+#         axis.text.x = element_text(angle = 45, hjust = 1))
+# return(stairplt)
+# }
+
+matrixset <- weeklydat21 %>%  group_by(report_date, epiweek) %>%
   summarise(value = sum(value, na.rm = TRUE), date = as.Date(max(date)), asof = as.Date(date + 2)) %>%
   ungroup() %>% #filter(date > as.Date("2022-01-29"), date < as.Date("2022-06-21")) %>%
   select(-epiweek)
@@ -253,7 +275,7 @@ matrixset <-  weeklydat %>% group_by(report_date, epiweek) %>%
 log10limlow <- min(log10(matrixset$value))
 log10limhigh <- max(log10(matrixset$value))
 
-stairplt <- 
+figures4a <- 
 matrixset %>% 
   ggplot(aes(y = date,x= report_date))+
   geom_tile(aes( fill = log10(value)))+
@@ -262,19 +284,38 @@ matrixset %>%
   scale_fill_gradient(name = NULL,low = "#6baed6", high = "#d6936b", limits = c(log10limlow, log10limhigh)) +
   scale_y_date(date_breaks = "1 week", date_labels = "%b %d", expand = c(0.01,0.01))+
   scale_x_date(date_breaks = "1 week", date_labels = "%b %d", expand = c(0.01,0.01))+
-  labs(x = "Week Reported", y = "Initial Admission Week")+
+  labs(x = "Week Reported", y = "Initial Admission Week", title = "Supplementary Figure 4: Data revision analysis: U.S. weekly reported hospitalizations from the HHS-Protect system [3] \nwith the initial date each weeks’ data were pulled (vertical axis) and reported values as of subsequent dates (horizontal \naxis). Coloring for the number of hospitalizations was normalized on a common log scale. a) 2021-22 season, b) 2022-2023 season", caption = "12")+
   theme(legend.position = "none", 
         axis.text.x = element_text(angle = 45, hjust = 1))
-return(stairplt)
-}
-
-figures4a <- stairstep_function(weeklydat21)
-figures4b <- stairstep_function(weeklydat23)
 
 
 
+matrixset <- weeklydat23 %>% group_by(report_date, epiweek) %>%
+  summarise(value = sum(value, na.rm = TRUE), date = as.Date(max(date)), asof = as.Date(date + 2)) %>%
+  ungroup() %>% #filter(date > as.Date("2022-01-29"), date < as.Date("2022-06-21")) %>%
+  select(-epiweek)
 
-ggsave(plot = figures4a,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures4a.png"), width = 8, height = 6, dpi = 300)
-ggsave(plot = figures4b,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures4b.png"), width = 12, height = 8, dpi = 300)
+
+log10limlow <- min(log10(matrixset$value))
+log10limhigh <- max(log10(matrixset$value))
+
+figures4b <-
+matrixset %>%
+  ggplot(aes(y = date,x= report_date))+
+  geom_tile(aes( fill = log10(value)))+
+  theme_bw()+
+  geom_label(aes(label = scales::comma(value)), label.padding = unit(.09, "lines"), size = 2.5)+
+  scale_fill_gradient(name = NULL,low = "#6baed6", high = "#d6936b", limits = c(log10limlow, log10limhigh)) +
+  scale_y_date(date_breaks = "1 week", date_labels = "%b %d", expand = c(0.01,0.01))+
+  scale_x_date(date_breaks = "1 week", date_labels = "%b %d", expand = c(0.0,0.0))+
+  labs(x = "Week Reported", y = "Initial Admission Week", caption = "13")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+ggsave(plot = figures4a,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figure_S4a.pdf"), width = 11.69, height = 8.27, dpi = 300)
+ggsave(plot = figures4b,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figure_S4b.pdf"), width = 14, height = 8)
 
 ```
