@@ -214,9 +214,410 @@
   #   
   # }
 
+#### this is a modified version of covidHubUtils::plot_forecast to better align the viz with the rest of the manuscript 
+###added +theme_bw()
+  plot_forecasts <- function (forecast_data, truth_data = NULL, hub = c("US", "ECDC", 
+                                                                        "FluSight"), models = NULL, target_variable = NULL, locations = NULL, 
+                              facet = NULL, facet_scales = "fixed", facet_nrow = NULL, 
+                              facet_ncol = NULL, forecast_dates, intervals, horizon, truth_source, 
+                              use_median_as_point = FALSE, plot_truth = TRUE, plot = TRUE, 
+                              fill_by_model = FALSE, fill_transparency = 1, truth_as_of = NULL, 
+                              top_layer = c("truth", "forecast"), title = "default", subtitle = "default", 
+                              show_caption = TRUE) 
+  {
+    if (is.na(title)) {
+      stop("Error in plot_forecasts: title argument interpretable as a character.")
+    }
+    if (is.na(subtitle)) {
+      stop("Error in plot_forecasts: subtitle argument interpretable as a character.")
+    }
+    if (!missing(models)) {
+      if (!all(models %in% forecast_data$model)) {
+        stop("Error in plot_forecasts: Not all models are available in forecast data.")
+      }
+    }
+    else {
+      models <- unique(forecast_data$model)
+    }
+    if (missing(locations)) {
+      locations <- unique(forecast_data$location)
+    }
+    else {
+      locations <- name_to_fips(locations, hub)
+    }
+    hub <- match.arg(hub, choices = c("US", "ECDC", "FluSight"), 
+                     several.ok = TRUE)
+    if (hub[1] == "US") {
+      valid_location_codes <- covidHubUtils::hub_locations$fips
+      valid_target_variables <- c("cum death", "inc case", 
+                                  "inc death", "inc hosp")
+      valid_truth_sources <- c("JHU", "NYTimes", "HealthData")
+    }
+    else if (hub[1] == "ECDC") {
+      valid_location_codes <- covidHubUtils::hub_locations_ecdc$location
+      valid_target_variables <- c("inc case", "inc death")
+      valid_truth_sources <- c("JHU", "jhu", "ECDC", "ecdc")
+    }
+    else if (hub[1] == "FluSight") {
+      valid_location_codes <- covidHubUtils::hub_locations_flusight$fips
+      valid_target_variables <- c("inc flu hosp")
+      valid_truth_sources <- c("HealthData")
+    }
+    if (!all(locations %in% forecast_data$location)) {
+      stop("Error in plot_forecasts: Not all locations are available in forecast_data.")
+    }
+    locations <- match.arg(locations, choices = valid_location_codes, 
+                           several.ok = TRUE)
+    if (length(locations) > 1) {
+      if (is.null(facet)) {
+        stop("Error in plot_forecasts: Passed in multiple locations without a facet command")
+      }
+    }
+    if (missing(target_variable)) {
+      if (length(unique(forecast_data$target_variable)) == 
+          1) {
+        target_variable <- unique(forecast_data$target_variable)
+      }
+      else {
+        stop("Error in plot_forecasts: Target variable unspecified and more than one target_variable in data.")
+      }
+    }
+    else {
+      if (!(target_variable %in% forecast_data$target_variable)) {
+        stop("Error in plot_forecasts: Please provide a valid target variable.")
+      }
+      target_variable <- match.arg(target_variable, choices = valid_target_variables, 
+                                   several.ok = FALSE)
+    }
+    if (!is.null(truth_data)) {
+      columns_check <- all(c("model", "target_variable", "target_end_date", 
+                             "location", "value") %in% colnames(truth_data))
+      if (!columns_check) {
+        stop("Error in plot_forecasts: Please provide columns model, \n           target_variable, target_end_date, location and value in truth_data.")
+      }
+      else {
+        if (!all(truth_data$location %in% valid_location_codes)) {
+          stop("Error in plot_forecasts: Please make sure all fips codes in location column are valid.")
+        }
+        if (!all(locations %in% truth_data$location)) {
+          stop("Error in plot_forecasts: At least one forecasted location not available in truth_data.")
+        }
+        if (!(target_variable %in% truth_data$target_variable)) {
+          stop("Error in plot_forecasts: Please provide a valid target variable.")
+        }
+      }
+    }
+    else {
+      truth_source <- match.arg(truth_source, choices = valid_truth_sources, 
+                                several.ok = FALSE)
+      if (target_variable == "inc hosp" | target_variable == 
+          "inc flu hosp") {
+        if (truth_source != "HealthData") {
+          stop("Error in plot_forecasts: Incident hopsitalization truth data is only available from HealthData.gov now.")
+        }
+      }
+      else {
+        if (truth_source == "HealthData") {
+          stop("Error in plot_forecasts: This function does not support selected target_variable from HealthData.")
+        }
+      }
+    }
+    if (show_caption) {
+      if (missing(truth_source)) {
+        stop("Error in plot_forecasts: Please provide truth_source for caption.")
+      }
+    }
+    if (missing(forecast_dates)) {
+      forecast_dates <- unique(forecast_data$forecast_date)
+    }
+    else {
+      forecast_dates <- as.Date(forecast_dates)
+      if (!all(forecast_dates %in% forecast_data$forecast_date)) {
+        stop("Error in plot_forecasts: Not all forecast_dates are available in forecast data.")
+      }
+    }
+    if (missing(intervals)) {
+      lower_bounds <- unique(forecast_data[forecast_data$type == 
+                                             "quantile" & forecast_data$quantile < 0.5, ]$quantile)
+      if ("NA" %in% lower_bounds) {
+        intervals <- NULL
+      }
+      else {
+        if (length(unique(models)) > 5) {
+          intervals <- c(0.95)
+        }
+        else {
+          intervals <- lapply(lower_bounds, function(l) {
+            1 - as.numeric(2 * l)
+          })
+          if (all(c(0.5, 0.8, 0.95) %in% intervals)) {
+            intervals <- c(0.5, 0.8, 0.95)
+          }
+        }
+      }
+    }
+    if (!is.null(intervals) & length(unique(models)) > 5) {
+      intervals <- c(0.95)
+    }
+    quantiles_to_plot <- unlist(lapply(intervals, function(interval) {
+      c(0.5 - as.numeric(interval)/2, 0.5 + as.numeric(interval)/2)
+    }))
+    if (use_median_as_point) {
+      if (0.5 %in% forecast_data$quantile) {
+        quantiles_to_plot <- append(quantiles_to_plot, 0.5)
+      }
+      else {
+        stop("Error in plot_forecasts: Median quantiles are not available in forecast_data.")
+      }
+    }
+    if (fill_by_model) {
+      if (length(unique(models)) <= 5) {
+        color_families <- c("Blues", "Oranges", "Greens", 
+                            "Purples", "Reds")
+        if (use_median_as_point) {
+          colourCount <- (length(quantiles_to_plot) - 1)/2 + 
+            1
+        }
+        else {
+          colourCount <- length(quantiles_to_plot)/2 + 
+            1
+        }
+        model_colors <- purrr::map(color_families[1:length(unique(models))], 
+                                   function(color_family) {
+                                     getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(4, 
+                                                                                                        color_family))
+                                     if (colourCount < 4) {
+                                       getPalette(4) %>% tail(colourCount)
+                                     }
+                                     else {
+                                       getPalette(colourCount)
+                                     }
+                                   })
+        ribbon_colors <- RColorBrewer::brewer.pal(max(4, 
+                                                      colourCount), "Greys")
+        ribbon_colors <- ribbon_colors[seq_len(length(ribbon_colors) - 
+                                                 1)] %>% tail(colourCount)
+        forecast_colors <- unlist(lapply(model_colors, tail, 
+                                         n = 1))
+        interval_colors <- unlist(lapply(model_colors, head, 
+                                         n = colourCount - 1))
+      }
+      else {
+        if (use_median_as_point) {
+          colourCount <- (length(quantiles_to_plot) - 1)/2
+        }
+        else {
+          colourCount <- length(quantiles_to_plot)/2
+        }
+        modelCount <- length(unique(models))
+        getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(8, 
+                                                                           "Set1"))
+        model_colors <- getPalette(modelCount)
+        ribbon_colors <- RColorBrewer::brewer.pal(4, "Greys")[1:3]
+        forecast_colors <- unlist(lapply(model_colors, tail, 
+                                         n = 1))
+        interval_colors <- unlist(lapply(model_colors, function(color) {
+          colorspace::lighten(color, 0.2)
+        }))
+      }
+    }
+    else {
+      if (use_median_as_point) {
+        colourCount <- max((length(quantiles_to_plot) - 1)/2 + 
+                             1, 2)
+      }
+      else {
+        colourCount <- max(length(quantiles_to_plot)/2 + 
+                             1, 2)
+      }
+      getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(4, 
+                                                                         "Blues"))
+      blues <- getPalette(colourCount)
+      forecast_colors <- rep(tail(blues, 1), length(unique(models)))
+      blues[1:2] <- colorspace::darken(blues[1:2], 0.1)
+      interval_colors <- rep(blues[1:(length(blues) - 1)], 
+                             length(unique(models)))
+      ribbon_colors <- blues[1:(length(blues) - 1)]
+    }
+    if (!is.null(truth_as_of)) {
+      warning("Warning in plot_forecasts: truth_as_of is not used to load versioned truth data.\n            Will be available soon.")
+    }
+    plot_data <- get_plot_forecast_data(forecast_data = forecast_data, 
+                                        truth_data = truth_data, models_to_plot = models, forecast_dates_to_plot = as.Date(forecast_dates), 
+                                        horizons_to_plot = horizon, quantiles_to_plot = quantiles_to_plot, 
+                                        locations_to_plot = locations, plot_truth = plot_truth, 
+                                        truth_source = truth_source, target_variable_to_plot = target_variable, 
+                                        hub = hub)
+    if (show_caption) {
+      if (!is.null(truth_as_of)) {
+        caption <- paste0("source: ", truth_source, " (observed data as of ", 
+                          as.Date(truth_as_of), "), ", paste(models, collapse = ", "), 
+                          " (forecasts)")
+        caption <- paste(strwrap(caption, grDevices::dev.size("px")[1]), 
+                         collapse = "\n")
+      }
+      else {
+        caption <- paste0("source: ", truth_source, " (observed data), ", 
+                          paste(models, collapse = ", "), " (forecasts)")
+        caption <- paste(strwrap(caption, grDevices::dev.size("px")[1]), 
+                         collapse = "\n")
+      }
+    }
+    else {
+      caption <- NULL
+    }
+    if (target_variable == "cum death") {
+      full_target_variable <- "Cumulative Deaths"
+    }
+    else if (target_variable == "inc case") {
+      full_target_variable <- "Incident Cases"
+    }
+    else if (target_variable == "inc death") {
+      full_target_variable <- "Incident Deaths"
+    }
+    else if (target_variable == "inc hosp" | target_variable == 
+             "inc flu hosp") {
+      full_target_variable <- "Incident Hospitalizations"
+    }
+    plot_data_forecast <- plot_data %>% dplyr::filter(truth_forecast == 
+                                                        "forecast")
+    plot_data_truth <- plot_data %>% dplyr::filter(!is.na(point), 
+                                                   truth_forecast == "truth") %>% dplyr::rename(truth_model = model) %>% 
+      dplyr::select(-forecast_date)
+    if (title == "default") {
+      if (target_variable == "inc hosp" & hub[1] != "FluSight") {
+        title <- paste0("Daily COVID-19 ", full_target_variable, 
+                        ": observed and forecasted")
+      }
+      else if (hub[1] == "FluSight") {
+        title <- paste0("Weekly Influenza ", full_target_variable, 
+                        ": observed and forecasted")
+      }
+      else {
+        title <- paste0("Weekly COVID-19 ", full_target_variable, 
+                        ": observed and forecasted")
+      }
+    }
+    if (title == "none") {
+      title <- NULL
+    }
+    if (subtitle == "default") {
+      subtitle <- paste0("Selected location(s): ", paste(unique(plot_data_forecast$location), 
+                                                         collapse = ", "), "\nSelected forecast date(s): ", 
+                         paste(unique(plot_data_forecast$forecast_date), collapse = ", "))
+    }
+    if (subtitle == "none") {
+      subtitle <- NULL
+    }
+    graph <- ggplot2::ggplot(data = plot_data_forecast, ggplot2::aes(x = target_end_date))
+    if (top_layer[1] == "truth") {
+      if (!is.null(intervals)) {
+        graph <- graph + 
+          ggplot2::geom_ribbon(data = plot_data_forecast %>% 
+                                 dplyr::filter(type == "quantile"), 
+                               mapping = ggplot2::aes(ymin = lower, 
+                                                      ymax = upper, 
+                                                      group = interaction(`Prediction Interval`,  model, location, forecast_date), 
+                                                      fill = interaction(`Prediction Interval`,  model)), 
+                               alpha = fill_transparency, show.legend = FALSE) + 
+          ggplot2::scale_fill_manual(name = "Prediction Interval", 
+                                     values = interval_colors) + ggnewscale::new_scale_fill() + 
+          ggplot2::geom_ribbon(data = plot_data_forecast %>% 
+                                 dplyr::filter(type == "quantile"), 
+                               mapping = ggplot2::aes(ymin = lower, 
+                                                      ymax = upper, 
+                                                      fill = `Prediction Interval`), 
+                               alpha = 0) + 
+          ggplot2::scale_fill_manual(name = "Prediction Interval", values = ribbon_colors) + 
+          ggplot2::geom_line(data = plot_data_forecast %>% 
+                               dplyr::filter(type == "quantile"), 
+                             mapping = ggplot2::aes(y = upper,colour = model), 
+                             alpha = 0) + 
+          ggplot2::scale_color_manual(name = "Model",  values = forecast_colors) + 
+          ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(alpha = 1)))
+      }
+      graph <- graph + 
+        ggplot2::geom_line(data = plot_data_forecast %>% 
+                             dplyr::filter(!is.na(point)), 
+                           mapping = ggplot2::aes(x = target_end_date, 
+                                                  y = point, 
+                                                  group = interaction(model, location, forecast_date), 
+                                                  color = model)) + 
+        ggplot2::geom_point(data = plot_data_forecast %>% 
+                              dplyr::filter(!is.na(point)), 
+                            mapping = ggplot2::aes(x = target_end_date,
+                                                   y = point, 
+                                                   color = model)) + 
+        ggplot2::scale_color_manual(name = "Model", values = forecast_colors) + 
+        ggnewscale::new_scale_color() + 
+        ggplot2::geom_line(data = plot_data_truth %>% 
+                             dplyr::filter(!is.na(point)), 
+                           mapping = ggplot2::aes(x = target_end_date, 
+                                                  y = point, 
+                                                  color = truth_model)) + 
+        ggplot2::geom_point(data = plot_data_truth %>% 
+                              dplyr::filter(!is.na(point)), mapping = ggplot2::aes(x = target_end_date, 
+                                                                                   y = point, color = truth_model)) + 
+        ggplot2::scale_color_manual(name = "Truth", values = "black")
+    }
+    else if (top_layer[1] == "forecast") {
+      graph <- graph + ggplot2::geom_line(data = plot_data_truth %>% 
+                                            dplyr::filter(!is.na(point)), mapping = ggplot2::aes(x = target_end_date, 
+                                                                                                 y = point, color = truth_model)) + 
+        ggplot2::geom_point(data = plot_data_truth %>% 
+                              dplyr::filter(!is.na(point)), 
+                            mapping = ggplot2::aes(x = target_end_date,y = point, color = truth_model)) + 
+        ggplot2::scale_color_manual(name = "Truth", values = "black") + 
+        ggnewscale::new_scale_color()
+      if (!is.null(intervals)) {
+        graph <- graph + 
+          ggplot2::geom_ribbon(data = plot_data_forecast %>% 
+                                 dplyr::filter(type == "quantile"), 
+                               mapping = ggplot2::aes(ymin = lower,  
+                                                      ymax = upper, 
+                                                      group = interaction(`Prediction Interval`, model, location, forecast_date), 
+                                                      fill = interaction(`Prediction Interval`, model)), 
+                               alpha = fill_transparency, show.legend = FALSE) + 
+          ggplot2::scale_fill_manual(name = "Prediction Interval", 
+                                     values = interval_colors) + ggnewscale::new_scale_fill() + 
+          ggplot2::geom_ribbon(data = plot_data_forecast %>% 
+                                 dplyr::filter(type == "quantile"), mapping = ggplot2::aes(ymin = lower, 
+                                                                                           ymax = upper, fill = `Prediction Interval`), 
+                               alpha = 0) + ggplot2::scale_fill_manual(name = "Prediction Interval", 
+                                                                       values = ribbon_colors) + 
+          ggplot2::geom_line(data = plot_data_forecast %>% 
+                               dplyr::filter(type == "quantile"), mapping = ggplot2::aes(y = upper, colour = model), alpha = 0) + 
+          ggplot2::scale_color_manual(name = "Model",  values = forecast_colors) + 
+          ggplot2::guides(fill = ggplot2::guide_legend(override.aes = list(alpha = 1)))
+      }
+      graph <- graph + 
+        ggplot2::geom_line(data = plot_data_forecast %>% 
+                             dplyr::filter(!is.na(point)), 
+                           mapping = ggplot2::aes(x = target_end_date, y = point, group = interaction(model, location, forecast_date), color = model)) +
+        ggplot2::geom_point(data = plot_data_forecast %>%  dplyr::filter(!is.na(point)), mapping = ggplot2::aes(x = target_end_date,                                                                                                                                                     y = point, color = model)) + 
+        ggplot2::scale_color_manual(name = "Model",  values = forecast_colors)
+    }
+    if (!is.null(facet)) {
+      graph <- graph + ggplot2::facet_wrap(facets = facet, 
+                                           scales = facet_scales, nrow = facet_nrow, ncol = facet_ncol, 
+                                           labeller = ggplot2::label_wrap_gen(multi_line = FALSE))
+    }
+    graph <- graph + ggplot2::scale_x_date(name = NULL, date_breaks = "1 month", 
+                                           date_labels = "%b %d") + ggplot2::ylab(full_target_variable) + 
+      ggplot2::labs(title = title, subtitle = subtitle, caption = caption) + 
+      theme_bw() +
+      theme(legend.position = "bottom")
+    if (plot) {
+      print(graph)
+    }
+    return(invisible(graph))
+  }
+  
+  
   #Forecasts and observed 
   forecastsandobservedplt <- function(all_dat, obs_data, a= "a"){
-    plot_data_forecast <- all_dat %>% filter(model == "Flusight-ensemble", location == "US", forecast_date >= (as.Date(min(all_dat$forecast_date)) + 21)) %>% #target_end_date >= "2022-02-05"
+    plot_data_forecast <- all_dat %>% filter(model == "Flusight-ensemble", location == "US", forecast_date >= (as.Date(min(all_dat$forecast_date)) + 7)
+                                             ) %>% #target_end_date >= "2022-02-05"
       mutate(temporal_resolution = "wk",
              target_variable = "inc flu hosp",
              horizon = case_when(target == "1 wk ahead inc flu hosp" ~ "1", 
@@ -227,7 +628,7 @@
              full_location_name = location_name, 
              target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
              forecast_date = as.Date(forecast_date, format = "%Y-%m-%d")) %>% 
-      filter(forecast_date %in% c(min(forecast_date) + 28*c(0:10)))
+      filter(forecast_date %in% c(min(forecast_date) + 28*c(0:15)))
     
     obs <- obs_data %>% 
       filter(location_name == "National") %>% 
@@ -239,18 +640,21 @@
              full_location_name = location_name,
              value = value_inc, 
              target_end_date <- as.Date(target_end_date, format = "%Y-%m-%d")) %>% 
-      select(target_end_date, location, location_name, value, model, target_variable, full_location_name)
+      select(target_end_date, location, location_name, value, model, target_variable, full_location_name, season)
     
-    plttitle = case_when(a == "a" ~ "2021-22", a == "b" ~ "2022-23")
+    plttitle = " " 
     
     fig = plot_forecasts(plot_data_forecast,
                          truth_data = obs,
                          models = "Flusight-ensemble",
                          truth_source = "HealthData.gov",
+                         facet = "season",
+                         facet_scales = "free",
                          locations = c("US"),
                          use_median_as_point = T,
                          subtitle = "",
-                         title = plttitle)+ theme(text = element_text(size = 15))  
+                         title = plttitle
+                         )
     return(fig)
   }
 
@@ -391,3 +795,4 @@
     }
     return(finalset)
   }
+  

@@ -6,6 +6,8 @@ format:
     self-contained: true
     code-background: true
   docx: default
+header-includes:
+  \usepackage{fontspec}
 editor: source
 date: today 
 echo: false
@@ -301,13 +303,22 @@ figure1a <- forecastsandobservedplt(all_dat21, obs_data21, "a")
 figure1b <- forecastsandobservedplt(all_dat23, obs_data23, "b")
 
 
-# ggsave(paste0(manuscript_repo,"/Output/figure1a.png"), plot = figure1a, width=10, height=8)
-# ggsave(paste0(manuscript_repo,"/Output/figure1b.png"), plot = figure1b, width=10, height=8)
+ggsave(paste0(manuscript_repo,"/Output/figure1a.png"), plot = figure1a, width=8, height=6)
+ggsave(paste0(manuscript_repo,"/Output/figure1b.png"), plot = figure1b, width=8, height=6)
 
+
+all_dat_forplt <- bind_rows(mutate(all_dat21, season = "2021-2022"), mutate(all_dat23, season = "2022-2023"))
+obs_dat_forplt <- bind_rows(mutate(obs_data21, season = "2021-2022"), mutate(obs_data23, season = "2022-2023"))
+
+
+figure1 <- forecastsandobservedplt(all_dat_forplt, obs_dat_forplt)
+figure1
+
+ggsave(paste0(manuscript_repo,"/Output/Figure_1.pdf"), plot = figure1, width=12, height=6)
 
 ```
 
-
+\fontspec{Arial}
 
 ##### Season inc rankings (Table 1)
 
@@ -346,12 +357,14 @@ inc.rankings_all <- rbind(mutate(inc.rankings_all21, season = "2021-2022"), muta
           ) %>%
     mutate_if(is.numeric, round, digits = 2) %>%  
     mutate(`% of Forecasts Submitted` = round(`% of Forecasts Submitted`)) %>% 
-    knitr::kable(align = c("lcccccccc"), caption = "Table 1",#col.names = c()
+    knitr::kable(align = c("lcccccccc"),# caption = "Table 1",#col.names = c()
     ) %>% 
     kableExtra::pack_rows(index = table(inc.rankings_all$season)) %>% 
     kableExtra::footnote( general_title = "") %>%
-    kableExtra::kable_classic() #%>% 
-    #kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/Table1.pdf"))
+    kableExtra::kable_classic(html_font = "Arial", full_width = F, ) %>% 
+     kableExtra::column_spec(1, width_min = "2cm") %>% 
+     kableExtra::column_spec(2:9, width_min = "1cm") %>% 
+    kableExtra::save_kable(file = paste0(manuscript_repo,"/Output/Table_1test.pdf"), density = 320)
  
   
    #need below installed to run save_kable  
@@ -484,7 +497,8 @@ figure2 <- inc_scores_overall %>%
   theme(strip.text = element_text(size = 10))
 figure2
 
-# ggsave(paste0(manuscript_repo,"/Output/Figure2.png"), width=8, height=8, units="in", plot = figure2)
+ggsave(paste0(manuscript_repo,"/Output/Figure2.png"), width=8, height=8, units="in", plot = figure2)
+ggsave(paste0(manuscript_repo,"/Output/Figure2.pdf"), width=8, height=8, units="in", plot = figure2)
 
 ```
 
@@ -518,23 +532,34 @@ figure3 <- ggplot(scores,
                           group = season)) +
   geom_tile() +
   theme_bw()+
-  geom_text(aes(label = signif(rel_wis, 2)), size = 2.5) + # I adapted the rounding 
+  geom_text(aes(label = signif(rel_wis, 2)), size = 1.5) + # I adapted the rounding 
   scale_fill_gradient2(low ="#6baed6", high =  "#d6936b", midpoint = 1, na.value = "grey50", 
                        name = "Relative WIS", 
                        breaks = c(-2,-1,0,1,2), 
-                       labels =c("0.25", 0.5, 1, 2, 4)) + 
-  labs(x = NULL, y = NULL)+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
-        axis.title.x = element_text(size = 9),
-        axis.text.y = element_text(size = 7),
-        title = element_text(size = 9)
-        ) +
+                       labels =c("0.25", 0.5, 0, 1, 2)) + 
   scale_y_discrete(limits = rev) +
-    scale_x_discrete(labels = function(x) substring(x, 1, nchar(x)-10))+
+  scale_x_discrete(labels = function(x) substring(x, 1, nchar(x)-10))+
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")))+
-  theme(axis.ticks.y = element_blank())
+  labs(x = NULL, y = NULL) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 5),
+        # axis.title.x = element_text(size = 9),
+        axis.text.y = element_text(size = 5),
+        #title = element_text(size = 9), 
+        axis.ticks.y = element_blank(), 
+        axis.ticks.x = element_line(linewidth = 0.25),
+        legend.position = "top", 
+        legend.key.width = unit(1, "cm"),
+        legend.key.height = unit(0.25, "cm"),
+        legend.margin = margin(0,-5,-5,-5), 
+        text = element_text(size = 6), 
+        legend.title = element_text(size = 6), 
+        line=element_line(linewidth=0.25), 
+        panel.border = element_rect(linewidth = 0.25), 
+        strip.background = element_rect(linewidth = 0.25)
+        )
 figure3
-# ggsave(paste0(manuscript_repo,"/Output/figure3.png"), plot = figure3, width = 12, height= 8)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_3.pdf"), plot = figure3, width = 11, height= 8, dpi = 320)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_3test.pdf"), plot = figure3, width = 8, height= 5.8, dpi = 320)
 
 
 modelrankings21 <- inc.rankings_location21 %>%  ungroup()%>% group_by(model) %>% summarise(low = min(rel_wis), high = max(rel_wis), median = median(rel_wis), mean = mean(rel_wis)) %>% mutate(diff = high - low)
@@ -593,7 +618,7 @@ wis_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
 
  #ggsave(paste0(manuscript_repo,"/Output/figure4_absWIS.png"), width=8, height=5, plot = figure4_absWIS)
 
-figure4a <-  ggplot(abs_flusight, aes(x = target_end_date,
+figure4 <-  ggplot(abs_flusight, aes(x = target_end_date,
                                      y = log_WIS, group = model,
                                      col = model)) +
   geom_line(linewidth = 1) + geom_point(size = 2) +
@@ -602,15 +627,20 @@ figure4a <-  ggplot(abs_flusight, aes(x = target_end_date,
   labs(y = "Absolute WIS",
        x = "Forecast Target End Date",
        color = "Model",
-       title = "Absolute WIS by Model"
+       #title = "Absolute WIS by Model"
        ) +
   theme_bw()+
   scale_x_date(breaks = seq.Date(from = min(abs_flusight$target_end_date), to= max(abs_flusight$target_end_date), by = "2 weeks"), date_labels = "%d %b") +
   scale_y_continuous(breaks = c(0,1,2,3), labels = c("0", "1", "10", "100"))+
-  theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1), 
+        panel.grid = element_blank(), 
+        #text = element_text(size = 7)
+        )+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
-figure4a
-# ggsave(paste0(manuscript_repo,"/Output/figure4a.png"), plot = figure4a, width = 8, height = 5)
+figure4
+# ggsave(paste0(manuscript_repo,"/Output/Figure_4.png"), plot = figure4, width = 8, height = 5)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_4.pdf"), plot = figure4, width = 8, height = 5)
+
 ```
 
 ##### Coverage Tables
@@ -704,11 +734,12 @@ cov95_breakdown23 <- cov95_function(WIS_Season23, Scores_tab23)
 cov95_breakdownall <- rbind(mutate(cov95_breakdown21, season = "2021-2022"), mutate(cov95_breakdown23, season = "2022-2023"))
 
 cov95_breakdownall %>% arrange(season, Relative_WIS) %>% mutate_if(is.numeric, round, digits = 2) %>% select(-season) %>%  
-  knitr::kable(align = c("lcccccccccc"), caption = "Table 2", col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
-  kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>% 
-  kableExtra::pack_rows(index = table(cov95_breakdownall$season))# %>% 
+  knitr::kable(align = c("lcccccccccc"), #caption = "Table 2", 
+               col.names = c("Model", "Relative WIS", "% WIS Below Baseline", "1 Wk Coverage", "2 Wk Coverage", "3 Wk Coverage", "4 Wk Coverage", "% Cov abv 90 (1 Wk)", "% Cov abv 90 (2 Wk)", "% Cov abv 90 (3 Wk)", "% Cov abv 90 (4 Wk)")) %>% 
+  # kableExtra::footnote(general = "Table 2: % WIS Below Baseline shows the percent of WIS values for each model below the corresponding FluSight-Baseline WIS. The '% Cov abv 90' columns show the percent of weekly 95% coverage values that are greater than or equal to 90% for each model by horizon.", general_title = "") %>%
+  kableExtra::pack_rows(index = table(cov95_breakdownall$season)) #%>% 
 
- # kableExtra::kable_classic()  %>%    kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table2.pdf"))
+ # kableExtra::kable_classic()  %>%    kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/Table_2.pdf"))
 
 # length(unique(coverage95_states$target_end_date[coverage95_states$target == "1 wk ahead inc flu hosp"]))
 # length(unique(coverage95_states$target_end_date))
@@ -736,8 +767,7 @@ abs_states_all <- WIS_Season %>% filter(location_name != "National") %>%
   group_by(model, target_end_date, target, season) %>% 
   summarise(model = model,
             target_end_date = as.Date(target_end_date, format = "%Y-%m-%d"),
-            abs_WIS = mean(WIS,na.rm = TRUE)) %>% 
-  mutate(model_color = ifelse(model == "Flusight-baseline", "red", ifelse(model == "Flusight-ensemble", "green", "gray")))
+            abs_WIS = mean(WIS,na.rm = TRUE))
 
 
 model_abs_all <- abs_states_all %>% unique() %>% group_by(model, target, season) %>% summarise(
@@ -769,23 +799,24 @@ abs_breakdown_WIS <- merge(inc.rankings_all[,c(1,7,11)], abs_breakdown, by= c("m
   
   
 abs_breakdown_WIS %>% select(-season) %>% mutate_if(is.numeric, round, digits = 2) %>%  
-  knitr::kable(align = c("lccccc"), caption = "Table 3", col.names = c("Model", "Relative WIS", "1 Wk ABS WIS", "2 Wk ABS WIS", "3 Wk ABS WIS", "4 Wk ABS WIS")) %>% 
-  kableExtra::footnote(general = "Table 3", general_title = "")%>% 
+  knitr::kable(align = c("lccccc"), #caption = "Table 3", 
+               col.names = c("Model", "Relative WIS", "1 Wk ABS WIS", "2 Wk ABS WIS", "3 Wk ABS WIS", "4 Wk ABS WIS")) %>% 
+ # kableExtra::footnote(general = "Table 3", general_title = "")%>% 
   kableExtra::pack_rows(index = table(abs_breakdown_WIS$season)) %>% 
-  kableExtra::kable_classic()# %>%   kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/table3.pdf"))
+  kableExtra::kable_classic() %>%   kableExtra::save_kable(file = paste0(manuscript_repo, "/Output/Table_3.pdf"))
 
 
-fs_wis_min_date21 <- abs_states %>% filter(season == "2021-2022", model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
-fs_wis_max_date21 <- abs_states %>% filter(season == "2021-2022",model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
-
-fs_wis_min4_date21 <- abs_states %>% filter(season == "2021-2022", model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
-fs_wis_max4_date21 <- abs_states %>% filter(season == "2021-2022",model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
-
-fs_wis_min_date23 <- abs_states %>% filter(season == "2022-2023", model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
-fs_wis_max_date23 <- abs_states %>% filter(season == "2022-2023",model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
-
-fs_wis_min4_date23 <- abs_states %>% filter(season == "2022-2023", model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
-fs_wis_max4_date23 <- abs_states %>% filter(season == "2022-2023",model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
+# fs_wis_min_date21 <- abs_states %>% filter(season == "2021-2022", model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
+# fs_wis_max_date21 <- abs_states %>% filter(season == "2021-2022",model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
+# 
+# fs_wis_min4_date21 <- abs_states %>% filter(season == "2021-2022", model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
+# fs_wis_max4_date21 <- abs_states %>% filter(season == "2021-2022",model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
+# 
+# fs_wis_min_date23 <- abs_states %>% filter(season == "2022-2023", model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
+# fs_wis_max_date23 <- abs_states %>% filter(season == "2022-2023",model == "Flusight-ensemble", target == "1 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
+# 
+# fs_wis_min4_date23 <- abs_states %>% filter(season == "2022-2023", model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(abs_WIS) %>% {head(., n = 1)} %>% pull(target_end_date)
+# fs_wis_max4_date23 <- abs_states %>% filter(season == "2022-2023",model == "Flusight-ensemble", target == "4 wk ahead inc flu hosp") %>% arrange(desc(abs_WIS)) %>% {head(., n = 1)} %>% pull(target_end_date)
 
 ```
 ## Absolute WIS
@@ -813,23 +844,25 @@ coverage_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
 
 
 
-figure4b <- ggplot(coverage95_flusight, aes(x = target_end_date, 
+figure5 <- ggplot(coverage95_flusight, aes(x = target_end_date, 
                                      y = coverage95, group = model,
                                      col = model)) +
-  geom_line(linewidth = 1) + geom_point(size = 2) +
+  geom_line(linewidth = 1) + 
+  #geom_point(size = 2) +
   geom_line(data = coverage95_not_flusight, aes(x = target_end_date, y = coverage95, group = model), color = adjustcolor("grey50", .35)) + 
   labs(y = "95% Coverage",
        x = "",
        color = "Model",
-       title = "95% Coverage by Model") +
+       #title = "95% Coverage by Model"
+       ) +
   scale_color_manual(values = c("#d6936b", "#6baed6")) +
   theme_bw()+
   scale_x_date(breaks = seq.Date(from = min(coverage95_flusight$target_end_date), to= max(coverage95_flusight$target_end_date), by = "2 weeks"), date_labels = "%d %b") +
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
-figure4b
+figure5
 
- # ggsave(paste0(manuscript_repo,"/Output/figure4b.png"), width=8, height=6, plot = figure4b)
+ ggsave(paste0(manuscript_repo,"/Output/Figure_5_colors.pdf"), width=8, height=6, plot = figure5)
 
 
 ```
@@ -891,13 +924,13 @@ figs1 <- model_order %>%
   ggplot( aes(x = fct_inorder(model), y = rel_wis))+
   geom_boxplot()+
   theme_bw() +
-  geom_hline(aes(yintercept = 1), color = "#6baed6")+
+  geom_hline(aes(yintercept = 1), color = "black")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         plot.margin = margin(0,1,0,25))+
   labs(x = "Model", y = "Relative WIS")+
-  facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022", `2022-2023` = "B) 2022-2023")))
+  facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022", `2022-2023` = "2022-2023")))
 figs1
- # ggsave(paste0(manuscript_repo,"/Output/figures1.jpg"), plot = figs1, width=10, height=8)
+ # ggsave(paste0(manuscript_repo,"/Output/Figure_S1.jpg"), plot = figs1, width=8, height=6)
 ```
 
 
@@ -909,8 +942,8 @@ figs1
   figure1b
   figure2 
   figure3 
-  figure4a
-  figure4b
+  figure4
+  figur5
  #figure4_absWIS 
  #figure4_50cov 
  #figs1
