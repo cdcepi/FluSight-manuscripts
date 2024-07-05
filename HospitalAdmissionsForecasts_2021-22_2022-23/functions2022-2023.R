@@ -604,9 +604,12 @@
     }
     graph <- graph + ggplot2::scale_x_date(name = NULL, date_breaks = "1 month", 
                                            date_labels = "%b %d") + ggplot2::ylab(full_target_variable) + 
-      ggplot2::labs(title = title, subtitle = subtitle, caption = caption) + 
+      ggplot2::labs(title = title, subtitle = subtitle, caption = caption, y = "Weekly Hospital Admissions") + 
       theme_bw() +
-      theme(legend.position = "bottom")
+      scale_y_continuous(label = scales::comma)+
+      theme(legend.position = "right", 
+            legend.box.margin = margin(0,0,0,0), 
+            text = element_text(size = 7))
     if (plot) {
       print(graph)
     }
@@ -650,10 +653,12 @@
                          truth_source = "HealthData.gov",
                          facet = "season",
                          facet_scales = "free",
+                         facet_ncol = 2,
                          locations = c("US"),
                          use_median_as_point = T,
                          subtitle = "",
-                         title = plttitle
+                         title = plttitle, 
+                         show_caption = FALSE
                          )
     return(fig)
   }
