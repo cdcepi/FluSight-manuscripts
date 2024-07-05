@@ -902,7 +902,7 @@ coverage_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
 
 
 
-figure4b <- ggplot(coverage95_flusight, aes(x = target_end_date, 
+figure5 <- ggplot(coverage95_flusight, aes(x = target_end_date, 
                                      y = coverage95, group = model,
                                      col = model)) +
   geom_line(linewidth = 1) + 
@@ -918,9 +918,9 @@ figure4b <- ggplot(coverage95_flusight, aes(x = target_end_date,
   scale_x_date(breaks = seq.Date(from = min(coverage95_flusight$target_end_date), to= max(coverage95_flusight$target_end_date), by = "2 weeks"), date_labels = "%d %b") +
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
-figure4b
+figure5
 
- ggsave(paste0(manuscript_repo,"/Output/Figure_4b.pdf"), width=8, height=6, plot = figure4b)
+ ggsave(paste0(manuscript_repo,"/Output/Figure_5.pdf"), width=8, height=6, plot = figure5)
 
 
 ```

@@ -151,13 +151,82 @@ kableExtra::kable_classic() #%>% kableExtra::save_kable(file = paste0(manuscript
 # obs_data21 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/obs_data21.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
 # obs_data23 <- read.csv(paste0(manuscript_repo, "/Data_for_Figures/obs_data23.csv")) %>% mutate(target_end_date = as.Date(target_end_date))
 
-Figure_1a <- forecastsandobservedplt(all_dat21, obs_data21, "a")
+all_dat_forplt <- bind_rows(mutate(all_dat21, season = "2021-2022"), mutate(all_dat23, season = "2022-2023"))
+obs_dat_forplt <- bind_rows(mutate(obs_data21, season = "2021-2022"), mutate(obs_data23, season = "2022-2023"))
 
 
-Figure_1b <- forecastsandobservedplt(all_dat23, obs_data23, "b")
+figure1 <- forecastsandobservedplt(all_dat_forplt, obs_dat_forplt)
+figure1
+#additions were made to figure 1 thanks to reviewer comments
 
-# ggsave(paste0(manuscript_repo,"/Output/Figure_1a.pdf"), plot = Figure_1a, width=10, height=8)
-# ggsave(paste0(manuscript_repo,"/Output/Figure_1b.pdf"), plot = Figure_1b, width=10, height=8)
+all_dat23_ <- all_dat23 %>% mutate(target_end_date = as.Date(target_end_date)) %>%  pivot_wider(names_from = c(type, quantile))
+obs_data23_ <- obs_data23 %>% mutate(target_end_date = as.Date(target_end_date))
+
+
+m_colors <- c('CADPH-FluCAT_Ensemble' = '#FFCC00',
+              'CEPH-Rtrend_fluH' = '#0c7eb3',
+              'CMU-TimeSeries' = '#481769FF',
+              'CU-ensemble' = '#472A7AFF',
+              'Flusight-baseline' = '#FDE725FF',
+              'GT-FluFNP' = '#3D4E8AFF',
+              'ISU_NiemiLab-Flu' = '#d0d90c',
+              'JHU_IDD-CovidSP' = '#2e1023',
+              'LUcompUncertLab-HWAR2' = '#990000',
+              'LUcompUncertLab-KalmanFilter' = '#993366',
+              'LUcompUncertLab-ensemble_rclp' = '#9933FF',
+              'LUcompUncertLab-hier_mech_model' = '#cc23de',
+              'LUcompUncertLab-stacked_ili' = '#22E8CD',
+              'MIGHTE-Nsemble' = '#780f57',
+              'MOBS-GLEAM_FLUH' = '#1F978BFF',
+              'NIH-Flu_ARIMA' = '#00FFCC',
+              'PSI-DICE' = '#e66200',
+              'SGroup-RandomForest' = '#2EB37CFF',
+              'SigSci-CREG' = '#65CB5EFF',
+              'SigSci-TSENS' = '#89D548FF',
+              'UGA_flucast-OKeeffe' = '#33FF00',
+              'UGuelph-FluPLUG' = '#e3b17a',
+              'UMass-trends_ensemble' = '#B0DD2FFF',
+              'UNC_IDD-InfluPaint' = '#c5aa27',
+              'UVAFluX-Ensemble' = '#FDE725FF',
+              'VTSanghani-ExogModel' = '#C9E120FF',
+              'VTSanghani-Transformer' = '#fffb00', 
+              'Reported' = 'black')
+
+## adding in model-specific plots
+plts_4 <- 
+  all_dat23_ %>% filter((forecast_date == "2022-11-14" | forecast_date == "2022-12-05" | forecast_date == "2023-02-27"), location == "US") %>% 
+  ggplot(aes(x = target_end_date, y = quantile_0.5))+
+  theme_bw()+
+  geom_ribbon(aes(ymin = quantile_0.05, ymax = quantile_0.975, color = model, fill = model), alpha = 0.35, show.legend = FALSE)+
+  geom_line(aes(color = model), show.legend = FALSE)+
+  geom_point(aes(color = model, fill = model))+
+  geom_line(data = filter(obs_data23_, location == "US", target_end_date <= "2023-04-22"), aes(y = value_inc), color = 'black')+
+  geom_point(data = filter(obs_data23_, location == "US", target_end_date <= "2023-04-22"), aes(y = value_inc), color = 'black')+
+  scale_y_continuous(label = scales::comma)+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %d")+
+  scale_color_manual(values = m_colors, drop = FALSE)+
+  scale_fill_manual(values = m_colors, drop = FALSE)+
+  coord_cartesian(ylim = c(0, 50000))+
+  labs(x = NULL, y = "Weekly Hospital Admissions", color = NULL, fill = NULL)+
+  facet_wrap(facets = vars(forecast_date), nrow = 1, ncol = 3)+
+  guides(color = guide_legend(ncol = 9),
+         fill = guide_legend(ncol = 9))+
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        legend.box.margin = margin(-5,-5,-5,-20), 
+        legend.margin = margin(-5,-5,-5,-20),
+        text = element_text(size = 7),
+        legend.text = element_text(size = 5),
+        legend.key.spacing = unit(0, "mm")
+        #axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+
+
+new_figure1 <- plot_grid(figure1, plts_4, ncol = 1)
+new_figure1
+
+# ggsave(paste0(manuscript_repo,"/Output/Figure_1.pdf"), plot = new_figure1, width=12, height=8)
 
 ##################### Model Ranks Figure 2
 
@@ -217,17 +286,22 @@ Figure_3 <- ggplot(scores,
   scale_fill_gradient2(low ="#6baed6", high =  "#d6936b", midpoint = 1, na.value = "grey50", 
                        name = "Relative WIS", 
                        breaks = c(-2,-1,0,1,2), 
-                       labels =c("0.25", 0.5, 1, 2, 4)) + 
+                       labels =c("0.25", 0.5, 0, 1, 2)) + 
   labs(x = NULL, y = NULL)+
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
         axis.title.x = element_text(size = 9),
         axis.text.y = element_text(size = 7),
+        legend.position = "top", 
+        legend.key.width = unit(1, "cm"),
+        legend.key.height = unit(0.25, "cm"),
+        legend.margin = margin(0,-5,-5,-5), 
         title = element_text(size = 9)
   ) +
   scale_y_discrete(limits = rev) +
   scale_x_discrete(labels = function(x) substring(x, 1, nchar(x)-10))+
   facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022",`2022-2023` = "2022-2023")))+
   theme(axis.ticks.y = element_blank())
+
 Figure_3
 
  # ggsave(paste0(manuscript_repo,"/Output/Figure_3.pdf"), plot = Figure_3, width = 12, height= 8)
@@ -253,7 +327,7 @@ wis_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
 
 
 ##################### Figure 4a Absolute (log) WIS by model
-Figure_4a <-  ggplot(abs_flusight, aes(x = target_end_date,
+Figure_4 <-  ggplot(abs_flusight, aes(x = target_end_date,
                                 y = log_WIS, group = model,
                                 col = model)) +
   geom_line(linewidth = 1) + geom_point(size = 2) +
@@ -270,7 +344,7 @@ Figure_4a <-  ggplot(abs_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = wis_labels,  scales = "free_x")
 
-# ggsave(paste0(manuscript_repo,"/Output/Figure_4a.pdf"), plot = Figure_4a, width = 8, height = 5)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_4.pdf"), plot = Figure_4a, width = 8, height = 5)
 
 ##################### Coverage and Scores
 
@@ -290,7 +364,7 @@ coverage_labels <- as_labeller(c(`1 wk ahead inc flu hosp` = "1 Week Ahead",
 
 
 
-Figure_4b <- ggplot(coverage95_flusight, aes(x = target_end_date, 
+Figure_5 <- ggplot(coverage95_flusight, aes(x = target_end_date, 
                                      y = coverage95, group = model,
                                      col = model)) +
   geom_line(linewidth = 1) + geom_point(size = 2) +
@@ -305,7 +379,7 @@ Figure_4b <- ggplot(coverage95_flusight, aes(x = target_end_date,
   theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank())+
   facet_grid(rows = vars(target), cols = vars(season), labeller = coverage_labels, scales = "free_x")
 
-# ggsave(paste0(manuscript_repo,"/Output/Figure_4b.pdf"), width=8, height=6, plot = Figure_4b)
+# ggsave(paste0(manuscript_repo,"/Output/Figure_5.pdf"), width=8, height=6, plot = Figure_4b)
 
 ##################### Coverage Tables Table 2
 
@@ -366,11 +440,11 @@ Figure_S1 <- model_order %>%
   ggplot( aes(x = fct_inorder(model), y = rel_wis.y))+
   geom_boxplot()+
   theme_bw() +
-  geom_hline(aes(yintercept = 1), color = "#6baed6")+
+  geom_hline(aes(yintercept = 1), color = "black")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         plot.margin = margin(0,1,0,25))+
   labs(x = "Model", y = "Relative WIS")+
-  facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "A) 2021-2022", `2022-2023` = "B) 2022-2023")))
+  facet_grid(cols = vars(season), scales = "free_x", labeller = as_labeller(c(`2021-2022` = "2021-2022", `2022-2023` = "2022-2023")))
 
 Figure_S1
 # ggsave(paste0(manuscript_repo,"/Output/Figure_S1.jpg"), plot = Figure_S1, width=10, height=8)
