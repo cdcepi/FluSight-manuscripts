@@ -152,8 +152,8 @@ ggsave(plot = figures2, paste0(manuscript_repo,"/Supplemental_analyses/Supplemen
 
 ```{r, Backfill Differences}
 
-diffdf21 <- diff_df_function(truthtransmute21, forecastdata21) %>% mutate(season = "A) 2021-2022")
-diffdf23 <- diff_df_function(truthtransmute23, forecastdata23) %>% mutate(season = "B) 2022-2023")
+diffdf21 <- diff_df_function(truthtransmute21, forecastdata21) %>% mutate(season = "2021-2022")
+diffdf23 <- diff_df_function(truthtransmute23, forecastdata23) %>% mutate(season = "2022-2023")
 
 diffdf <- rbind(diffdf21, diffdf23)
 
@@ -199,15 +199,21 @@ Jurisdiction-specific median percent differences had a larger range in 2021-22 f
 
 figures3a <- diffdf %>% filter(location_name != "US") %>% 
   ggplot(aes(x = absolutediff, y = location_name))+
-  geom_boxplot(color = "#d6936b", outlier.color = "black")+
+  geom_boxplot(color = "black", outlier.color = "black")+
   scale_y_discrete( limits = rev) +
-  labs(x = "Difference", y = "", title = "Supplementary Figure 3: state-specific distributions of absolute (panel a) and \nrelative changes (panel b) in HHS-Protect reported hospitalizations as of the \ninitial report date and the final evaluation date. ", caption = "10")+
+  labs(x = "Difference", y = "", title = 
+  "Supplementary Figure 3: state-specific distributions of absolute (panels a and b) and 
+  \nrelative changes (panels c and d) in HHS-Protect reported hospitalizations as of the 
+  \ninitial report date and the final evaluation date. Boxplot elements are defined as 
+  \nfollows: center line, median;box limits, upper and lower quartiles; whiskers, 1.5x 
+  \ninterquartile range; points, outliers.", caption = "10")+
   theme_bw()+
-  facet_grid(cols = vars(season))
+  facet_grid(cols = vars(season))+
+  theme(plot.title = element_text(lineheight=.5))
 
 figures3a
 
-ggsave(plot = figures3a,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Figure_S3a.pdf"), width = 8, height = 10)
+ggsave(plot = figures3a,  paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Figure_S3a.pdf"), width = 8.5, height = 11)
 
 ```
 
@@ -217,14 +223,14 @@ ggsave(plot = figures3a,  paste0(manuscript_repo,"/Supplemental_analyses/Supplem
 
 figures3b <- diffdf %>% filter(location_name != "US") %>% #can take out != National
   ggplot(aes(x = final_perc_change*100, y = location_name))+
-  geom_boxplot(color = "#6baed6", outlier.color = "black")+
+  geom_boxplot(color = "black", outlier.color = "black")+
   scale_y_discrete( limits = rev) +
   labs(x = "Percent Difference", y = "", caption = "11")+
   theme_bw()+
 facet_grid(cols = vars(season))
 figures3b
 
-ggsave(plot = figures3b, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Figure_S3b.pdf"), width = 8, height = 10.1, dpi = 300)
+ggsave(plot = figures3b, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Figure_S3b.pdf"), width = 8.5, height = 11, dpi = 300)
 
 ```
 

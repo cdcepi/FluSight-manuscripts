@@ -52,13 +52,14 @@ figures2
 
 ###### Absolute Difference: Figure S3
 
-diffdf <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/diffdf.csv"))
+diffdf <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/diffdf.csv")) %>% mutate(season = case_when(season == "A) 2021-2022" ~ "2021-2022", 
+                                                                                                                 TRUE ~ "2022-2023"))
 
 figures3a <- diffdf %>% filter(location_name != "US") %>% 
   ggplot(aes(x = absolutediff, y = location_name))+
-  geom_boxplot(color = "#d6936b", outlier.color = "black")+
+  geom_boxplot(color = "black", outlier.color = "black")+
   scale_y_discrete( limits = rev) +
-  labs(x = "Difference", y = "", title = "Absolute Changes")+
+  labs(x = "Difference", y = "")+
   theme_bw()+
   facet_grid(cols = vars(season))
 
@@ -68,9 +69,9 @@ figures3a
 
 figures3b <- diffdf %>% filter(location_name != "US") %>% #can take out != National
   ggplot(aes(x = final_perc_change*100, y = location_name))+
-  geom_boxplot(color = "#6baed6", outlier.color = "black")+
+  geom_boxplot(color = "black", outlier.color = "black")+
   scale_y_discrete( limits = rev) +
-  labs(x = "Percent Difference", y = "", title = "Relative Changes")+
+  labs(x = "Percent Difference", y = "")+
   theme_bw()+
   facet_grid(cols = vars(season))
 figures3b
