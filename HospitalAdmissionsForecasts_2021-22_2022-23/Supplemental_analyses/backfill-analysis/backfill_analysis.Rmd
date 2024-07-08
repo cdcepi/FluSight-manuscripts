@@ -145,7 +145,7 @@ figures2 <-
 
 figures2
  
-ggsave(plot = figures2, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures2.png"), height = 6, width = 8, dpi = 300)
+# ggsave(plot = figures2, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/figures2.png"), height = 6, width = 8, dpi = 300)
 ```
 
 ##### Backfill Differences 

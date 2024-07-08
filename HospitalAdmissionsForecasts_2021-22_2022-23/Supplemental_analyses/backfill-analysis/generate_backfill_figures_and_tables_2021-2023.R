@@ -34,7 +34,8 @@ flu23_target_end_dates <- c("2022-10-22", "2022-10-29", "2022-11-05", "2022-11-1
 ###### Backfill Epicurve: Figure S2
 
 
-fullset <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/fullset.csv")) %>% mutate(report_date = as.Date(report_date))
+fullset <- read.csv(paste0(backfill_repo, "/Data for Backfill Figures/fullset.csv")) %>% mutate(report_date = as.Date(report_date)) %>% 
+  mutate(season = case_when(season == "A) 2021-2022" ~ "2021-2022",  TRUE ~ "2022-2023"))
 
 figures2 <- 
   ggplot(fullset, aes(x = report_date)) +
@@ -49,6 +50,8 @@ figures2 <-
   facet_grid(cols = vars(season), scales = "free_x")
 
 figures2
+
+# ggsave(plot = figures2, paste0(manuscript_repo,"/Supplemental_analyses/Supplemental Output/Figure_S2.png"), height = 6, width = 8, dpi = 300)
 
 ###### Absolute Difference: Figure S3
 
