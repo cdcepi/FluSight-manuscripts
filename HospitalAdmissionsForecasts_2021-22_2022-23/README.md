@@ -75,3 +75,5 @@ All source code that is specific to the overall project is available under an op
 R: 4.3.0
 RStudio: 2023.03.1+446
 Windows 10: 22H2
+
+Installation of R will vary by machine and main manuscript software run-time may exceed 30 minutes. 
