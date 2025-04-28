@@ -1,0 +1,29 @@
+"Model","Relative WIS","50% Coverage (%)","95% Coverage (%)","% of Forecasts Submitted"
+"UMass-flusion (ENS,  AI/ML, STAT)",0.63,58.35,96.69,100
+"FluSight-ensemble (ENS,  STAT)",0.71,51.7,92.67,100
+"FluSight-lop_norm (ENS,  STAT)",0.73,59.31,99,100
+"MIGHTE-Nsemble (ENS,  AI/ML, STAT)",0.74,55.81,94.02,100
+"UGA_flucast-INFLAenza (STAT)",0.74,47.9,90.81,89
+"CU-ensemble (ENS,  MECH, AI/ML, STAT)",0.75,44.21,82.7,100
+"fjordhest-ensemble (ENS,  MECH, STAT)",0.78,46.69,90.31,100
+"UGA_flucast-Copycat (STAT)",0.84,41.85,82.45,85
+"PSI-PROF (MECH)",0.85,49.83,88.4,100
+"MOBS-GLEAM_FLUH (MECH)",0.86,36.26,79.37,98
+"UVAFluX-Ensemble (ENS,  AI/ML, STAT)",0.86,39.49,77.35,98
+"CMU-TimeSeries (ENS,  STAT)",0.87,44.97,92.94,87
+"UMass-trends_ensemble (ENS,  STAT)",0.89,61.78,92.23,100
+"UNC_IDD-InfluPaint (MECH, AI/ML)",0.93,28.69,71.7,77
+"cfarenewal-cfaepimlight (MECH)",0.94,45.66,93.87,99
+"SigSci-TSENS (ENS,  STAT)",0.99,55.41,86.99,96
+"cfa-flumech (MECH, AI/ML)",0.99,37.68,80.2,88
+"CEPH-Rtrend_fluH (MECH, AI/ML)",1,46.06,85.48,100
+"FluSight-baseline (STAT)",1,28.17,88.79,100
+"SGroup-RandomForest (ENS,  AI/ML)",1,42.96,89.58,96
+"Stevens-GBR (ENS,  AI/ML)",1.02,24.31,75.11,96
+"LUcompUncertLab-chimera (MECH)",1.15,47.44,83.86,94
+"UM-DeepOutbreak (AI/ML)",1.16,59.62,79.38,99
+"GT-FluFNP (STAT)",1.18,31.68,61.51,85
+"ISU_NiemiLab-NLH (STAT)",1.21,36.89,76.81,84
+"VTSanghani-Ensemble (ENS,  AI/ML, STAT)",1.27,21.87,49.47,85
+"UGuelph-CompositeCurve (STAT)",1.39,39.01,82.22,93
+"LosAlamos_NAU-CModel_Flu (MECH, AI/ML)",1.61,17.29,42.8,93

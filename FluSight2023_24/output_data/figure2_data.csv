@@ -1,0 +1,1451 @@
+"model","location_name","rel_wis"
+"CEPH-Rtrend_fluH","Alabama",0.82
+"CEPH-Rtrend_fluH","Alaska",1.16
+"CEPH-Rtrend_fluH","Arizona",0.76
+"CEPH-Rtrend_fluH","Arkansas",0.99
+"CEPH-Rtrend_fluH","California",0.65
+"CEPH-Rtrend_fluH","Colorado",0.97
+"CEPH-Rtrend_fluH","Connecticut",1.15
+"CEPH-Rtrend_fluH","Delaware",1.29
+"CEPH-Rtrend_fluH","District of Columbia",1.28
+"CEPH-Rtrend_fluH","Florida",1.11
+"CEPH-Rtrend_fluH","Georgia",0.84
+"CEPH-Rtrend_fluH","Hawaii",1.52
+"CEPH-Rtrend_fluH","Idaho",1.04
+"CEPH-Rtrend_fluH","Illinois",0.74
+"CEPH-Rtrend_fluH","Indiana",0.75
+"CEPH-Rtrend_fluH","Iowa",0.82
+"CEPH-Rtrend_fluH","Kansas",1.11
+"CEPH-Rtrend_fluH","Kentucky",1
+"CEPH-Rtrend_fluH","Louisiana",0.99
+"CEPH-Rtrend_fluH","Maine",1.25
+"CEPH-Rtrend_fluH","Maryland",0.94
+"CEPH-Rtrend_fluH","Massachusetts",0.94
+"CEPH-Rtrend_fluH","Michigan",0.7
+"CEPH-Rtrend_fluH","Minnesota",0.85
+"CEPH-Rtrend_fluH","Mississippi",0.99
+"CEPH-Rtrend_fluH","Missouri",0.83
+"CEPH-Rtrend_fluH","Montana",1.04
+"CEPH-Rtrend_fluH","Nebraska",1.25
+"CEPH-Rtrend_fluH","Nevada",1.09
+"CEPH-Rtrend_fluH","New Hampshire",1.32
+"CEPH-Rtrend_fluH","New Jersey",0.8
+"CEPH-Rtrend_fluH","New Mexico",0.81
+"CEPH-Rtrend_fluH","New York",0.81
+"CEPH-Rtrend_fluH","North Carolina",0.7
+"CEPH-Rtrend_fluH","North Dakota",1.41
+"CEPH-Rtrend_fluH","Ohio",0.92
+"CEPH-Rtrend_fluH","Oklahoma",0.87
+"CEPH-Rtrend_fluH","Oregon",1.18
+"CEPH-Rtrend_fluH","Pennsylvania",0.78
+"CEPH-Rtrend_fluH","Puerto Rico",0.98
+"CEPH-Rtrend_fluH","Rhode Island",1.23
+"CEPH-Rtrend_fluH","South Carolina",0.81
+"CEPH-Rtrend_fluH","South Dakota",1.32
+"CEPH-Rtrend_fluH","Tennessee",0.81
+"CEPH-Rtrend_fluH","Texas",0.76
+"CEPH-Rtrend_fluH","Utah",1.21
+"CEPH-Rtrend_fluH","Vermont",1.49
+"CEPH-Rtrend_fluH","Virginia",1.15
+"CEPH-Rtrend_fluH","Washington",1.01
+"CEPH-Rtrend_fluH","West Virginia",1.1
+"CEPH-Rtrend_fluH","Wisconsin",0.97
+"CEPH-Rtrend_fluH","Wyoming",1.05
+"CMU-TimeSeries","Alabama",0.87
+"CMU-TimeSeries","Alaska",1.13
+"CMU-TimeSeries","Arizona",0.79
+"CMU-TimeSeries","Arkansas",0.76
+"CMU-TimeSeries","California",0.78
+"CMU-TimeSeries","Colorado",0.92
+"CMU-TimeSeries","Connecticut",0.98
+"CMU-TimeSeries","Delaware",0.86
+"CMU-TimeSeries","District of Columbia",1.04
+"CMU-TimeSeries","Florida",1.05
+"CMU-TimeSeries","Georgia",0.81
+"CMU-TimeSeries","Hawaii",1.02
+"CMU-TimeSeries","Idaho",0.86
+"CMU-TimeSeries","Illinois",0.82
+"CMU-TimeSeries","Indiana",0.88
+"CMU-TimeSeries","Iowa",0.9
+"CMU-TimeSeries","Kansas",0.82
+"CMU-TimeSeries","Kentucky",0.82
+"CMU-TimeSeries","Louisiana",0.86
+"CMU-TimeSeries","Maine",0.84
+"CMU-TimeSeries","Maryland",0.8
+"CMU-TimeSeries","Massachusetts",0.81
+"CMU-TimeSeries","Michigan",0.81
+"CMU-TimeSeries","Minnesota",0.78
+"CMU-TimeSeries","Mississippi",0.84
+"CMU-TimeSeries","Missouri",0.82
+"CMU-TimeSeries","Montana",0.95
+"CMU-TimeSeries","Nebraska",0.81
+"CMU-TimeSeries","Nevada",0.88
+"CMU-TimeSeries","New Hampshire",0.87
+"CMU-TimeSeries","New Jersey",0.79
+"CMU-TimeSeries","New Mexico",0.92
+"CMU-TimeSeries","New York",0.85
+"CMU-TimeSeries","North Carolina",0.86
+"CMU-TimeSeries","North Dakota",1.02
+"CMU-TimeSeries","Ohio",0.82
+"CMU-TimeSeries","Oklahoma",0.72
+"CMU-TimeSeries","Oregon",0.79
+"CMU-TimeSeries","Pennsylvania",0.82
+"CMU-TimeSeries","Puerto Rico",1.25
+"CMU-TimeSeries","Rhode Island",0.9
+"CMU-TimeSeries","South Carolina",0.85
+"CMU-TimeSeries","South Dakota",0.91
+"CMU-TimeSeries","Tennessee",0.76
+"CMU-TimeSeries","Texas",0.82
+"CMU-TimeSeries","Utah",0.89
+"CMU-TimeSeries","Vermont",0.88
+"CMU-TimeSeries","Virginia",0.82
+"CMU-TimeSeries","Washington",0.89
+"CMU-TimeSeries","West Virginia",0.89
+"CMU-TimeSeries","Wisconsin",0.82
+"CMU-TimeSeries","Wyoming",1.06
+"CU-ensemble","Alabama",0.77
+"CU-ensemble","Alaska",1.27
+"CU-ensemble","Arizona",0.74
+"CU-ensemble","Arkansas",0.63
+"CU-ensemble","California",0.74
+"CU-ensemble","Colorado",0.78
+"CU-ensemble","Connecticut",0.81
+"CU-ensemble","Delaware",0.78
+"CU-ensemble","District of Columbia",0.75
+"CU-ensemble","Florida",0.98
+"CU-ensemble","Georgia",0.77
+"CU-ensemble","Hawaii",0.9
+"CU-ensemble","Idaho",0.71
+"CU-ensemble","Illinois",0.62
+"CU-ensemble","Indiana",0.68
+"CU-ensemble","Iowa",0.76
+"CU-ensemble","Kansas",0.65
+"CU-ensemble","Kentucky",0.66
+"CU-ensemble","Louisiana",0.77
+"CU-ensemble","Maine",0.87
+"CU-ensemble","Maryland",0.77
+"CU-ensemble","Massachusetts",0.85
+"CU-ensemble","Michigan",0.56
+"CU-ensemble","Minnesota",0.64
+"CU-ensemble","Mississippi",0.68
+"CU-ensemble","Missouri",0.53
+"CU-ensemble","Montana",0.72
+"CU-ensemble","Nebraska",0.86
+"CU-ensemble","Nevada",0.74
+"CU-ensemble","New Hampshire",0.82
+"CU-ensemble","New Jersey",0.72
+"CU-ensemble","New Mexico",0.7
+"CU-ensemble","New York",0.71
+"CU-ensemble","North Carolina",0.68
+"CU-ensemble","North Dakota",0.79
+"CU-ensemble","Ohio",0.74
+"CU-ensemble","Oklahoma",0.58
+"CU-ensemble","Oregon",0.72
+"CU-ensemble","Pennsylvania",0.67
+"CU-ensemble","Puerto Rico",0.86
+"CU-ensemble","Rhode Island",0.79
+"CU-ensemble","South Carolina",0.82
+"CU-ensemble","South Dakota",0.82
+"CU-ensemble","Tennessee",0.63
+"CU-ensemble","Texas",0.67
+"CU-ensemble","Utah",0.94
+"CU-ensemble","Vermont",0.72
+"CU-ensemble","Virginia",0.78
+"CU-ensemble","Washington",0.79
+"CU-ensemble","West Virginia",0.63
+"CU-ensemble","Wisconsin",0.66
+"CU-ensemble","Wyoming",0.85
+"FluSight-baseline","Alabama",1
+"FluSight-baseline","Alaska",1
+"FluSight-baseline","Arizona",1
+"FluSight-baseline","Arkansas",1
+"FluSight-baseline","California",1
+"FluSight-baseline","Colorado",1
+"FluSight-baseline","Connecticut",1
+"FluSight-baseline","Delaware",1
+"FluSight-baseline","District of Columbia",1
+"FluSight-baseline","Florida",1
+"FluSight-baseline","Georgia",1
+"FluSight-baseline","Hawaii",1
+"FluSight-baseline","Idaho",1
+"FluSight-baseline","Illinois",1
+"FluSight-baseline","Indiana",1
+"FluSight-baseline","Iowa",1
+"FluSight-baseline","Kansas",1
+"FluSight-baseline","Kentucky",1
+"FluSight-baseline","Louisiana",1
+"FluSight-baseline","Maine",1
+"FluSight-baseline","Maryland",1
+"FluSight-baseline","Massachusetts",1
+"FluSight-baseline","Michigan",1
+"FluSight-baseline","Minnesota",1
+"FluSight-baseline","Mississippi",1
+"FluSight-baseline","Missouri",1
+"FluSight-baseline","Montana",1
+"FluSight-baseline","Nebraska",1
+"FluSight-baseline","Nevada",1
+"FluSight-baseline","New Hampshire",1
+"FluSight-baseline","New Jersey",1
+"FluSight-baseline","New Mexico",1
+"FluSight-baseline","New York",1
+"FluSight-baseline","North Carolina",1
+"FluSight-baseline","North Dakota",1
+"FluSight-baseline","Ohio",1
+"FluSight-baseline","Oklahoma",1
+"FluSight-baseline","Oregon",1
+"FluSight-baseline","Pennsylvania",1
+"FluSight-baseline","Puerto Rico",1
+"FluSight-baseline","Rhode Island",1
+"FluSight-baseline","South Carolina",1
+"FluSight-baseline","South Dakota",1
+"FluSight-baseline","Tennessee",1
+"FluSight-baseline","Texas",1
+"FluSight-baseline","Utah",1
+"FluSight-baseline","Vermont",1
+"FluSight-baseline","Virginia",1
+"FluSight-baseline","Washington",1
+"FluSight-baseline","West Virginia",1
+"FluSight-baseline","Wisconsin",1
+"FluSight-baseline","Wyoming",1
+"FluSight-ensemble","Alabama",0.67
+"FluSight-ensemble","Alaska",0.87
+"FluSight-ensemble","Arizona",0.58
+"FluSight-ensemble","Arkansas",0.65
+"FluSight-ensemble","California",0.56
+"FluSight-ensemble","Colorado",0.66
+"FluSight-ensemble","Connecticut",0.79
+"FluSight-ensemble","Delaware",0.83
+"FluSight-ensemble","District of Columbia",0.84
+"FluSight-ensemble","Florida",0.71
+"FluSight-ensemble","Georgia",0.66
+"FluSight-ensemble","Hawaii",0.78
+"FluSight-ensemble","Idaho",0.74
+"FluSight-ensemble","Illinois",0.65
+"FluSight-ensemble","Indiana",0.58
+"FluSight-ensemble","Iowa",0.72
+"FluSight-ensemble","Kansas",0.76
+"FluSight-ensemble","Kentucky",0.67
+"FluSight-ensemble","Louisiana",0.64
+"FluSight-ensemble","Maine",0.74
+"FluSight-ensemble","Maryland",0.69
+"FluSight-ensemble","Massachusetts",0.66
+"FluSight-ensemble","Michigan",0.65
+"FluSight-ensemble","Minnesota",0.67
+"FluSight-ensemble","Mississippi",0.67
+"FluSight-ensemble","Missouri",0.68
+"FluSight-ensemble","Montana",0.74
+"FluSight-ensemble","Nebraska",0.84
+"FluSight-ensemble","Nevada",0.64
+"FluSight-ensemble","New Hampshire",0.88
+"FluSight-ensemble","New Jersey",0.67
+"FluSight-ensemble","New Mexico",0.72
+"FluSight-ensemble","New York",0.66
+"FluSight-ensemble","North Carolina",0.64
+"FluSight-ensemble","North Dakota",0.8
+"FluSight-ensemble","Ohio",0.7
+"FluSight-ensemble","Oklahoma",0.57
+"FluSight-ensemble","Oregon",0.74
+"FluSight-ensemble","Pennsylvania",0.69
+"FluSight-ensemble","Puerto Rico",0.88
+"FluSight-ensemble","Rhode Island",0.81
+"FluSight-ensemble","South Carolina",0.66
+"FluSight-ensemble","South Dakota",0.88
+"FluSight-ensemble","Tennessee",0.62
+"FluSight-ensemble","Texas",0.52
+"FluSight-ensemble","Utah",0.77
+"FluSight-ensemble","Vermont",0.76
+"FluSight-ensemble","Virginia",0.71
+"FluSight-ensemble","Washington",0.73
+"FluSight-ensemble","West Virginia",0.73
+"FluSight-ensemble","Wisconsin",0.7
+"FluSight-ensemble","Wyoming",0.81
+"FluSight-lop_norm","Alabama",0.7
+"FluSight-lop_norm","Alaska",0.88
+"FluSight-lop_norm","Arizona",0.61
+"FluSight-lop_norm","Arkansas",0.65
+"FluSight-lop_norm","California",0.59
+"FluSight-lop_norm","Colorado",0.7
+"FluSight-lop_norm","Connecticut",0.82
+"FluSight-lop_norm","Delaware",0.85
+"FluSight-lop_norm","District of Columbia",0.82
+"FluSight-lop_norm","Florida",0.79
+"FluSight-lop_norm","Georgia",0.66
+"FluSight-lop_norm","Hawaii",0.81
+"FluSight-lop_norm","Idaho",0.75
+"FluSight-lop_norm","Illinois",0.68
+"FluSight-lop_norm","Indiana",0.62
+"FluSight-lop_norm","Iowa",0.75
+"FluSight-lop_norm","Kansas",0.76
+"FluSight-lop_norm","Kentucky",0.71
+"FluSight-lop_norm","Louisiana",0.66
+"FluSight-lop_norm","Maine",0.77
+"FluSight-lop_norm","Maryland",0.68
+"FluSight-lop_norm","Massachusetts",0.68
+"FluSight-lop_norm","Michigan",0.67
+"FluSight-lop_norm","Minnesota",0.69
+"FluSight-lop_norm","Mississippi",0.68
+"FluSight-lop_norm","Missouri",0.71
+"FluSight-lop_norm","Montana",0.73
+"FluSight-lop_norm","Nebraska",0.85
+"FluSight-lop_norm","Nevada",0.71
+"FluSight-lop_norm","New Hampshire",0.88
+"FluSight-lop_norm","New Jersey",0.68
+"FluSight-lop_norm","New Mexico",0.72
+"FluSight-lop_norm","New York",0.7
+"FluSight-lop_norm","North Carolina",0.64
+"FluSight-lop_norm","North Dakota",0.82
+"FluSight-lop_norm","Ohio",0.71
+"FluSight-lop_norm","Oklahoma",0.59
+"FluSight-lop_norm","Oregon",0.79
+"FluSight-lop_norm","Pennsylvania",0.7
+"FluSight-lop_norm","Puerto Rico",0.99
+"FluSight-lop_norm","Rhode Island",0.83
+"FluSight-lop_norm","South Carolina",0.66
+"FluSight-lop_norm","South Dakota",0.88
+"FluSight-lop_norm","Tennessee",0.65
+"FluSight-lop_norm","Texas",0.58
+"FluSight-lop_norm","Utah",0.77
+"FluSight-lop_norm","Vermont",0.79
+"FluSight-lop_norm","Virginia",0.72
+"FluSight-lop_norm","Washington",0.76
+"FluSight-lop_norm","West Virginia",0.72
+"FluSight-lop_norm","Wisconsin",0.71
+"FluSight-lop_norm","Wyoming",0.79
+"GT-FluFNP","Alabama",1.13
+"GT-FluFNP","Alaska",1.43
+"GT-FluFNP","Arizona",1.13
+"GT-FluFNP","Arkansas",0.81
+"GT-FluFNP","California",1.53
+"GT-FluFNP","Colorado",1.18
+"GT-FluFNP","Connecticut",1.46
+"GT-FluFNP","Delaware",1.04
+"GT-FluFNP","District of Columbia",1.13
+"GT-FluFNP","Florida",1.42
+"GT-FluFNP","Georgia",1.35
+"GT-FluFNP","Idaho",1.24
+"GT-FluFNP","Illinois",1.44
+"GT-FluFNP","Indiana",1.26
+"GT-FluFNP","Iowa",1.17
+"GT-FluFNP","Kansas",1.12
+"GT-FluFNP","Kentucky",1.17
+"GT-FluFNP","Louisiana",0.94
+"GT-FluFNP","Maine",1.06
+"GT-FluFNP","Maryland",1.06
+"GT-FluFNP","Massachusetts",1.16
+"GT-FluFNP","Michigan",1.29
+"GT-FluFNP","Minnesota",1.18
+"GT-FluFNP","Mississippi",0.84
+"GT-FluFNP","Missouri",1.26
+"GT-FluFNP","Montana",1.06
+"GT-FluFNP","Nebraska",1.04
+"GT-FluFNP","Nevada",1.22
+"GT-FluFNP","New Hampshire",1.36
+"GT-FluFNP","New Jersey",1.25
+"GT-FluFNP","New Mexico",1.16
+"GT-FluFNP","New York",1.55
+"GT-FluFNP","North Carolina",1.11
+"GT-FluFNP","North Dakota",0.95
+"GT-FluFNP","Ohio",1.38
+"GT-FluFNP","Oklahoma",0.82
+"GT-FluFNP","Oregon",1.36
+"GT-FluFNP","Pennsylvania",1.39
+"GT-FluFNP","Rhode Island",1.18
+"GT-FluFNP","South Carolina",1.04
+"GT-FluFNP","South Dakota",1.25
+"GT-FluFNP","Tennessee",1.06
+"GT-FluFNP","Texas",0.91
+"GT-FluFNP","Utah",0.97
+"GT-FluFNP","Vermont",1.13
+"GT-FluFNP","Virginia",1.26
+"GT-FluFNP","Washington",1.24
+"GT-FluFNP","West Virginia",1
+"GT-FluFNP","Wisconsin",1.32
+"GT-FluFNP","Wyoming",1.26
+"ISU_NiemiLab-NLH","Alabama",1.12
+"ISU_NiemiLab-NLH","Alaska",1.16
+"ISU_NiemiLab-NLH","Arizona",1.12
+"ISU_NiemiLab-NLH","Arkansas",1.42
+"ISU_NiemiLab-NLH","California",1.19
+"ISU_NiemiLab-NLH","Colorado",0.95
+"ISU_NiemiLab-NLH","Connecticut",1.22
+"ISU_NiemiLab-NLH","Delaware",1.33
+"ISU_NiemiLab-NLH","District of Columbia",1.47
+"ISU_NiemiLab-NLH","Florida",1.32
+"ISU_NiemiLab-NLH","Georgia",1.21
+"ISU_NiemiLab-NLH","Hawaii",1.17
+"ISU_NiemiLab-NLH","Idaho",1.13
+"ISU_NiemiLab-NLH","Illinois",1.48
+"ISU_NiemiLab-NLH","Indiana",1.12
+"ISU_NiemiLab-NLH","Iowa",1.48
+"ISU_NiemiLab-NLH","Kansas",1.21
+"ISU_NiemiLab-NLH","Kentucky",1
+"ISU_NiemiLab-NLH","Louisiana",1.26
+"ISU_NiemiLab-NLH","Maine",0.98
+"ISU_NiemiLab-NLH","Maryland",1.44
+"ISU_NiemiLab-NLH","Massachusetts",0.94
+"ISU_NiemiLab-NLH","Michigan",1.06
+"ISU_NiemiLab-NLH","Minnesota",1.16
+"ISU_NiemiLab-NLH","Mississippi",1.01
+"ISU_NiemiLab-NLH","Missouri",1.2
+"ISU_NiemiLab-NLH","Montana",1.1
+"ISU_NiemiLab-NLH","Nebraska",1.34
+"ISU_NiemiLab-NLH","Nevada",1.12
+"ISU_NiemiLab-NLH","New Hampshire",1.16
+"ISU_NiemiLab-NLH","New Jersey",1.06
+"ISU_NiemiLab-NLH","New Mexico",1.02
+"ISU_NiemiLab-NLH","New York",1.32
+"ISU_NiemiLab-NLH","North Carolina",1.42
+"ISU_NiemiLab-NLH","North Dakota",1.31
+"ISU_NiemiLab-NLH","Ohio",1.39
+"ISU_NiemiLab-NLH","Oklahoma",1.34
+"ISU_NiemiLab-NLH","Oregon",1.19
+"ISU_NiemiLab-NLH","Pennsylvania",1.24
+"ISU_NiemiLab-NLH","Puerto Rico",1.17
+"ISU_NiemiLab-NLH","Rhode Island",1.36
+"ISU_NiemiLab-NLH","South Carolina",1.16
+"ISU_NiemiLab-NLH","South Dakota",1.32
+"ISU_NiemiLab-NLH","Tennessee",0.65
+"ISU_NiemiLab-NLH","Texas",1.48
+"ISU_NiemiLab-NLH","Utah",0.8
+"ISU_NiemiLab-NLH","Vermont",1.25
+"ISU_NiemiLab-NLH","Virginia",0.94
+"ISU_NiemiLab-NLH","Washington",1.15
+"ISU_NiemiLab-NLH","West Virginia",1.64
+"ISU_NiemiLab-NLH","Wisconsin",1.27
+"ISU_NiemiLab-NLH","Wyoming",1.41
+"LUcompUncertLab-chimera","Alabama",0.98
+"LUcompUncertLab-chimera","Alaska",1.76
+"LUcompUncertLab-chimera","Arizona",1.1
+"LUcompUncertLab-chimera","Arkansas",0.83
+"LUcompUncertLab-chimera","California",1.35
+"LUcompUncertLab-chimera","Colorado",1.09
+"LUcompUncertLab-chimera","Connecticut",1.19
+"LUcompUncertLab-chimera","Delaware",1.34
+"LUcompUncertLab-chimera","District of Columbia",1.24
+"LUcompUncertLab-chimera","Florida",1.9
+"LUcompUncertLab-chimera","Georgia",0.97
+"LUcompUncertLab-chimera","Hawaii",1.03
+"LUcompUncertLab-chimera","Idaho",1.18
+"LUcompUncertLab-chimera","Illinois",1.04
+"LUcompUncertLab-chimera","Indiana",0.82
+"LUcompUncertLab-chimera","Iowa",0.95
+"LUcompUncertLab-chimera","Kansas",1.13
+"LUcompUncertLab-chimera","Kentucky",1.01
+"LUcompUncertLab-chimera","Louisiana",1.02
+"LUcompUncertLab-chimera","Maine",1.26
+"LUcompUncertLab-chimera","Maryland",1.1
+"LUcompUncertLab-chimera","Massachusetts",0.91
+"LUcompUncertLab-chimera","Michigan",1
+"LUcompUncertLab-chimera","Minnesota",1.21
+"LUcompUncertLab-chimera","Mississippi",1.19
+"LUcompUncertLab-chimera","Missouri",1.18
+"LUcompUncertLab-chimera","Montana",1.13
+"LUcompUncertLab-chimera","Nebraska",1.06
+"LUcompUncertLab-chimera","Nevada",1.33
+"LUcompUncertLab-chimera","New Hampshire",1.33
+"LUcompUncertLab-chimera","New Jersey",0.99
+"LUcompUncertLab-chimera","New Mexico",1.15
+"LUcompUncertLab-chimera","New York",1.22
+"LUcompUncertLab-chimera","North Carolina",0.99
+"LUcompUncertLab-chimera","North Dakota",1.12
+"LUcompUncertLab-chimera","Ohio",1.22
+"LUcompUncertLab-chimera","Oklahoma",0.96
+"LUcompUncertLab-chimera","Oregon",1.32
+"LUcompUncertLab-chimera","Pennsylvania",1.11
+"LUcompUncertLab-chimera","Puerto Rico",2.81
+"LUcompUncertLab-chimera","Rhode Island",1.18
+"LUcompUncertLab-chimera","South Carolina",1.26
+"LUcompUncertLab-chimera","South Dakota",1.44
+"LUcompUncertLab-chimera","Tennessee",1
+"LUcompUncertLab-chimera","Texas",1.07
+"LUcompUncertLab-chimera","Utah",1.03
+"LUcompUncertLab-chimera","Vermont",0.91
+"LUcompUncertLab-chimera","Virginia",1.5
+"LUcompUncertLab-chimera","Washington",1.17
+"LUcompUncertLab-chimera","West Virginia",0.99
+"LUcompUncertLab-chimera","Wisconsin",1.01
+"LUcompUncertLab-chimera","Wyoming",1.07
+"LosAlamos_NAU-CModel_Flu","Alabama",1.4
+"LosAlamos_NAU-CModel_Flu","Alaska",2.05
+"LosAlamos_NAU-CModel_Flu","Arizona",1.36
+"LosAlamos_NAU-CModel_Flu","Arkansas",1.51
+"LosAlamos_NAU-CModel_Flu","California",1.56
+"LosAlamos_NAU-CModel_Flu","Colorado",1.47
+"LosAlamos_NAU-CModel_Flu","Connecticut",1.84
+"LosAlamos_NAU-CModel_Flu","Delaware",1.7
+"LosAlamos_NAU-CModel_Flu","District of Columbia",1.73
+"LosAlamos_NAU-CModel_Flu","Florida",1.34
+"LosAlamos_NAU-CModel_Flu","Georgia",1.24
+"LosAlamos_NAU-CModel_Flu","Hawaii",1.17
+"LosAlamos_NAU-CModel_Flu","Idaho",1.79
+"LosAlamos_NAU-CModel_Flu","Illinois",1.74
+"LosAlamos_NAU-CModel_Flu","Indiana",1.39
+"LosAlamos_NAU-CModel_Flu","Iowa",1.52
+"LosAlamos_NAU-CModel_Flu","Kansas",1.09
+"LosAlamos_NAU-CModel_Flu","Kentucky",1.58
+"LosAlamos_NAU-CModel_Flu","Louisiana",1.4
+"LosAlamos_NAU-CModel_Flu","Maine",1.12
+"LosAlamos_NAU-CModel_Flu","Maryland",1.96
+"LosAlamos_NAU-CModel_Flu","Massachusetts",1.64
+"LosAlamos_NAU-CModel_Flu","Michigan",1.59
+"LosAlamos_NAU-CModel_Flu","Minnesota",1.7
+"LosAlamos_NAU-CModel_Flu","Mississippi",1.47
+"LosAlamos_NAU-CModel_Flu","Missouri",1.72
+"LosAlamos_NAU-CModel_Flu","Montana",1.31
+"LosAlamos_NAU-CModel_Flu","Nebraska",1.68
+"LosAlamos_NAU-CModel_Flu","Nevada",5.18
+"LosAlamos_NAU-CModel_Flu","New Hampshire",2.06
+"LosAlamos_NAU-CModel_Flu","New Jersey",1.32
+"LosAlamos_NAU-CModel_Flu","New Mexico",1.79
+"LosAlamos_NAU-CModel_Flu","New York",1.7
+"LosAlamos_NAU-CModel_Flu","North Carolina",1.48
+"LosAlamos_NAU-CModel_Flu","North Dakota",1.41
+"LosAlamos_NAU-CModel_Flu","Ohio",1.61
+"LosAlamos_NAU-CModel_Flu","Oklahoma",0.92
+"LosAlamos_NAU-CModel_Flu","Oregon",1.4
+"LosAlamos_NAU-CModel_Flu","Pennsylvania",1.86
+"LosAlamos_NAU-CModel_Flu","Puerto Rico",1.5
+"LosAlamos_NAU-CModel_Flu","Rhode Island",2.32
+"LosAlamos_NAU-CModel_Flu","South Carolina",1.53
+"LosAlamos_NAU-CModel_Flu","South Dakota",2.16
+"LosAlamos_NAU-CModel_Flu","Tennessee",1.38
+"LosAlamos_NAU-CModel_Flu","Texas",1.23
+"LosAlamos_NAU-CModel_Flu","Utah",1.25
+"LosAlamos_NAU-CModel_Flu","Vermont",1.23
+"LosAlamos_NAU-CModel_Flu","Virginia",1.31
+"LosAlamos_NAU-CModel_Flu","Washington",1.71
+"LosAlamos_NAU-CModel_Flu","West Virginia",1.26
+"LosAlamos_NAU-CModel_Flu","Wisconsin",1.7
+"LosAlamos_NAU-CModel_Flu","Wyoming",1.24
+"MIGHTE-Nsemble","Alabama",0.65
+"MIGHTE-Nsemble","Alaska",1.17
+"MIGHTE-Nsemble","Arizona",0.6
+"MIGHTE-Nsemble","Arkansas",0.73
+"MIGHTE-Nsemble","California",0.58
+"MIGHTE-Nsemble","Colorado",0.64
+"MIGHTE-Nsemble","Connecticut",0.75
+"MIGHTE-Nsemble","Delaware",0.84
+"MIGHTE-Nsemble","District of Columbia",0.84
+"MIGHTE-Nsemble","Florida",0.84
+"MIGHTE-Nsemble","Georgia",0.62
+"MIGHTE-Nsemble","Hawaii",0.84
+"MIGHTE-Nsemble","Idaho",0.79
+"MIGHTE-Nsemble","Illinois",0.6
+"MIGHTE-Nsemble","Indiana",0.59
+"MIGHTE-Nsemble","Iowa",0.89
+"MIGHTE-Nsemble","Kansas",0.76
+"MIGHTE-Nsemble","Kentucky",0.68
+"MIGHTE-Nsemble","Louisiana",0.54
+"MIGHTE-Nsemble","Maine",0.79
+"MIGHTE-Nsemble","Maryland",0.54
+"MIGHTE-Nsemble","Massachusetts",0.64
+"MIGHTE-Nsemble","Michigan",0.69
+"MIGHTE-Nsemble","Minnesota",0.61
+"MIGHTE-Nsemble","Mississippi",0.73
+"MIGHTE-Nsemble","Missouri",0.73
+"MIGHTE-Nsemble","Montana",0.73
+"MIGHTE-Nsemble","Nebraska",0.82
+"MIGHTE-Nsemble","Nevada",1.02
+"MIGHTE-Nsemble","New Hampshire",0.87
+"MIGHTE-Nsemble","New Jersey",0.54
+"MIGHTE-Nsemble","New Mexico",1.11
+"MIGHTE-Nsemble","New York",0.65
+"MIGHTE-Nsemble","North Carolina",0.64
+"MIGHTE-Nsemble","North Dakota",0.77
+"MIGHTE-Nsemble","Ohio",0.64
+"MIGHTE-Nsemble","Oklahoma",0.67
+"MIGHTE-Nsemble","Oregon",0.99
+"MIGHTE-Nsemble","Pennsylvania",0.58
+"MIGHTE-Nsemble","Puerto Rico",0.89
+"MIGHTE-Nsemble","Rhode Island",0.69
+"MIGHTE-Nsemble","South Carolina",0.66
+"MIGHTE-Nsemble","South Dakota",0.91
+"MIGHTE-Nsemble","Tennessee",0.69
+"MIGHTE-Nsemble","Texas",0.48
+"MIGHTE-Nsemble","Utah",0.86
+"MIGHTE-Nsemble","Vermont",0.96
+"MIGHTE-Nsemble","Virginia",0.67
+"MIGHTE-Nsemble","Washington",0.89
+"MIGHTE-Nsemble","West Virginia",0.63
+"MIGHTE-Nsemble","Wisconsin",0.7
+"MIGHTE-Nsemble","Wyoming",0.84
+"MOBS-GLEAM_FLUH","Alabama",0.7
+"MOBS-GLEAM_FLUH","Alaska",1.18
+"MOBS-GLEAM_FLUH","Arizona",0.69
+"MOBS-GLEAM_FLUH","Arkansas",0.82
+"MOBS-GLEAM_FLUH","California",0.64
+"MOBS-GLEAM_FLUH","Colorado",0.85
+"MOBS-GLEAM_FLUH","Connecticut",1.09
+"MOBS-GLEAM_FLUH","Delaware",1.12
+"MOBS-GLEAM_FLUH","District of Columbia",1.18
+"MOBS-GLEAM_FLUH","Florida",0.7
+"MOBS-GLEAM_FLUH","Georgia",0.59
+"MOBS-GLEAM_FLUH","Hawaii",0.74
+"MOBS-GLEAM_FLUH","Idaho",0.91
+"MOBS-GLEAM_FLUH","Illinois",0.84
+"MOBS-GLEAM_FLUH","Indiana",0.71
+"MOBS-GLEAM_FLUH","Iowa",0.91
+"MOBS-GLEAM_FLUH","Kansas",0.87
+"MOBS-GLEAM_FLUH","Kentucky",0.81
+"MOBS-GLEAM_FLUH","Louisiana",0.54
+"MOBS-GLEAM_FLUH","Maine",0.88
+"MOBS-GLEAM_FLUH","Maryland",0.77
+"MOBS-GLEAM_FLUH","Massachusetts",0.95
+"MOBS-GLEAM_FLUH","Michigan",0.89
+"MOBS-GLEAM_FLUH","Minnesota",0.81
+"MOBS-GLEAM_FLUH","Mississippi",0.63
+"MOBS-GLEAM_FLUH","Missouri",0.84
+"MOBS-GLEAM_FLUH","Montana",0.81
+"MOBS-GLEAM_FLUH","Nebraska",1.17
+"MOBS-GLEAM_FLUH","Nevada",0.61
+"MOBS-GLEAM_FLUH","New Hampshire",1.32
+"MOBS-GLEAM_FLUH","New Jersey",0.85
+"MOBS-GLEAM_FLUH","New Mexico",1
+"MOBS-GLEAM_FLUH","New York",0.89
+"MOBS-GLEAM_FLUH","North Carolina",0.72
+"MOBS-GLEAM_FLUH","North Dakota",0.93
+"MOBS-GLEAM_FLUH","Ohio",0.88
+"MOBS-GLEAM_FLUH","Oklahoma",0.6
+"MOBS-GLEAM_FLUH","Oregon",1.02
+"MOBS-GLEAM_FLUH","Pennsylvania",0.78
+"MOBS-GLEAM_FLUH","Rhode Island",1.17
+"MOBS-GLEAM_FLUH","South Carolina",0.68
+"MOBS-GLEAM_FLUH","South Dakota",1.16
+"MOBS-GLEAM_FLUH","Tennessee",0.71
+"MOBS-GLEAM_FLUH","Texas",0.48
+"MOBS-GLEAM_FLUH","Utah",0.89
+"MOBS-GLEAM_FLUH","Vermont",0.96
+"MOBS-GLEAM_FLUH","Virginia",0.73
+"MOBS-GLEAM_FLUH","Washington",0.92
+"MOBS-GLEAM_FLUH","West Virginia",0.94
+"MOBS-GLEAM_FLUH","Wisconsin",0.89
+"MOBS-GLEAM_FLUH","Wyoming",0.88
+"PSI-PROF","Alabama",0.86
+"PSI-PROF","Alaska",1.03
+"PSI-PROF","Arizona",0.63
+"PSI-PROF","Arkansas",0.91
+"PSI-PROF","California",0.52
+"PSI-PROF","Colorado",0.73
+"PSI-PROF","Connecticut",1.01
+"PSI-PROF","Delaware",1.02
+"PSI-PROF","District of Columbia",1.07
+"PSI-PROF","Florida",0.82
+"PSI-PROF","Georgia",0.64
+"PSI-PROF","Hawaii",1
+"PSI-PROF","Idaho",0.82
+"PSI-PROF","Illinois",0.65
+"PSI-PROF","Indiana",0.71
+"PSI-PROF","Iowa",0.87
+"PSI-PROF","Kansas",0.91
+"PSI-PROF","Kentucky",0.85
+"PSI-PROF","Louisiana",0.84
+"PSI-PROF","Maine",0.93
+"PSI-PROF","Maryland",0.77
+"PSI-PROF","Massachusetts",0.77
+"PSI-PROF","Michigan",0.73
+"PSI-PROF","Minnesota",0.8
+"PSI-PROF","Mississippi",0.85
+"PSI-PROF","Missouri",0.77
+"PSI-PROF","Montana",1.01
+"PSI-PROF","Nebraska",1.01
+"PSI-PROF","Nevada",0.85
+"PSI-PROF","New Hampshire",1.04
+"PSI-PROF","New Jersey",0.8
+"PSI-PROF","New Mexico",0.87
+"PSI-PROF","New York",0.63
+"PSI-PROF","North Carolina",0.71
+"PSI-PROF","North Dakota",1.03
+"PSI-PROF","Ohio",0.68
+"PSI-PROF","Oklahoma",0.82
+"PSI-PROF","Oregon",0.88
+"PSI-PROF","Pennsylvania",0.7
+"PSI-PROF","Puerto Rico",0.92
+"PSI-PROF","Rhode Island",1.07
+"PSI-PROF","South Carolina",0.72
+"PSI-PROF","South Dakota",0.99
+"PSI-PROF","Tennessee",0.73
+"PSI-PROF","Texas",0.62
+"PSI-PROF","Utah",0.93
+"PSI-PROF","Vermont",1.19
+"PSI-PROF","Virginia",0.83
+"PSI-PROF","Washington",0.84
+"PSI-PROF","West Virginia",0.92
+"PSI-PROF","Wisconsin",0.8
+"PSI-PROF","Wyoming",0.97
+"SGroup-RandomForest","Alabama",0.94
+"SGroup-RandomForest","Alaska",0.95
+"SGroup-RandomForest","Arizona",0.96
+"SGroup-RandomForest","Arkansas",0.95
+"SGroup-RandomForest","California",0.8
+"SGroup-RandomForest","Colorado",0.99
+"SGroup-RandomForest","Connecticut",1.14
+"SGroup-RandomForest","Delaware",1.15
+"SGroup-RandomForest","District of Columbia",1.12
+"SGroup-RandomForest","Florida",1.21
+"SGroup-RandomForest","Georgia",0.88
+"SGroup-RandomForest","Hawaii",1
+"SGroup-RandomForest","Idaho",1.07
+"SGroup-RandomForest","Illinois",0.94
+"SGroup-RandomForest","Indiana",1.03
+"SGroup-RandomForest","Iowa",1.01
+"SGroup-RandomForest","Kansas",1.04
+"SGroup-RandomForest","Kentucky",0.92
+"SGroup-RandomForest","Louisiana",0.89
+"SGroup-RandomForest","Maine",1.04
+"SGroup-RandomForest","Maryland",0.94
+"SGroup-RandomForest","Massachusetts",0.83
+"SGroup-RandomForest","Michigan",0.95
+"SGroup-RandomForest","Minnesota",0.94
+"SGroup-RandomForest","Mississippi",0.96
+"SGroup-RandomForest","Missouri",1.08
+"SGroup-RandomForest","Montana",1
+"SGroup-RandomForest","Nebraska",1.02
+"SGroup-RandomForest","Nevada",0.96
+"SGroup-RandomForest","New Hampshire",1.15
+"SGroup-RandomForest","New Jersey",1.01
+"SGroup-RandomForest","New Mexico",1.13
+"SGroup-RandomForest","New York",1.04
+"SGroup-RandomForest","North Carolina",0.91
+"SGroup-RandomForest","North Dakota",1.11
+"SGroup-RandomForest","Ohio",0.99
+"SGroup-RandomForest","Oklahoma",0.94
+"SGroup-RandomForest","Oregon",1.09
+"SGroup-RandomForest","Pennsylvania",0.96
+"SGroup-RandomForest","Puerto Rico",1
+"SGroup-RandomForest","Rhode Island",0.99
+"SGroup-RandomForest","South Carolina",0.93
+"SGroup-RandomForest","South Dakota",1.06
+"SGroup-RandomForest","Tennessee",0.94
+"SGroup-RandomForest","Texas",1
+"SGroup-RandomForest","Utah",0.92
+"SGroup-RandomForest","Vermont",1.08
+"SGroup-RandomForest","Virginia",0.95
+"SGroup-RandomForest","Washington",1.08
+"SGroup-RandomForest","West Virginia",1.02
+"SGroup-RandomForest","Wisconsin",1.03
+"SGroup-RandomForest","Wyoming",1.22
+"SigSci-TSENS","Alabama",0.94
+"SigSci-TSENS","Alaska",0.99
+"SigSci-TSENS","Arizona",0.96
+"SigSci-TSENS","Arkansas",0.94
+"SigSci-TSENS","California",0.94
+"SigSci-TSENS","Colorado",0.91
+"SigSci-TSENS","Connecticut",1
+"SigSci-TSENS","Delaware",0.95
+"SigSci-TSENS","Florida",0.81
+"SigSci-TSENS","Georgia",0.9
+"SigSci-TSENS","Hawaii",0.84
+"SigSci-TSENS","Idaho",1.03
+"SigSci-TSENS","Illinois",1.04
+"SigSci-TSENS","Indiana",0.89
+"SigSci-TSENS","Iowa",1.09
+"SigSci-TSENS","Kansas",0.99
+"SigSci-TSENS","Kentucky",1.2
+"SigSci-TSENS","Louisiana",0.91
+"SigSci-TSENS","Maine",1.16
+"SigSci-TSENS","Maryland",1.02
+"SigSci-TSENS","Massachusetts",1.01
+"SigSci-TSENS","Michigan",1.01
+"SigSci-TSENS","Minnesota",0.86
+"SigSci-TSENS","Mississippi",1.06
+"SigSci-TSENS","Missouri",0.99
+"SigSci-TSENS","Montana",1
+"SigSci-TSENS","Nebraska",0.93
+"SigSci-TSENS","Nevada",1.16
+"SigSci-TSENS","New Hampshire",1
+"SigSci-TSENS","New Jersey",0.96
+"SigSci-TSENS","New Mexico",1.04
+"SigSci-TSENS","New York",1.02
+"SigSci-TSENS","North Carolina",0.94
+"SigSci-TSENS","North Dakota",0.85
+"SigSci-TSENS","Ohio",1.07
+"SigSci-TSENS","Oklahoma",0.87
+"SigSci-TSENS","Oregon",1.45
+"SigSci-TSENS","Pennsylvania",0.86
+"SigSci-TSENS","Rhode Island",1.01
+"SigSci-TSENS","South Carolina",1
+"SigSci-TSENS","South Dakota",0.95
+"SigSci-TSENS","Tennessee",0.96
+"SigSci-TSENS","Texas",0.83
+"SigSci-TSENS","Utah",0.94
+"SigSci-TSENS","Vermont",0.91
+"SigSci-TSENS","Virginia",0.9
+"SigSci-TSENS","Washington",1.25
+"SigSci-TSENS","West Virginia",0.98
+"SigSci-TSENS","Wisconsin",0.91
+"SigSci-TSENS","Wyoming",0.97
+"Stevens-GBR","Alabama",0.98
+"Stevens-GBR","Alaska",0.95
+"Stevens-GBR","Arizona",1
+"Stevens-GBR","Arkansas",0.94
+"Stevens-GBR","California",0.95
+"Stevens-GBR","Colorado",1.13
+"Stevens-GBR","Connecticut",1.09
+"Stevens-GBR","Delaware",0.98
+"Stevens-GBR","District of Columbia",0.9
+"Stevens-GBR","Florida",2.51
+"Stevens-GBR","Georgia",1.27
+"Stevens-GBR","Hawaii",1.14
+"Stevens-GBR","Idaho",0.96
+"Stevens-GBR","Illinois",1.05
+"Stevens-GBR","Indiana",0.92
+"Stevens-GBR","Iowa",0.83
+"Stevens-GBR","Kansas",0.93
+"Stevens-GBR","Kentucky",1.11
+"Stevens-GBR","Louisiana",0.89
+"Stevens-GBR","Maine",0.82
+"Stevens-GBR","Maryland",0.95
+"Stevens-GBR","Massachusetts",1.27
+"Stevens-GBR","Michigan",1.07
+"Stevens-GBR","Minnesota",0.94
+"Stevens-GBR","Mississippi",0.92
+"Stevens-GBR","Missouri",0.98
+"Stevens-GBR","Montana",0.79
+"Stevens-GBR","Nebraska",1.13
+"Stevens-GBR","Nevada",0.9
+"Stevens-GBR","New Hampshire",1.04
+"Stevens-GBR","New Jersey",1.37
+"Stevens-GBR","New Mexico",0.89
+"Stevens-GBR","New York",1.44
+"Stevens-GBR","North Carolina",0.94
+"Stevens-GBR","North Dakota",0.93
+"Stevens-GBR","Ohio",1.05
+"Stevens-GBR","Oklahoma",0.78
+"Stevens-GBR","Oregon",0.97
+"Stevens-GBR","Pennsylvania",1.2
+"Stevens-GBR","Puerto Rico",1.3
+"Stevens-GBR","Rhode Island",0.74
+"Stevens-GBR","South Carolina",1.03
+"Stevens-GBR","South Dakota",0.93
+"Stevens-GBR","Tennessee",1.23
+"Stevens-GBR","Texas",1.51
+"Stevens-GBR","Utah",1.01
+"Stevens-GBR","Vermont",0.92
+"Stevens-GBR","Virginia",1.34
+"Stevens-GBR","Washington",0.71
+"Stevens-GBR","West Virginia",0.92
+"Stevens-GBR","Wisconsin",0.91
+"Stevens-GBR","Wyoming",0.88
+"UGA_flucast-Copycat","Alabama",0.76
+"UGA_flucast-Copycat","Alaska",0.99
+"UGA_flucast-Copycat","Arizona",0.65
+"UGA_flucast-Copycat","Arkansas",0.76
+"UGA_flucast-Copycat","California",0.62
+"UGA_flucast-Copycat","Colorado",0.85
+"UGA_flucast-Copycat","Connecticut",1.01
+"UGA_flucast-Copycat","Delaware",0.91
+"UGA_flucast-Copycat","District of Columbia",0.96
+"UGA_flucast-Copycat","Florida",1.01
+"UGA_flucast-Copycat","Georgia",0.69
+"UGA_flucast-Copycat","Hawaii",1.18
+"UGA_flucast-Copycat","Idaho",0.83
+"UGA_flucast-Copycat","Illinois",0.75
+"UGA_flucast-Copycat","Indiana",0.69
+"UGA_flucast-Copycat","Iowa",0.92
+"UGA_flucast-Copycat","Kansas",0.97
+"UGA_flucast-Copycat","Kentucky",0.78
+"UGA_flucast-Copycat","Louisiana",0.68
+"UGA_flucast-Copycat","Maine",0.93
+"UGA_flucast-Copycat","Maryland",0.77
+"UGA_flucast-Copycat","Massachusetts",0.98
+"UGA_flucast-Copycat","Michigan",0.75
+"UGA_flucast-Copycat","Minnesota",0.92
+"UGA_flucast-Copycat","Mississippi",0.75
+"UGA_flucast-Copycat","Missouri",0.8
+"UGA_flucast-Copycat","Montana",0.95
+"UGA_flucast-Copycat","Nebraska",1.04
+"UGA_flucast-Copycat","Nevada",0.68
+"UGA_flucast-Copycat","New Hampshire",1.06
+"UGA_flucast-Copycat","New Jersey",0.73
+"UGA_flucast-Copycat","New Mexico",0.79
+"UGA_flucast-Copycat","New York",0.77
+"UGA_flucast-Copycat","North Carolina",0.73
+"UGA_flucast-Copycat","North Dakota",1.08
+"UGA_flucast-Copycat","Ohio",0.8
+"UGA_flucast-Copycat","Oklahoma",0.72
+"UGA_flucast-Copycat","Oregon",0.86
+"UGA_flucast-Copycat","Pennsylvania",0.67
+"UGA_flucast-Copycat","Puerto Rico",1.1
+"UGA_flucast-Copycat","Rhode Island",0.91
+"UGA_flucast-Copycat","South Carolina",0.63
+"UGA_flucast-Copycat","South Dakota",1.03
+"UGA_flucast-Copycat","Tennessee",0.6
+"UGA_flucast-Copycat","Texas",0.66
+"UGA_flucast-Copycat","Utah",0.91
+"UGA_flucast-Copycat","Vermont",0.94
+"UGA_flucast-Copycat","Virginia",0.72
+"UGA_flucast-Copycat","Washington",0.74
+"UGA_flucast-Copycat","West Virginia",0.97
+"UGA_flucast-Copycat","Wisconsin",0.92
+"UGA_flucast-Copycat","Wyoming",0.87
+"UGA_flucast-INFLAenza","Alabama",0.65
+"UGA_flucast-INFLAenza","Alaska",1.02
+"UGA_flucast-INFLAenza","Arizona",0.56
+"UGA_flucast-INFLAenza","Arkansas",0.98
+"UGA_flucast-INFLAenza","California",0.44
+"UGA_flucast-INFLAenza","Colorado",0.67
+"UGA_flucast-INFLAenza","Connecticut",0.75
+"UGA_flucast-INFLAenza","Delaware",0.87
+"UGA_flucast-INFLAenza","District of Columbia",0.75
+"UGA_flucast-INFLAenza","Florida",0.82
+"UGA_flucast-INFLAenza","Georgia",0.58
+"UGA_flucast-INFLAenza","Hawaii",0.78
+"UGA_flucast-INFLAenza","Idaho",0.75
+"UGA_flucast-INFLAenza","Illinois",0.57
+"UGA_flucast-INFLAenza","Indiana",0.73
+"UGA_flucast-INFLAenza","Iowa",0.79
+"UGA_flucast-INFLAenza","Kansas",0.74
+"UGA_flucast-INFLAenza","Kentucky",0.9
+"UGA_flucast-INFLAenza","Louisiana",0.52
+"UGA_flucast-INFLAenza","Maine",0.88
+"UGA_flucast-INFLAenza","Maryland",0.65
+"UGA_flucast-INFLAenza","Massachusetts",0.76
+"UGA_flucast-INFLAenza","Michigan",0.69
+"UGA_flucast-INFLAenza","Minnesota",0.75
+"UGA_flucast-INFLAenza","Mississippi",0.66
+"UGA_flucast-INFLAenza","Missouri",0.8
+"UGA_flucast-INFLAenza","Montana",0.87
+"UGA_flucast-INFLAenza","Nebraska",0.99
+"UGA_flucast-INFLAenza","Nevada",0.49
+"UGA_flucast-INFLAenza","New Hampshire",0.88
+"UGA_flucast-INFLAenza","New Jersey",0.65
+"UGA_flucast-INFLAenza","New Mexico",0.67
+"UGA_flucast-INFLAenza","New York",0.63
+"UGA_flucast-INFLAenza","North Carolina",0.54
+"UGA_flucast-INFLAenza","North Dakota",0.89
+"UGA_flucast-INFLAenza","Ohio",0.76
+"UGA_flucast-INFLAenza","Oklahoma",0.86
+"UGA_flucast-INFLAenza","Oregon",0.77
+"UGA_flucast-INFLAenza","Pennsylvania",0.62
+"UGA_flucast-INFLAenza","Puerto Rico",1.39
+"UGA_flucast-INFLAenza","Rhode Island",0.8
+"UGA_flucast-INFLAenza","South Carolina",0.5
+"UGA_flucast-INFLAenza","South Dakota",0.84
+"UGA_flucast-INFLAenza","Tennessee",0.72
+"UGA_flucast-INFLAenza","Texas",0.75
+"UGA_flucast-INFLAenza","Utah",0.74
+"UGA_flucast-INFLAenza","Vermont",0.87
+"UGA_flucast-INFLAenza","Virginia",0.63
+"UGA_flucast-INFLAenza","Washington",0.67
+"UGA_flucast-INFLAenza","West Virginia",0.91
+"UGA_flucast-INFLAenza","Wisconsin",0.68
+"UGA_flucast-INFLAenza","Wyoming",0.74
+"UGuelph-CompositeCurve","Alabama",1.48
+"UGuelph-CompositeCurve","Alaska",1.15
+"UGuelph-CompositeCurve","Arizona",1.41
+"UGuelph-CompositeCurve","Arkansas",1.06
+"UGuelph-CompositeCurve","California",0.68
+"UGuelph-CompositeCurve","Colorado",1.49
+"UGuelph-CompositeCurve","Connecticut",1.9
+"UGuelph-CompositeCurve","Delaware",1.2
+"UGuelph-CompositeCurve","District of Columbia",1.6
+"UGuelph-CompositeCurve","Florida",2.23
+"UGuelph-CompositeCurve","Georgia",1.28
+"UGuelph-CompositeCurve","Hawaii",1.24
+"UGuelph-CompositeCurve","Idaho",1.07
+"UGuelph-CompositeCurve","Illinois",1.68
+"UGuelph-CompositeCurve","Indiana",1.52
+"UGuelph-CompositeCurve","Iowa",1.46
+"UGuelph-CompositeCurve","Kansas",1.66
+"UGuelph-CompositeCurve","Kentucky",1.47
+"UGuelph-CompositeCurve","Louisiana",1.22
+"UGuelph-CompositeCurve","Maine",1.42
+"UGuelph-CompositeCurve","Maryland",1.16
+"UGuelph-CompositeCurve","Massachusetts",1.33
+"UGuelph-CompositeCurve","Michigan",1.44
+"UGuelph-CompositeCurve","Minnesota",2.06
+"UGuelph-CompositeCurve","Mississippi",1.4
+"UGuelph-CompositeCurve","Missouri",1.59
+"UGuelph-CompositeCurve","Montana",0.93
+"UGuelph-CompositeCurve","Nebraska",2.24
+"UGuelph-CompositeCurve","Nevada",1.12
+"UGuelph-CompositeCurve","New Hampshire",1.34
+"UGuelph-CompositeCurve","New Jersey",1.49
+"UGuelph-CompositeCurve","New Mexico",1.15
+"UGuelph-CompositeCurve","New York",1.32
+"UGuelph-CompositeCurve","North Carolina",1.12
+"UGuelph-CompositeCurve","North Dakota",1.8
+"UGuelph-CompositeCurve","Ohio",1.33
+"UGuelph-CompositeCurve","Oklahoma",1.16
+"UGuelph-CompositeCurve","Oregon",1.54
+"UGuelph-CompositeCurve","Pennsylvania",1.33
+"UGuelph-CompositeCurve","Puerto Rico",3.71
+"UGuelph-CompositeCurve","Rhode Island",1.1
+"UGuelph-CompositeCurve","South Carolina",1.13
+"UGuelph-CompositeCurve","South Dakota",1.35
+"UGuelph-CompositeCurve","Tennessee",1.4
+"UGuelph-CompositeCurve","Texas",1.52
+"UGuelph-CompositeCurve","Utah",1.3
+"UGuelph-CompositeCurve","Vermont",1.71
+"UGuelph-CompositeCurve","Virginia",1.5
+"UGuelph-CompositeCurve","Washington",1.52
+"UGuelph-CompositeCurve","West Virginia",1.1
+"UGuelph-CompositeCurve","Wisconsin",1.43
+"UGuelph-CompositeCurve","Wyoming",1.24
+"UM-DeepOutbreak","Alabama",1.36
+"UM-DeepOutbreak","Alaska",1.17
+"UM-DeepOutbreak","Arizona",1.16
+"UM-DeepOutbreak","Arkansas",0.85
+"UM-DeepOutbreak","California",1.35
+"UM-DeepOutbreak","Colorado",1.23
+"UM-DeepOutbreak","Connecticut",1.16
+"UM-DeepOutbreak","Delaware",1.29
+"UM-DeepOutbreak","District of Columbia",0.93
+"UM-DeepOutbreak","Florida",1.09
+"UM-DeepOutbreak","Georgia",1.23
+"UM-DeepOutbreak","Hawaii",1.18
+"UM-DeepOutbreak","Idaho",1.11
+"UM-DeepOutbreak","Illinois",1.19
+"UM-DeepOutbreak","Indiana",1.04
+"UM-DeepOutbreak","Iowa",1.18
+"UM-DeepOutbreak","Kansas",1.21
+"UM-DeepOutbreak","Kentucky",1.16
+"UM-DeepOutbreak","Louisiana",1.2
+"UM-DeepOutbreak","Maine",1.06
+"UM-DeepOutbreak","Maryland",0.97
+"UM-DeepOutbreak","Massachusetts",1.03
+"UM-DeepOutbreak","Michigan",1.08
+"UM-DeepOutbreak","Minnesota",1.02
+"UM-DeepOutbreak","Mississippi",1.16
+"UM-DeepOutbreak","Missouri",1.25
+"UM-DeepOutbreak","Montana",1.22
+"UM-DeepOutbreak","Nebraska",1.17
+"UM-DeepOutbreak","Nevada",1.21
+"UM-DeepOutbreak","New Hampshire",1.29
+"UM-DeepOutbreak","New Jersey",1.09
+"UM-DeepOutbreak","New Mexico",1.15
+"UM-DeepOutbreak","New York",1.03
+"UM-DeepOutbreak","North Carolina",1.17
+"UM-DeepOutbreak","North Dakota",1.16
+"UM-DeepOutbreak","Ohio",1.13
+"UM-DeepOutbreak","Oklahoma",1.1
+"UM-DeepOutbreak","Oregon",1.36
+"UM-DeepOutbreak","Pennsylvania",1.28
+"UM-DeepOutbreak","Puerto Rico",1.78
+"UM-DeepOutbreak","Rhode Island",1.26
+"UM-DeepOutbreak","South Carolina",1.23
+"UM-DeepOutbreak","South Dakota",1.09
+"UM-DeepOutbreak","Tennessee",1.33
+"UM-DeepOutbreak","Texas",1.1
+"UM-DeepOutbreak","Utah",1.14
+"UM-DeepOutbreak","Vermont",1.07
+"UM-DeepOutbreak","Virginia",1.29
+"UM-DeepOutbreak","Washington",1.38
+"UM-DeepOutbreak","West Virginia",0.99
+"UM-DeepOutbreak","Wisconsin",1.07
+"UM-DeepOutbreak","Wyoming",1.23
+"UMass-flusion","Alabama",0.57
+"UMass-flusion","Alaska",0.89
+"UMass-flusion","Arizona",0.42
+"UMass-flusion","Arkansas",0.55
+"UMass-flusion","California",0.4
+"UMass-flusion","Colorado",0.54
+"UMass-flusion","Connecticut",0.69
+"UMass-flusion","Delaware",0.8
+"UMass-flusion","District of Columbia",0.8
+"UMass-flusion","Florida",0.55
+"UMass-flusion","Georgia",0.51
+"UMass-flusion","Hawaii",0.98
+"UMass-flusion","Idaho",0.62
+"UMass-flusion","Illinois",0.52
+"UMass-flusion","Indiana",0.49
+"UMass-flusion","Iowa",0.62
+"UMass-flusion","Kansas",0.69
+"UMass-flusion","Kentucky",0.63
+"UMass-flusion","Louisiana",0.53
+"UMass-flusion","Maine",0.82
+"UMass-flusion","Maryland",0.55
+"UMass-flusion","Massachusetts",0.6
+"UMass-flusion","Michigan",0.57
+"UMass-flusion","Minnesota",0.56
+"UMass-flusion","Mississippi",0.55
+"UMass-flusion","Missouri",0.57
+"UMass-flusion","Montana",0.64
+"UMass-flusion","Nebraska",0.84
+"UMass-flusion","Nevada",0.54
+"UMass-flusion","New Hampshire",0.76
+"UMass-flusion","New Jersey",0.54
+"UMass-flusion","New Mexico",0.55
+"UMass-flusion","New York",0.49
+"UMass-flusion","North Carolina",0.49
+"UMass-flusion","North Dakota",0.74
+"UMass-flusion","Ohio",0.55
+"UMass-flusion","Oklahoma",0.59
+"UMass-flusion","Oregon",0.74
+"UMass-flusion","Pennsylvania",0.54
+"UMass-flusion","Puerto Rico",0.84
+"UMass-flusion","Rhode Island",0.8
+"UMass-flusion","South Carolina",0.47
+"UMass-flusion","South Dakota",0.78
+"UMass-flusion","Tennessee",0.56
+"UMass-flusion","Texas",0.5
+"UMass-flusion","Utah",0.72
+"UMass-flusion","Vermont",0.82
+"UMass-flusion","Virginia",0.63
+"UMass-flusion","Washington",0.73
+"UMass-flusion","West Virginia",0.62
+"UMass-flusion","Wisconsin",0.55
+"UMass-flusion","Wyoming",0.82
+"UMass-trends_ensemble","Alabama",0.8
+"UMass-trends_ensemble","Alaska",1.05
+"UMass-trends_ensemble","Arizona",0.73
+"UMass-trends_ensemble","Arkansas",0.93
+"UMass-trends_ensemble","California",0.74
+"UMass-trends_ensemble","Colorado",0.82
+"UMass-trends_ensemble","Connecticut",0.93
+"UMass-trends_ensemble","Delaware",1.01
+"UMass-trends_ensemble","District of Columbia",1.01
+"UMass-trends_ensemble","Florida",0.71
+"UMass-trends_ensemble","Georgia",0.79
+"UMass-trends_ensemble","Hawaii",1.18
+"UMass-trends_ensemble","Idaho",0.87
+"UMass-trends_ensemble","Illinois",0.8
+"UMass-trends_ensemble","Indiana",0.79
+"UMass-trends_ensemble","Iowa",0.87
+"UMass-trends_ensemble","Kansas",0.88
+"UMass-trends_ensemble","Kentucky",0.81
+"UMass-trends_ensemble","Louisiana",0.82
+"UMass-trends_ensemble","Maine",0.98
+"UMass-trends_ensemble","Maryland",0.9
+"UMass-trends_ensemble","Massachusetts",0.76
+"UMass-trends_ensemble","Michigan",0.77
+"UMass-trends_ensemble","Minnesota",0.77
+"UMass-trends_ensemble","Mississippi",0.96
+"UMass-trends_ensemble","Missouri",0.85
+"UMass-trends_ensemble","Montana",0.88
+"UMass-trends_ensemble","Nebraska",0.97
+"UMass-trends_ensemble","Nevada",0.91
+"UMass-trends_ensemble","New Hampshire",1.01
+"UMass-trends_ensemble","New Jersey",0.87
+"UMass-trends_ensemble","New Mexico",0.94
+"UMass-trends_ensemble","New York",0.86
+"UMass-trends_ensemble","North Carolina",0.78
+"UMass-trends_ensemble","North Dakota",1.03
+"UMass-trends_ensemble","Ohio",0.81
+"UMass-trends_ensemble","Oklahoma",0.87
+"UMass-trends_ensemble","Oregon",0.99
+"UMass-trends_ensemble","Pennsylvania",0.84
+"UMass-trends_ensemble","Puerto Rico",1.28
+"UMass-trends_ensemble","Rhode Island",0.97
+"UMass-trends_ensemble","South Carolina",0.84
+"UMass-trends_ensemble","South Dakota",0.97
+"UMass-trends_ensemble","Tennessee",0.86
+"UMass-trends_ensemble","Texas",0.67
+"UMass-trends_ensemble","Utah",1.01
+"UMass-trends_ensemble","Vermont",1.04
+"UMass-trends_ensemble","Virginia",0.93
+"UMass-trends_ensemble","Washington",0.99
+"UMass-trends_ensemble","West Virginia",0.88
+"UMass-trends_ensemble","Wisconsin",0.85
+"UMass-trends_ensemble","Wyoming",1
+"UNC_IDD-InfluPaint","Alabama",0.67
+"UNC_IDD-InfluPaint","Alaska",1.28
+"UNC_IDD-InfluPaint","Arizona",0.66
+"UNC_IDD-InfluPaint","Arkansas",0.65
+"UNC_IDD-InfluPaint","California",0.63
+"UNC_IDD-InfluPaint","Colorado",0.87
+"UNC_IDD-InfluPaint","Connecticut",1.28
+"UNC_IDD-InfluPaint","Delaware",1.15
+"UNC_IDD-InfluPaint","District of Columbia",1.02
+"UNC_IDD-InfluPaint","Florida",1.23
+"UNC_IDD-InfluPaint","Georgia",0.72
+"UNC_IDD-InfluPaint","Hawaii",1.08
+"UNC_IDD-InfluPaint","Idaho",1.11
+"UNC_IDD-InfluPaint","Illinois",0.99
+"UNC_IDD-InfluPaint","Indiana",0.91
+"UNC_IDD-InfluPaint","Iowa",1.12
+"UNC_IDD-InfluPaint","Kansas",1.06
+"UNC_IDD-InfluPaint","Kentucky",0.96
+"UNC_IDD-InfluPaint","Louisiana",1.02
+"UNC_IDD-InfluPaint","Maine",1.08
+"UNC_IDD-InfluPaint","Maryland",0.82
+"UNC_IDD-InfluPaint","Massachusetts",0.91
+"UNC_IDD-InfluPaint","Michigan",1.07
+"UNC_IDD-InfluPaint","Minnesota",0.89
+"UNC_IDD-InfluPaint","Mississippi",0.72
+"UNC_IDD-InfluPaint","Missouri",1.08
+"UNC_IDD-InfluPaint","Montana",0.77
+"UNC_IDD-InfluPaint","Nebraska",1.08
+"UNC_IDD-InfluPaint","Nevada",0.75
+"UNC_IDD-InfluPaint","New Hampshire",0.96
+"UNC_IDD-InfluPaint","New Jersey",1
+"UNC_IDD-InfluPaint","New Mexico",0.81
+"UNC_IDD-InfluPaint","New York",1.01
+"UNC_IDD-InfluPaint","North Carolina",0.82
+"UNC_IDD-InfluPaint","North Dakota",1.1
+"UNC_IDD-InfluPaint","Ohio",1
+"UNC_IDD-InfluPaint","Oklahoma",0.83
+"UNC_IDD-InfluPaint","Oregon",0.93
+"UNC_IDD-InfluPaint","Pennsylvania",1
+"UNC_IDD-InfluPaint","Rhode Island",1
+"UNC_IDD-InfluPaint","South Carolina",0.86
+"UNC_IDD-InfluPaint","South Dakota",1.22
+"UNC_IDD-InfluPaint","Tennessee",0.76
+"UNC_IDD-InfluPaint","Texas",0.72
+"UNC_IDD-InfluPaint","Utah",0.79
+"UNC_IDD-InfluPaint","Vermont",0.81
+"UNC_IDD-InfluPaint","Virginia",1
+"UNC_IDD-InfluPaint","Washington",0.85
+"UNC_IDD-InfluPaint","West Virginia",0.8
+"UNC_IDD-InfluPaint","Wisconsin",0.89
+"UNC_IDD-InfluPaint","Wyoming",0.88
+"UVAFluX-Ensemble","Alabama",0.84
+"UVAFluX-Ensemble","Alaska",1.07
+"UVAFluX-Ensemble","Arizona",0.76
+"UVAFluX-Ensemble","Arkansas",0.73
+"UVAFluX-Ensemble","California",0.68
+"UVAFluX-Ensemble","Colorado",0.79
+"UVAFluX-Ensemble","Connecticut",0.93
+"UVAFluX-Ensemble","Delaware",1.01
+"UVAFluX-Ensemble","District of Columbia",1.02
+"UVAFluX-Ensemble","Florida",0.82
+"UVAFluX-Ensemble","Georgia",0.78
+"UVAFluX-Ensemble","Hawaii",1.01
+"UVAFluX-Ensemble","Idaho",0.94
+"UVAFluX-Ensemble","Illinois",0.77
+"UVAFluX-Ensemble","Indiana",0.73
+"UVAFluX-Ensemble","Iowa",0.75
+"UVAFluX-Ensemble","Kansas",0.82
+"UVAFluX-Ensemble","Kentucky",0.79
+"UVAFluX-Ensemble","Louisiana",0.92
+"UVAFluX-Ensemble","Maine",0.87
+"UVAFluX-Ensemble","Maryland",0.88
+"UVAFluX-Ensemble","Massachusetts",0.78
+"UVAFluX-Ensemble","Michigan",0.77
+"UVAFluX-Ensemble","Minnesota",0.81
+"UVAFluX-Ensemble","Mississippi",0.86
+"UVAFluX-Ensemble","Missouri",0.8
+"UVAFluX-Ensemble","Montana",0.9
+"UVAFluX-Ensemble","Nebraska",0.97
+"UVAFluX-Ensemble","Nevada",0.84
+"UVAFluX-Ensemble","New Hampshire",1.06
+"UVAFluX-Ensemble","New Jersey",0.77
+"UVAFluX-Ensemble","New Mexico",0.95
+"UVAFluX-Ensemble","New York",0.76
+"UVAFluX-Ensemble","North Carolina",0.81
+"UVAFluX-Ensemble","North Dakota",0.92
+"UVAFluX-Ensemble","Ohio",0.74
+"UVAFluX-Ensemble","Oklahoma",0.7
+"UVAFluX-Ensemble","Oregon",0.9
+"UVAFluX-Ensemble","Pennsylvania",0.84
+"UVAFluX-Ensemble","Puerto Rico",1.11
+"UVAFluX-Ensemble","Rhode Island",0.96
+"UVAFluX-Ensemble","South Carolina",0.83
+"UVAFluX-Ensemble","South Dakota",1.08
+"UVAFluX-Ensemble","Tennessee",0.77
+"UVAFluX-Ensemble","Texas",0.75
+"UVAFluX-Ensemble","Utah",0.93
+"UVAFluX-Ensemble","Vermont",0.96
+"UVAFluX-Ensemble","Virginia",0.88
+"UVAFluX-Ensemble","Washington",0.85
+"UVAFluX-Ensemble","West Virginia",0.84
+"UVAFluX-Ensemble","Wisconsin",0.86
+"UVAFluX-Ensemble","Wyoming",0.95
+"VTSanghani-Ensemble","Alabama",1.24
+"VTSanghani-Ensemble","Alaska",1.73
+"VTSanghani-Ensemble","Arizona",1.2
+"VTSanghani-Ensemble","Arkansas",1.01
+"VTSanghani-Ensemble","California",1.25
+"VTSanghani-Ensemble","Colorado",1.24
+"VTSanghani-Ensemble","Connecticut",1.31
+"VTSanghani-Ensemble","Delaware",1.47
+"VTSanghani-Ensemble","District of Columbia",1.05
+"VTSanghani-Ensemble","Florida",1.96
+"VTSanghani-Ensemble","Georgia",1.37
+"VTSanghani-Ensemble","Hawaii",1.28
+"VTSanghani-Ensemble","Idaho",1.22
+"VTSanghani-Ensemble","Illinois",1.26
+"VTSanghani-Ensemble","Indiana",1.34
+"VTSanghani-Ensemble","Iowa",1.19
+"VTSanghani-Ensemble","Kansas",1.07
+"VTSanghani-Ensemble","Kentucky",1.22
+"VTSanghani-Ensemble","Louisiana",1.57
+"VTSanghani-Ensemble","Maine",1.29
+"VTSanghani-Ensemble","Maryland",1.07
+"VTSanghani-Ensemble","Massachusetts",1.2
+"VTSanghani-Ensemble","Michigan",1.32
+"VTSanghani-Ensemble","Minnesota",1.28
+"VTSanghani-Ensemble","Mississippi",1.26
+"VTSanghani-Ensemble","Missouri",1.19
+"VTSanghani-Ensemble","Montana",1.15
+"VTSanghani-Ensemble","Nebraska",1.25
+"VTSanghani-Ensemble","Nevada",1.22
+"VTSanghani-Ensemble","New Hampshire",1.65
+"VTSanghani-Ensemble","New Jersey",1.15
+"VTSanghani-Ensemble","New Mexico",1.15
+"VTSanghani-Ensemble","New York",1.27
+"VTSanghani-Ensemble","North Carolina",1.27
+"VTSanghani-Ensemble","North Dakota",1.04
+"VTSanghani-Ensemble","Ohio",1.23
+"VTSanghani-Ensemble","Oklahoma",0.98
+"VTSanghani-Ensemble","Oregon",1.46
+"VTSanghani-Ensemble","Pennsylvania",1.29
+"VTSanghani-Ensemble","Puerto Rico",2.53
+"VTSanghani-Ensemble","Rhode Island",1.55
+"VTSanghani-Ensemble","South Carolina",1.27
+"VTSanghani-Ensemble","South Dakota",1.26
+"VTSanghani-Ensemble","Tennessee",1.24
+"VTSanghani-Ensemble","Texas",1.42
+"VTSanghani-Ensemble","Utah",1.2
+"VTSanghani-Ensemble","Vermont",1.26
+"VTSanghani-Ensemble","Virginia",1.24
+"VTSanghani-Ensemble","Washington",1.24
+"VTSanghani-Ensemble","West Virginia",1.1
+"VTSanghani-Ensemble","Wisconsin",1.39
+"VTSanghani-Ensemble","Wyoming",1.1
+"cfa-flumech","Alabama",1.04
+"cfa-flumech","Alaska",1.4
+"cfa-flumech","Arizona",0.63
+"cfa-flumech","Arkansas",0.93
+"cfa-flumech","California",0.8
+"cfa-flumech","Colorado",1.08
+"cfa-flumech","Connecticut",1.1
+"cfa-flumech","Delaware",1.18
+"cfa-flumech","District of Columbia",1.1
+"cfa-flumech","Florida",0.91
+"cfa-flumech","Georgia",0.86
+"cfa-flumech","Hawaii",0.89
+"cfa-flumech","Idaho",0.85
+"cfa-flumech","Illinois",0.86
+"cfa-flumech","Indiana",0.76
+"cfa-flumech","Iowa",1.21
+"cfa-flumech","Kansas",0.98
+"cfa-flumech","Kentucky",1.14
+"cfa-flumech","Louisiana",0.79
+"cfa-flumech","Maine",1.14
+"cfa-flumech","Maryland",0.75
+"cfa-flumech","Massachusetts",0.85
+"cfa-flumech","Michigan",1.08
+"cfa-flumech","Minnesota",0.97
+"cfa-flumech","Mississippi",0.92
+"cfa-flumech","Missouri",0.99
+"cfa-flumech","Montana",0.89
+"cfa-flumech","Nebraska",1.31
+"cfa-flumech","Nevada",0.91
+"cfa-flumech","New Hampshire",1.49
+"cfa-flumech","New Jersey",0.83
+"cfa-flumech","New Mexico",0.98
+"cfa-flumech","New York",0.84
+"cfa-flumech","North Carolina",0.72
+"cfa-flumech","North Dakota",1.04
+"cfa-flumech","Ohio",1.08
+"cfa-flumech","Oklahoma",0.75
+"cfa-flumech","Oregon",1.14
+"cfa-flumech","Pennsylvania",1.2
+"cfa-flumech","Puerto Rico",1.46
+"cfa-flumech","Rhode Island",1.24
+"cfa-flumech","South Carolina",0.76
+"cfa-flumech","South Dakota",1.38
+"cfa-flumech","Tennessee",0.88
+"cfa-flumech","Texas",1.02
+"cfa-flumech","Utah",0.97
+"cfa-flumech","Vermont",1.08
+"cfa-flumech","Virginia",0.93
+"cfa-flumech","Washington",0.92
+"cfa-flumech","West Virginia",1.09
+"cfa-flumech","Wisconsin",0.89
+"cfa-flumech","Wyoming",0.93
+"cfarenewal-cfaepimlight","Alabama",0.8
+"cfarenewal-cfaepimlight","Alaska",0.99
+"cfarenewal-cfaepimlight","Arizona",0.82
+"cfarenewal-cfaepimlight","Arkansas",0.94
+"cfarenewal-cfaepimlight","California",0.7
+"cfarenewal-cfaepimlight","Colorado",0.99
+"cfarenewal-cfaepimlight","Connecticut",1.2
+"cfarenewal-cfaepimlight","Delaware",1.08
+"cfarenewal-cfaepimlight","District of Columbia",1.09
+"cfarenewal-cfaepimlight","Florida",1.12
+"cfarenewal-cfaepimlight","Georgia",0.96
+"cfarenewal-cfaepimlight","Hawaii",0.93
+"cfarenewal-cfaepimlight","Idaho",0.84
+"cfarenewal-cfaepimlight","Illinois",0.76
+"cfarenewal-cfaepimlight","Indiana",0.72
+"cfarenewal-cfaepimlight","Iowa",1.01
+"cfarenewal-cfaepimlight","Kansas",1.04
+"cfarenewal-cfaepimlight","Kentucky",0.93
+"cfarenewal-cfaepimlight","Louisiana",0.83
+"cfarenewal-cfaepimlight","Maine",1.19
+"cfarenewal-cfaepimlight","Maryland",0.82
+"cfarenewal-cfaepimlight","Massachusetts",0.81
+"cfarenewal-cfaepimlight","Michigan",0.88
+"cfarenewal-cfaepimlight","Minnesota",0.77
+"cfarenewal-cfaepimlight","Mississippi",1.05
+"cfarenewal-cfaepimlight","Missouri",0.9
+"cfarenewal-cfaepimlight","Montana",0.94
+"cfarenewal-cfaepimlight","Nebraska",1.05
+"cfarenewal-cfaepimlight","Nevada",0.76
+"cfarenewal-cfaepimlight","New Hampshire",1.12
+"cfarenewal-cfaepimlight","New Jersey",0.91
+"cfarenewal-cfaepimlight","New Mexico",0.85
+"cfarenewal-cfaepimlight","New York",0.86
+"cfarenewal-cfaepimlight","North Carolina",0.77
+"cfarenewal-cfaepimlight","North Dakota",1.22
+"cfarenewal-cfaepimlight","Ohio",0.96
+"cfarenewal-cfaepimlight","Oklahoma",0.78
+"cfarenewal-cfaepimlight","Oregon",1.03
+"cfarenewal-cfaepimlight","Pennsylvania",0.84
+"cfarenewal-cfaepimlight","Puerto Rico",1.31
+"cfarenewal-cfaepimlight","Rhode Island",1.08
+"cfarenewal-cfaepimlight","South Carolina",0.8
+"cfarenewal-cfaepimlight","South Dakota",1.19
+"cfarenewal-cfaepimlight","Tennessee",0.78
+"cfarenewal-cfaepimlight","Texas",0.71
+"cfarenewal-cfaepimlight","Utah",0.97
+"cfarenewal-cfaepimlight","Vermont",1.04
+"cfarenewal-cfaepimlight","Virginia",0.98
+"cfarenewal-cfaepimlight","Washington",0.99
+"cfarenewal-cfaepimlight","West Virginia",0.98
+"cfarenewal-cfaepimlight","Wisconsin",0.92
+"cfarenewal-cfaepimlight","Wyoming",1.3
+"fjordhest-ensemble","Alabama",0.73
+"fjordhest-ensemble","Alaska",1.02
+"fjordhest-ensemble","Arizona",0.63
+"fjordhest-ensemble","Arkansas",0.71
+"fjordhest-ensemble","California",0.7
+"fjordhest-ensemble","Colorado",0.7
+"fjordhest-ensemble","Connecticut",0.86
+"fjordhest-ensemble","Delaware",0.98
+"fjordhest-ensemble","District of Columbia",0.92
+"fjordhest-ensemble","Florida",0.73
+"fjordhest-ensemble","Georgia",0.68
+"fjordhest-ensemble","Hawaii",0.87
+"fjordhest-ensemble","Idaho",0.75
+"fjordhest-ensemble","Illinois",0.72
+"fjordhest-ensemble","Indiana",0.64
+"fjordhest-ensemble","Iowa",0.74
+"fjordhest-ensemble","Kansas",0.79
+"fjordhest-ensemble","Kentucky",0.74
+"fjordhest-ensemble","Louisiana",0.76
+"fjordhest-ensemble","Maine",0.78
+"fjordhest-ensemble","Maryland",0.76
+"fjordhest-ensemble","Massachusetts",0.76
+"fjordhest-ensemble","Michigan",0.67
+"fjordhest-ensemble","Minnesota",0.69
+"fjordhest-ensemble","Mississippi",0.79
+"fjordhest-ensemble","Missouri",0.69
+"fjordhest-ensemble","Montana",0.78
+"fjordhest-ensemble","Nebraska",0.83
+"fjordhest-ensemble","Nevada",0.78
+"fjordhest-ensemble","New Hampshire",0.91
+"fjordhest-ensemble","New Jersey",0.68
+"fjordhest-ensemble","New Mexico",0.78
+"fjordhest-ensemble","New York",0.69
+"fjordhest-ensemble","North Carolina",0.68
+"fjordhest-ensemble","North Dakota",0.92
+"fjordhest-ensemble","Ohio",0.7
+"fjordhest-ensemble","Oklahoma",0.6
+"fjordhest-ensemble","Oregon",0.84
+"fjordhest-ensemble","Pennsylvania",0.72
+"fjordhest-ensemble","Puerto Rico",1.07
+"fjordhest-ensemble","Rhode Island",0.94
+"fjordhest-ensemble","South Carolina",0.72
+"fjordhest-ensemble","South Dakota",0.94
+"fjordhest-ensemble","Tennessee",0.72
+"fjordhest-ensemble","Texas",0.61
+"fjordhest-ensemble","Utah",0.97
+"fjordhest-ensemble","Vermont",0.81
+"fjordhest-ensemble","Virginia",0.86
+"fjordhest-ensemble","Washington",0.85
+"fjordhest-ensemble","West Virginia",0.77
+"fjordhest-ensemble","Wisconsin",0.68
+"fjordhest-ensemble","Wyoming",0.84
