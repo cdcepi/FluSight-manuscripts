@@ -331,7 +331,9 @@ figure2_output <- scores %>% select(model, location_name, rel_wis) %>%
   pivot_wider(id_cols = Jurisdiction, names_from = model, values_from = rel_wis) 
 # write.csv(figure2_output, paste0(dashboard_r_code, "/output_data/figure2_data_wide.csv"), row.names = FALSE)
 
-figure2_stats <- figure2_output %>% 
+figure2_stats <- scores %>% select(model, location_name, rel_wis) %>% 
+  mutate(Jurisdiction = location_name, 
+         model = factor(model, levels = scores_order$model)) %>% 
   group_by(model) %>% 
   summarise(difference = max(rel_wis,na.rm = TRUE) - min(rel_wis, na.rm = TRUE), 
             perc_under1 = sum(rel_wis <1)/n()) %>% 
@@ -362,7 +364,9 @@ coverage_95_plt <-
                                   y = coverage95, group = model,
                                   col = model)) +
   geom_line(data = coverage95_not_flusight, aes(x = target_end_date, y = coverage95, group = model, color = "model")) + 
-  geom_line(linewidth = 1) + geom_point(size = 2) +
+  geom_line(linewidth = 1) + 
+  geom_point(size = 2) +
+  geom_hline(aes(yintercept = 0.95), linetype = 2)+
   labs(y = "95% Coverage", x = "", color = "Model") +
   scale_color_manual(values = c("#00a599", adjustcolor("grey50", .35)),
                      labels = c("FluSight-ensemble", "Contributed Models"),
@@ -375,7 +379,7 @@ coverage_95_plt <-
   facet_wrap(facets = vars(target), labeller = coverage_labels, scales = "free_x")
 
 coverage_95_plt
-ggsave(paste0(dashboard_r_code,"/viz/figure3_coverage95.png"), width=10, height=8, plot = coverage_95_plt)
+# ggsave(paste0(dashboard_r_code,"/viz/figure3_coverage95.png"), width=10, height=8, plot = coverage_95_plt)
 
 
 
