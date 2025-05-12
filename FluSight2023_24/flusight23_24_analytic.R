@@ -22,6 +22,19 @@ mutate = dplyr::mutate
 
 #read in model type as designated using "FluSight-manuscripts/FluSight2023_24/model_type_designation.R"
 model_metadata <- read.csv(paste0(dashboard_r_code, "/model_types.csv")) %>% select(-methods, -model_name_pulled) %>% 
+  ### Based on team feedback, updating model types here ###
+  mutate(mechanistic = case_when(model_name == "UNC_IDD-InfluPaint" ~ FALSE,
+                                 model_name == "FluSight-ensemble" ~ FALSE,
+                                 model_name == "FluSight-lop_norm" ~ FALSE,
+                                 TRUE ~ mechanistic), 
+         stat = case_when(model_name == "CEPH-Rtrend_fluH" ~ TRUE, 
+                          model_name == "FluSight-ensemble" ~ FALSE,
+                          model_name == "FluSight-lop_norm" ~ FALSE,
+                          TRUE ~ stat), 
+         ai_ml = case_when(model_name == "UGA_flucast-INFLAenza" ~ TRUE, 
+                           model_name == "FluSight-ensemble" ~ FALSE,
+                           model_name == "FluSight-lop_norm" ~ FALSE,
+                           TRUE ~ ai_ml)) %>% 
   mutate(model_type = case_when(mechanistic == TRUE & ai_ml == TRUE & stat == TRUE ~ "mech, AI/ML, stat", 
                                 mechanistic == FALSE & ai_ml == TRUE & stat == TRUE ~ "AI/ML, stat",
                                 mechanistic == TRUE & ai_ml == FALSE & stat == TRUE ~ "mech, stat",
