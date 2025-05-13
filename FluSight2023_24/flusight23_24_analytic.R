@@ -268,7 +268,7 @@ table1 <- inc.rankings_all %>%
 # write.csv(table1, paste0(dashboard_r_code, "/output_data/table1_data.csv"), row.names = FALSE)
 
 
-WIS_and_coverage_24 <- WIS_Season24 %>% 
+WIS_and_coverage_24 <- WIS_Season24 %>%
   group_by(model, location_name) %>% 
   summarise(Percent.Cov.50 = mean(coverage.50, na.rm = TRUE), 
             Percent.Cov.95 = mean(coverage.95, na.rm = TRUE)) %>% 
@@ -342,7 +342,7 @@ figure2_output <- scores %>% select(model, location_name, rel_wis) %>%
          model = factor(model, levels = scores_order$model)) %>% 
   arrange(model) %>% 
   pivot_wider(id_cols = Jurisdiction, names_from = model, values_from = rel_wis) 
-# write.csv(figure2_output, paste0(dashboard_r_code, "/output_data/figure2_data_wide.csv"), row.names = FALSE)
+# write.csv(figure2_output, paste0(dashboard_r_code, "/output_data/table2_data.csv"), row.names = FALSE)
 
 figure2_stats <- scores %>% select(model, location_name, rel_wis) %>% 
   mutate(Jurisdiction = location_name, 
@@ -360,7 +360,7 @@ coverage95_states <- WIS_Season %>% filter(location_name != "National") %>%
   summarise(coverage95 = mean(coverage.95)) %>% 
   ungroup()
 
-# write.csv(coverage95_states, paste0(dashboard_r_code, "/output_data/figure3_data.csv"), row.names = FALSE)
+# write.csv(coverage95_states, paste0(dashboard_r_code, "/output_data/figure2_data.csv"), row.names = FALSE)
 
 coverage95_flusight <- coverage95_states %>% filter(model == "FluSight-ensemble") 
 coverage95_not_flusight <- coverage95_states %>% filter(model != "FluSight-ensemble") 
