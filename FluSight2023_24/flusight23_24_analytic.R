@@ -4,8 +4,10 @@
 
 
 # Packages
+# install.packages("https://github.com/epiforecasts/scoringutils/archive/refs/tags/v1.2.2.tar.gz", repos = NULL, type = "source")
 library(scoringutils)
 library(tidyverse)
+# install.packages("hubData", repos = c("https://hubverse-org.r-universe.dev", "https://cloud.r-project.org"))
 library(hubData)
 library(ggridges)
 
@@ -67,12 +69,12 @@ raw_data <- raw_forecasts %>%
     raw_target %>%  dplyr::select(target_end_date = date, location, location_name, true_value = value),
     by = c("location", "target_end_date")
   ) %>% 
-  dplyr::rename(model=model_id, quantile=output_type_id, prediction=value) %>% 
+  dplyr::rename(model=model_id, quantile=output_type_id) %>% 
   dplyr::mutate(quantile = as.numeric(quantile)) %>% dplyr::filter(target_end_date <= as.Date("2024-05-01")) %>% ## May 1 was the last date of mandatory reporting
   filter(!(location_name == "Massachusetts" & reference_date == "2023-12-09")) ## MA did not report these data on time, 
 
 all_dat24 <- raw_data %>% 
-  rename("forecast_date" = reference_date, "type" = output_type, "value" = prediction) %>% 
+  rename("forecast_date" = reference_date, "type" = output_type) %>% 
   unite(target, horizon, target, sep = " ", remove = T) %>% 
   dplyr::select(location, target, target_end_date, forecast_date, type, quantile, value, model, location_name) %>% 
   mutate(location_name = ifelse(location == 'US', 'National', location_name))%>% 
@@ -80,8 +82,8 @@ all_dat24 <- raw_data %>%
 
 obs_data24 <- raw_target %>%
   mutate(target_end_date = as.Date(date, "%m/%d/%y"),
-         location_name = ifelse(location == 'US', 'National', location_name), 
-         report = value,) %>%
+         location_name = ifelse(location == 'US', 'National', location_name)) %>% 
+  rename(report = value) %>%
   select(-date) %>%
   filter(target_end_date %in% as.Date(unique(all_dat24$target_end_date)))%>% 
   dplyr::select(location, location_name, report, target_end_date) %>% 
@@ -110,8 +112,11 @@ include24 <- all_dat24 %>%
 dat_for_scores24 <- dat_for_scores_function(all_dat24, obs_data24, include24) 
 dat_for_scores24_log <- dat_for_scores_function_log(all_dat24, obs_data24, include24) 
 
+
 ## Getting coverage from non-log-transformed values
-raw_scores24 <- dat_for_scores24 %>% select(-c(logvalue, logreport)) %>% scoringutils::score()
+raw_scores24 <- dat_for_scores24 %>% select(-c(logvalue, logreport)) %>% 
+#  as_forecast_quantile(observed = "true_value", predicted = "prediction", quantile_level = "quantile") %>% 
+  scoringutils::score()
 
 wis_season_by_model_24 <- raw_scores24 %>%
   filter(location != "US", model %in% include24$model) %>% 
@@ -122,7 +127,9 @@ wis_season_by_model_24 <- raw_scores24 %>%
   select(model, cov_50, cov_95) ## rel wis, wis, and mae only on log scores 
 
 ## scoring log-transformed values
-raw_scores24_log <- dat_for_scores24_log %>% select(-c(value, report)) %>% scoringutils::score()
+raw_scores24_log <- dat_for_scores24_log %>% select(-c(value, report)) %>% 
+ # as_forecast_quantile(observed = "true_value", predicted = "prediction", quantile_level = "quantile") %>% 
+  scoringutils::score()
 
 wis_season_by_model_24_log <- raw_scores24_log %>%
   filter(location != "US", model %in% include24$model) %>% 
@@ -360,7 +367,38 @@ coverage95_states <- WIS_Season %>% filter(location_name != "National") %>%
   summarise(coverage95 = mean(coverage.95)) %>% 
   ungroup()
 
-# write.csv(coverage95_states, paste0(dashboard_r_code, "/output_data/figure2_data.csv"), row.names = FALSE)
+complete_df0 <- coverage95_states %>%
+  filter(target == "0 wk inc flu hosp") %>% 
+  select(model, target_end_date, target) %>%
+  distinct() %>%
+  complete(model, target_end_date, target)
+
+complete_df1 <- coverage95_states %>%
+  filter(target == "1 wk inc flu hosp") %>% 
+  select(model, target_end_date, target) %>%
+  distinct() %>%
+  complete(model, target_end_date, target)
+
+complete_df2 <- coverage95_states %>%
+  filter(target == "2 wk inc flu hosp") %>% 
+  select(model, target_end_date, target) %>%
+  distinct() %>%
+  complete(model, target_end_date, target)
+
+complete_df3 <- coverage95_states %>%
+  filter(target == "3 wk inc flu hosp") %>% 
+  select(model, target_end_date, target) %>%
+  distinct() %>%
+  complete(model, target_end_date, target)
+
+complete_df <- bind_rows(complete_df0, complete_df1, complete_df2, complete_df3) %>% arrange(model, target_end_date, target)
+
+# Join with the original dataframe
+result_df <- complete_df %>%
+  left_join(coverage95_states, by = c("model", "target_end_date", "target")) %>%
+  mutate(coverage95 = ifelse(is.na(coverage95), "No data", coverage95))
+
+# write.csv(result_df, paste0(dashboard_r_code, "/output_data/figure2_data.csv"), row.names = FALSE)
 
 coverage95_flusight <- coverage95_states %>% filter(model == "FluSight-ensemble") 
 coverage95_not_flusight <- coverage95_states %>% filter(model != "FluSight-ensemble") 
