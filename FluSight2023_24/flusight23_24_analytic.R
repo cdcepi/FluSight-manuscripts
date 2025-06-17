@@ -187,7 +187,8 @@ ntl_ens_forecasts <- all_dat24 %>% filter(location == "US", model == "FluSight-e
   pivot_wider(names_from = c(type, quantile), values_from = value) %>% 
   ungroup()
 
-ntl_ens_plt <- ggplot(ntl_ens_forecasts, aes(x = target_end_date, y = quantile_0.5))+
+ntl_ens_plt <-
+  ggplot(ntl_ens_forecasts, aes(x = target_end_date, y = quantile_0.5))+
   geom_ribbon(aes(ymin = quantile_0.025, ymax = quantile_0.975, group = interaction(model, forecast_date),  alpha = "95%"),fill = "#3BBBB0")+
   geom_ribbon(aes(ymin = quantile_0.25, ymax = quantile_0.75, group = interaction(model, forecast_date), alpha = "50%"), fill = "#3BBBB0")+
   geom_line(aes(color = "Forecasted",group = interaction(model, forecast_date)))+
@@ -199,10 +200,12 @@ ntl_ens_plt <- ggplot(ntl_ens_forecasts, aes(x = target_end_date, y = quantile_0
   scale_alpha_manual(values = c("95%" = .25, "50%" = .50), name = "Prediction Interval")+
   theme_bw()+
   scale_y_continuous(labels = scales::comma, name = "Weekly hospital admissions")+
-  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y", name = NULL)
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y", name = NULL)+
+    theme(legend.position = "inside", 
+          legend.position.inside = c(.85,.7))
 
 ntl_ens_plt
-# ggsave(paste0(dashboard_r_code,"/viz/figure1_ntl_ens.png"), plot = ntl_ens_plt, width=12, height=8)
+ggsave(paste0(dashboard_r_code,"/viz/figure1_ntl_ensv1.png"), plot = ntl_ens_plt, width=8, height=4.5) ## original 12 x 8
 
 ## Figure 1 csv 
 ntl_ens_output <- ntl_ens_forecasts %>% 
