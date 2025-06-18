@@ -205,7 +205,7 @@ ntl_ens_plt <-
           legend.position.inside = c(.85,.7))
 
 ntl_ens_plt
-ggsave(paste0(dashboard_r_code,"/viz/figure1_ntl_ensv1.png"), plot = ntl_ens_plt, width=8, height=4.5) ## original 12 x 8
+ggsave(paste0(dashboard_r_code,"/viz/figure1_ntl_ensv1.png"), plot = ntl_ens_plt, width=8, height=4.5) ## original 12 x 8, aspect ratio for web is 16:9
 
 ## Figure 1 csv 
 ntl_ens_output <- ntl_ens_forecasts %>% 
