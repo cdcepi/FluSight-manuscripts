@@ -1,0 +1,32 @@
+"location","target","target_end_date","forecast_date","model","location_name","median","lower_50","upper_50","lower_95","upper_95","observed"
+"US","0 wk inc flu hosp",2024-11-30,2024-11-30,"FluSight-ensemble","National","3947",3576,4579,2701,6252,4277
+"US","1 wk inc flu hosp",2024-12-07,2024-11-30,"FluSight-ensemble","National","4727",3916,5796,2042,8353,6288
+"US","2 wk inc flu hosp",2024-12-14,2024-11-30,"FluSight-ensemble","National","5415",4031,6929,2403,10724,9166
+"US","3 wk inc flu hosp",2024-12-21,2024-11-30,"FluSight-ensemble","National","6248",4224,8271,2323,13970,15429
+"US","0 wk inc flu hosp",2025-01-04,2025-01-04,"FluSight-ensemble","National","25891",22477,28513,17196,36169,38690
+"US","1 wk inc flu hosp",2025-01-11,2025-01-04,"FluSight-ensemble","National","26451",22761,31409,16729,40846,30750
+"US","2 wk inc flu hosp",2025-01-18,2025-01-04,"FluSight-ensemble","National","24083",19270,29355,13372,42595,32984
+"US","3 wk inc flu hosp",2025-01-25,2025-01-04,"FluSight-ensemble","National","23735",18711,29913,11087,42719,40604
+"US","0 wk inc flu hosp",2025-02-15,2025-02-15,"FluSight-ensemble","National","45052",38273,51097,30423,60355,46327
+"US","1 wk inc flu hosp",2025-02-22,2025-02-15,"FluSight-ensemble","National","40726",32448,48077,24458,63101,37871
+"US","2 wk inc flu hosp",2025-03-01,2025-02-15,"FluSight-ensemble","National","37235",27006,42977,19599,63413,30809
+"US","3 wk inc flu hosp",2025-03-08,2025-02-15,"FluSight-ensemble","National","34093",25110,39141,15825,60260,23986
+"US","0 wk inc flu hosp",2025-03-22,2025-03-22,"FluSight-ensemble","National","14018",11909,15787,7856,20887,13640
+"US","1 wk inc flu hosp",2025-03-29,2025-03-22,"FluSight-ensemble","National","11058",8460,14184,5182,20711,9684
+"US","2 wk inc flu hosp",2025-04-05,2025-03-22,"FluSight-ensemble","National","9409",7002,12120,3631,20207,6802
+"US","3 wk inc flu hosp",2025-04-12,2025-03-22,"FluSight-ensemble","National","7607",5511,9998,2233,20432,4917
+"US","0 wk inc flu hosp",2025-04-26,2025-04-26,"FluSight-ensemble","National","2702",2063,3542,1066,5178,3242
+"US","1 wk inc flu hosp",2025-05-03,2025-04-26,"FluSight-ensemble","National","2141",1358,3178,502,4879,2442
+"US","2 wk inc flu hosp",2025-05-10,2025-04-26,"FluSight-ensemble","National","1574",915,2828,277,5080,2116
+"US","3 wk inc flu hosp",2025-05-17,2025-04-26,"FluSight-ensemble","National","1294",675,2749,189,5202,1837
+"US","0 wk inc flu hosp",2025-05-31,2025-05-31,"FluSight-ensemble","National","1463",1126,1710,752,2540,1806
+"US","1 wk inc flu hosp",2025-06-07,2025-05-31,"FluSight-ensemble","National","1263",1022,1569,689,2501,1487
+"US","2 wk inc flu hosp",2025-06-14,2025-05-31,"FluSight-ensemble","National","1099",835,1450,382,2721,1437
+"US","3 wk inc flu hosp",2025-06-21,2025-05-31,"FluSight-ensemble","National","972",483,1613,175,2901,1279
+"US",NA,2025-03-15,NA,NA,"National","Intentionally left blank for visualization purposes",NA,NA,NA,NA,18389
+"US",NA,2025-05-24,NA,NA,"National","Intentionally left blank for visualization purposes",NA,NA,NA,NA,1688
+"US",NA,2025-02-08,NA,NA,"National","Intentionally left blank for visualization purposes",NA,NA,NA,NA,54271
+"US",NA,2025-04-19,NA,NA,"National","Intentionally left blank for visualization purposes",NA,NA,NA,NA,3871
+"US",NA,2025-02-01,NA,NA,"National","Intentionally left blank for visualization purposes",NA,NA,NA,NA,51206
+"US",NA,2024-12-28,NA,NA,"National","Intentionally left blank for visualization purposes",NA,NA,NA,NA,27681
+"US",NA,2024-11-23,NA,NA,"National","Intentionally left blank for visualization purposes",NA,NA,NA,NA,3092
