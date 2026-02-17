@@ -1,0 +1,949 @@
+---
+title: "Weighted Flusight Ensemble"
+author: "Aaron Frutos"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = F)
+```
+
+The purpose of this analysis is to evaluate the performance of a weighted ensemble relative to the Vincent median ensemble that is currently used by CDC.
+
+We implement a weighted Vincent median and mean We use three different training periods (2,4,6 weeks) to evaluate the component forecasts and then weight according to performance.
+
+## Main takeway:
+The weighted ensemble has marginal improvement over the unweighted ensemble. However the trends are not qualitatively different 
+
+
+## Model performance
+
+Summary:
+
+There is not a consistent ensemble that is best across seasons or when comparing US overall vs the state ensemble.
+
+```{r first, echo=FALSE, message=F, warning=F}
+
+#Evaluate the models
+library(gridExtra)
+library(plyr)
+library(dplyr)
+library(tidyverse)
+library(zoltr)
+library(lubridate)
+library(readr)
+library(tidyr)
+library(stringr)
+library(hubUtils)
+library(hubEnsembles)
+library(gt)
+
+
+#2223 Results
+
+load("data/rds/2223/weighted US weights revis.rds")
+load("data/rds/2223/weighted state weights revis.rds")
+load("data/rds/2223/weighted state forecasts  new weight revis.rds")
+load("data/rds/2223/weighted US forecasts  new weight revis.rds")
+load("data/rds/2223/wis_model_us_2223.rds")
+load("data/rds/2223/wis_model_states_2223.rds")
+
+load("data/rds/2223/all_forecasts_us_compl2323.rds")
+
+weighted_US_forecasts_all_2223<-weighted_US_forecasts_all%>%rbind.fill(all_forecasts_us_compl2323)%>% dplyr::select(-model, -type,-quantile,-abbreviation, -full_location_name,-population)
+weighted_state_forecasts_all_2223<-weighted_state_forecasts_all
+
+weighted_US_weights22<-weighted_US_weights
+weighted_state_weights22<-weighted_state_weights
+
+
+
+#2324 Results
+
+load("data/rds/2324/weighted US weights 2324.rds")
+load("data/rds/2324/weighted state weights 2324.rds")
+load("data/rds/2324/weighted state forecasts 2324.rds")
+load("data/rds/2324/weighted US forecasts 2324.rds")
+load("data/rds/2324/wis_model_us_2324.rds")
+load("data/rds/2324/wis_model_states_2324.rds")
+
+load("data/rds/2324/all_forecasts_us_compl2324.rds")
+weighted_US_weights23<-weighted_US_weights
+weighted_state_weights23<-weighted_state_weights
+
+
+#source("C:/Users/ZOH1/OneDrive - CDC/Documents - NCIRD-EPB-ARM/Modeling-Forecasting/FluSight/Manuscripts/Weighted ensemble/Frutos_FluSight Ensemble/list_as_of_data2324.R")
+
+
+weighted_US_forecasts_all_2324<-weighted_US_forecasts_all%>%rbind.fill(all_forecasts_us_compl2324)%>%select(-model)
+
+weighted_state_forecasts_all_2324<-weighted_state_forecasts_all
+
+#2425 Results
+
+load("data/rds/2425/weighted US weights 2425.rds")
+load("data/rds/2425/weighted state weights 2425.rds")
+load("data/rds/2425/weighted state forecasts 2425.rds")
+load("data/rds/2425/weighted US forecasts 2425.rds")
+load("data/rds/2425/wis_model_us_2425.rds")
+load("data/rds/2425/wis_model_states_2425.rds")
+
+load("data/rds/2425/all_forecasts_us_compl2425.rds")
+weighted_US_weights24<-weighted_US_weights
+weighted_state_weights24<-weighted_state_weights
+
+
+source("functions/list_as_of_data2425.R")
+
+
+weighted_US_forecasts_all_2425<-weighted_US_forecasts_all%>%rbind.fill(all_forecasts_us_compl2425)%>%select(-model)
+weighted_state_forecasts_all_2425<-weighted_state_forecasts_all
+################
+
+wis_model_us_2223$model<-factor(wis_model_us_2223$model,
+                                  levels = c('flu-truth','Flusight-ensemble', 'Flusight-baseline',
+                                             'Weighted Median ensemble US2', 'Weighted Median ensemble US4','Weighted Median ensemble US6', "Weighted mean ensemble US6","Weighted mean ensemble US4","Weighted mean ensemble US2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_states_2223$model<-factor(wis_model_states_2223$model,
+                                  levels = c('flu-truth','Flusight-ensemble', 'Flusight-baseline',
+                                             'Weighted Median ensemble state2', 'Weighted Median ensemble state4','Weighted Median ensemble state6', "Weighted mean ensemble state6","Weighted mean ensemble state4","Weighted mean ensemble state2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_us_2324$model<-factor(wis_model_us_2324$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble US2', 'Weighted Median ensemble US4','Weighted Median ensemble US6', "Weighted mean ensemble US6","Weighted mean ensemble US4","Weighted mean ensemble US2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_states_2324$model<-factor(wis_model_states_2324$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble state2', 'Weighted Median ensemble state4','Weighted Median ensemble state6', "Weighted mean ensemble state6","Weighted mean ensemble state4","Weighted mean ensemble state2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+####### 2024/25 additions
+wis_model_us_2425$model<-factor(wis_model_us_2425$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble US2', 'Weighted Median ensemble US4','Weighted Median ensemble US6', "Weighted mean ensemble US6","Weighted mean ensemble US4","Weighted mean ensemble US2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_states_2425$model<-factor(wis_model_states_2425$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble state2', 'Weighted Median ensemble state4','Weighted Median ensemble state6', "Weighted mean ensemble state6","Weighted mean ensemble state4","Weighted mean ensemble state2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+
+
+
+wis_model_us_2223%>%gt()%>%
+tab_header(
+  title = md("**US Overall Ensemble Performance 22-23**"),
+  subtitle = md("10/17/2022–2/27/2023"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_states_2223%>%gt()%>%
+tab_header(
+  title = md("**State Ensemble Performance 22-23**"),
+  subtitle = md("10/17/2022–2/27/2023"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_us_2324%>%gt()%>%
+tab_header(
+  title = md("**US Overall Ensemble Performance 23-24**"),
+  subtitle = md("10/14/2023–4/27/2024"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_states_2324%>%gt()%>%
+tab_header(
+  title = md("**State Ensemble Performance 23-24**"),
+  subtitle = md("10/14/2023–4/27/2024"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+######## 2024/25 additions
+wis_model_us_2425%>%gt()%>%
+tab_header(
+  title = md("**US Overall Ensemble Performance 24-25**"),
+  subtitle = md("11/22/2024–5/31/2025"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_states_2425%>%gt()%>%
+tab_header(
+  title = md("**State Ensemble Performance 24-25**"),
+  subtitle = md("11/22/2024–5/31/2025"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+
+
+
+```
+
+## Scores when <75% of jurisdictions were categorized as stable
+
+
+Summary:
+
+The best performing ensemble again varies with only marginal improvements
+
+```{r trunc, echo=FALSE, message=F, warning=F}
+
+load("Supplement/wis_model_us_2223_trunc.rds")
+load("Supplement/wis_model_states_2223_trunc.rds")
+load("Supplement/wis_model_us_2324_trunc.rds")
+load("Supplement/wis_model_states_2324_trunc.rds")
+load("Supplement/wis_model_us_2425_trunc.rds")
+load("Supplement/wis_model_states_2425_trunc.rds")
+
+
+
+wis_model_us_2223_trunc$model<-factor(wis_model_us_2223_trunc$model,
+                                  levels = c('flu-truth','Flusight-ensemble', 'Flusight-baseline',
+                                             'Weighted Median ensemble US2', 'Weighted Median ensemble US4','Weighted Median ensemble US6', "Weighted mean ensemble US6","Weighted mean ensemble US4","Weighted mean ensemble US2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_states_2223_trunc$model<-factor(wis_model_states_2223_trunc$model,
+                                  levels = c('flu-truth','Flusight-ensemble', 'Flusight-baseline',
+                                             'Weighted Median ensemble state2', 'Weighted Median ensemble state4','Weighted Median ensemble state6', "Weighted mean ensemble state6","Weighted mean ensemble state4","Weighted mean ensemble state2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_us_2324_trunc$model<-factor(wis_model_us_2324_trunc$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble US2', 'Weighted Median ensemble US4','Weighted Median ensemble US6', "Weighted mean ensemble US6","Weighted mean ensemble US4","Weighted mean ensemble US2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_states_2324_trunc$model<-factor(wis_model_states_2324_trunc$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble state2', 'Weighted Median ensemble state4','Weighted Median ensemble state6', "Weighted mean ensemble state6","Weighted mean ensemble state4","Weighted mean ensemble state2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+#######2024/25 additions 
+wis_model_us_2425_trunc$model<-factor(wis_model_us_2425_trunc$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble US2', 'Weighted Median ensemble US4','Weighted Median ensemble US6', "Weighted mean ensemble US6","Weighted mean ensemble US4","Weighted mean ensemble US2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_states_2425_trunc$model<-factor(wis_model_states_2425_trunc$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble state2', 'Weighted Median ensemble state4','Weighted Median ensemble state6', "Weighted mean ensemble state6","Weighted mean ensemble state4","Weighted mean ensemble state2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+
+wis_model_us_2223_trunc%>%gt()%>%
+tab_header(
+  title = md("**US Overall Ensemble Performance 22-23**"),
+  subtitle = md("11/5/2022–1/28/2023"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 3) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_states_2223_trunc%>%gt()%>%
+tab_header(
+  title = md("**State Ensemble Performance 22-23**"),
+  subtitle = md("11/5/2022–1/28/2023"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 3) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_us_2324_trunc%>%gt()%>%
+tab_header(
+  title = md("**US Overall Ensemble Performance 23-24**"),
+  subtitle = md("12/16/2023–2/10/2024"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 3) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_states_2324_trunc%>%gt()%>%
+tab_header(
+  title = md("**State Ensemble Performance 23-24**"),
+  subtitle = md("12/16/2023–2/10/2024"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 3) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+###### 2024/25 additions (using 2024/25 thresholds)
+wis_model_us_2425_trunc%>%gt()%>%
+tab_header(
+  title = md("**US Overall Ensemble Performance 24-25**"),
+  subtitle = md("12/7/2024–4/12/2025"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 3) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_states_2425_trunc%>%gt()%>%
+tab_header(
+  title = md("**State Ensemble Performance 24-25**"),
+  subtitle = md("12/7/2024–4/12/2025"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 3) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+
+
+
+```
+
+
+## Forecast values, US Overall 2022-2023
+Here we are comparing the unweighted median ensemble with the weighted median ensemble with a 6 week training period.
+
+Summary:
+
+Generally the weighted median predicted fewer hospitalizations than the median (a result of down weighting those models that consistently predict too many hospitalizations). However the difference between the unweighted and weighted ensemble is generally small. I wouldn't say that the trends for the weighted median are any different.  After 12/19/2022, the medians from both ensembles all almost identical
+
+
+```{r values, echo=FALSE, message=F, warning=F}
+
+median_value<-weighted_US_forecasts_all_2223%>%filter(output_type_id==.5)%>%  dplyr::rename(median=value)%>%dplyr::select(!output_type_id)
+ucl95_value<-weighted_US_forecasts_all_2223%>%filter(output_type_id==.95)%>%  dplyr::rename(ucl95=value)%>%dplyr::select(!output_type_id)
+lcl95_value<-weighted_US_forecasts_all_2223%>%filter(output_type_id==.05)%>%  dplyr::rename(lcl95=value)%>%dplyr::select(!output_type_id)
+ucl50_value<-weighted_US_forecasts_all_2223%>%filter(output_type_id==.75)%>%  dplyr::rename(ucl50=value)%>%dplyr::select(!output_type_id)
+lcl50_value<-weighted_US_forecasts_all_2223%>%filter(output_type_id==.25)%>%  dplyr::rename(lcl50=value)%>%dplyr::select(!output_type_id)
+
+
+
+plotting_value<-median_value%>%left_join(ucl95_value, by=c("model_id", "forecast_date", "target_end_date"))%>%left_join(lcl95_value, by=c("model_id", "forecast_date","target_end_date"))%>%
+  left_join(ucl50_value, by=c("model_id", "forecast_date", "target_end_date"))%>%left_join(lcl50_value, by=c("model_id", "forecast_date","target_end_date"))%>%unique()
+
+flu_truth_plot<-flu_truth_current%>%filter(location=='US')%>%dplyr::rename(target_end_date=date, median=value)%>%
+  dplyr::select(median,target_end_date)%>%mutate(model_id='Truth',target_end_date=as.Date(target_end_date) )
+
+plotting_value_edit<-plotting_value%>%filter(model_id=='Weighted Median ensemble US6' |model_id=='Flusight-ensemble' )
+plotting_value_edit$model_id<-factor(plotting_value_edit$model_id,
+                                  levels = c('flu-truth','Flusight-ensemble',
+                                            'Weighted Median ensemble US6'),
+                                  labels=c('Truth', 'Median', 'W Median (6 wk)')  )
+plotting_value_edit$forecast_date<-as.Date(plotting_value_edit$forecast_date)
+
+
+plotting_value_mult<-plotting_value_edit%>%
+  rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plot_forecast1 <-plotting_value_mult%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2022-11-01'),as.Date('2023-02-15')))+ggtitle("11-28-2022")+
+ylab("Hospitalizations")+ylim(c(0,80000))
+
+
+plotting_value_11_28<-plotting_value_edit%>%
+  filter(forecast_date=='2022-11-28')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value_12_05<-plotting_value_edit%>%
+  filter(forecast_date=='2022-12-05')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value_12_12<-plotting_value_edit%>%
+  filter(forecast_date=='2022-12-12')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value_12_19<-plotting_value_edit%>%
+  filter(forecast_date=='2022-12-19')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value_12_26<-plotting_value_edit%>%
+  filter(forecast_date=='2022-12-26')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value_01_02<-plotting_value_edit%>%
+  filter(forecast_date=='2023-01-02')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value_01_09<-plotting_value_edit%>%
+  filter(forecast_date=='2023-01-09')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value_01_16<-plotting_value_edit%>%
+  filter(forecast_date=='2023-01-16')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plot_forecast1 <-plotting_value_11_28%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2022-11-01'),as.Date('2023-02-15')))+ggtitle("11-28-2022")+
+ylab("Hospitalizations")+ylim(c(0,80000))
+
+plot_forecast2 <-plotting_value_12_05%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2022-11-01'),as.Date('2023-02-15')))+ggtitle("12-05-2022")+
+ylab("Hospitalizations")+ylim(c(0,80000))
+
+plot_forecast3 <-plotting_value_12_12%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2022-11-01'),as.Date('2023-02-15')))+ggtitle("12-12-2022")+
+ylab("Hospitalizations")+ylim(c(0,80000))
+
+plot_forecast4 <-plotting_value_12_19%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2022-11-01'),as.Date('2023-02-15')))+ggtitle("12-19-2022")+
+ylab("Hospitalizations")+ylim(c(0,80000))
+
+plot_forecast5 <-plotting_value_12_26%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2022-11-01'),as.Date('2023-02-15')))+ggtitle("12-26-2022")+
+ylab("Hospitalizations")+ylim(c(0,80000))
+
+plot_forecast6 <-plotting_value_01_02%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2022-11-01'),as.Date('2023-02-15')))+ggtitle("01-02-2023")+
+ylab("Hospitalizations")+ylim(c(0,80000))
+
+plot_forecast7 <-plotting_value_01_09%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2022-11-01'),as.Date('2023-02-15')))+ggtitle("01-09-2023")+
+  ylab("Hospitalizations")+ylim(c(0,80000))
+
+plot_forecast8 <-plotting_value_01_16%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2022-11-01'),as.Date('2023-02-15')))+ggtitle("01-16-2023")+
+  ylab("Hospitalizations")+ylim(c(0,80000))
+
+library(patchwork)
+plot_forecast1/plot_forecast2
+plot_forecast3/plot_forecast4
+plot_forecast5/plot_forecast6
+plot_forecast7/plot_forecast8
+
+```
+
+
+## Forecast values, US Overall 2023-2024
+Here we are comparing the unweighted median ensemble with the weighted median ensemble with a 6 week training period.
+
+Summary:
+
+Generally the weighted median predicted more hospitalizations than the median.The predictions intervals are greater for the weighted mediant than the unweighted.
+
+
+```{r values2, echo=FALSE, message=F, warning=F}
+
+median_value<-weighted_US_forecasts_all_2324%>%filter(output_type_id==.5)%>%  dplyr::rename(median=value)%>%dplyr::select(!output_type_id)
+ucl95_value<-weighted_US_forecasts_all_2324%>%filter(output_type_id==.95)%>%  dplyr::rename(ucl95=value)%>%dplyr::select(!output_type_id)
+lcl95_value<-weighted_US_forecasts_all_2324%>%filter(output_type_id==.05)%>%  dplyr::rename(lcl95=value)%>%dplyr::select(!output_type_id)
+ucl50_value<-weighted_US_forecasts_all_2324%>%filter(output_type_id==.75)%>%  dplyr::rename(ucl50=value)%>%dplyr::select(!output_type_id)
+lcl50_value<-weighted_US_forecasts_all_2324%>%filter(output_type_id==.25)%>%  dplyr::rename(lcl50=value)%>%dplyr::select(!output_type_id)
+
+
+
+plotting_value<-median_value%>%left_join(ucl95_value, by=c("model_id", "reference_date", "target_end_date"))%>%left_join(lcl95_value, by=c("model_id", "reference_date","target_end_date"))%>%
+  left_join(ucl50_value, by=c("model_id", "reference_date", "target_end_date"))%>%left_join(lcl50_value, by=c("model_id", "reference_date","target_end_date"))%>%unique()
+
+flu_truth_plot<-flu_truth_current%>%filter(location=='US')%>%dplyr::rename(target_end_date=date, median=value)%>%
+  dplyr::select(median,target_end_date)%>%mutate(model_id='Truth',target_end_date=as.Date(target_end_date) )
+# 
+# flu_truth_plot2<-flu_truth_all%>%filter(location=='US')%>%dplyr::select(model,value,target_end_date)%>%
+#   dplyr::rename(median=value)%>%mutate(model_id='Truth')
+
+
+# plotting_value2<-plotting_value%>%left_join(flu_truth_plot)
+
+plotting_value_edit<-plotting_value%>%filter(model_id=='Weighted Median ensemble US6' |model_id=='FluSight-ensemble' )
+plotting_value_edit$model_id<-factor(plotting_value_edit$model_id,
+                                  levels = c('flu-truth','FluSight-ensemble',
+                                            'Weighted Median ensemble US6'),
+                                  labels=c('Truth', 'Median', 'W Median (6 wk)')  )
+plotting_value_edit$reference_date<-as.Date(plotting_value_edit$reference_date)
+
+
+plotting_value1<-plotting_value_edit%>%
+  filter(reference_date=='2023-11-25')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value2<-plotting_value_edit%>%
+  filter(reference_date=='2023-12-02')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value3<-plotting_value_edit%>%
+  filter(reference_date=='2023-12-09')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value4<-plotting_value_edit%>%
+  filter(reference_date=='2023-12-16')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value5<-plotting_value_edit%>%
+  filter(reference_date=='2023-12-23')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value6<-plotting_value_edit%>%
+  filter(reference_date=='2023-12-30')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value7<-plotting_value_edit%>%
+  filter(reference_date=='2024-01-06')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value8<-plotting_value_edit%>%
+  filter(reference_date=='2024-01-13')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value9<-plotting_value_edit%>%
+  filter(reference_date=='2024-01-20')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value10<-plotting_value_edit%>%
+  filter(reference_date=='2024-01-27')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value11<-plotting_value_edit%>%
+  filter(reference_date=='2024-02-03')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value12<-plotting_value_edit%>%
+  filter(reference_date=='2024-02-10')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value13<-plotting_value_edit%>%
+  filter(reference_date=='2024-02-17')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value14<-plotting_value_edit%>%
+  filter(reference_date=='2024-02-24')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value15<-plotting_value_edit%>%
+  filter(reference_date=='2024-03-02')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value16<-plotting_value_edit%>%
+  filter(reference_date=='2024-03-09')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value17<-plotting_value_edit%>%
+  filter(reference_date=='2024-03-16')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value18<-plotting_value_edit%>%
+  filter(reference_date=='2024-03-23')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value19<-plotting_value_edit%>%
+  filter(reference_date=='2024-03-30')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id,levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value20<-plotting_value_edit%>%
+  filter(reference_date=='2024-04-06')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value21<-plotting_value_edit%>%
+  filter(reference_date=='2024-04-13')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value22<-plotting_value_edit%>%
+  filter(reference_date=='2024-04-20')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value23<-plotting_value_edit%>%
+  filter(reference_date=='2024-04-27')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+
+
+
+plot_forecast1 <-plotting_value1%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2023-11-18'),as.Date('2024-04-30')))+ggtitle("11-25-2023")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast2 <-plotting_value2%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2023-11-18'),as.Date('2024-04-30')))+ggtitle("12-02-2023")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast3 <-plotting_value3%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2023-11-18'),as.Date('2024-04-30')))+ggtitle("12-09-2023")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast4 <-plotting_value4%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2023-11-18'),as.Date('2024-04-30')))+ggtitle("12-16-2023")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast5 <-plotting_value5%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2023-11-18'),as.Date('2024-04-30')))+ggtitle("12-23-2023")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast6 <-plotting_value6%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2023-11-18'),as.Date('2024-04-30')))+ggtitle("12-30-2023")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast7 <-plotting_value7%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2023-11-18'),as.Date('2024-04-30')))+ggtitle("01-06-2024")+
+  ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast8 <-plotting_value8%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2023-11-18'),as.Date('2024-04-30')))+ggtitle("01-13-2024")+
+  ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast1/plot_forecast2
+plot_forecast3/plot_forecast4
+plot_forecast5/plot_forecast6
+plot_forecast7/plot_forecast8
+
+```
+
+## Forecast values, US Overall 2024-2025
+Here we are comparing the unweighted median ensemble with the weighted median ensemble with a 6 week training period.
+
+Summary:
+
+
+
+```{r values3, echo=FALSE, message=F, warning=F}
+
+median_value<-weighted_US_forecasts_all_2425%>%filter(output_type_id==.5)%>%  dplyr::rename(median=value)%>%dplyr::select(!output_type_id)
+ucl95_value<-weighted_US_forecasts_all_2425%>%filter(output_type_id==.95)%>%  dplyr::rename(ucl95=value)%>%dplyr::select(!output_type_id)
+lcl95_value<-weighted_US_forecasts_all_2425%>%filter(output_type_id==.05)%>%  dplyr::rename(lcl95=value)%>%dplyr::select(!output_type_id)
+ucl50_value<-weighted_US_forecasts_all_2425%>%filter(output_type_id==.75)%>%  dplyr::rename(ucl50=value)%>%dplyr::select(!output_type_id)
+lcl50_value<-weighted_US_forecasts_all_2425%>%filter(output_type_id==.25)%>%  dplyr::rename(lcl50=value)%>%dplyr::select(!output_type_id)
+
+
+
+plotting_value<-median_value%>%left_join(ucl95_value, by=c("model_id", "reference_date", "target_end_date"))%>%left_join(lcl95_value, by=c("model_id", "reference_date","target_end_date"))%>%
+  left_join(ucl50_value, by=c("model_id", "reference_date", "target_end_date"))%>%left_join(lcl50_value, by=c("model_id", "reference_date","target_end_date"))%>%unique()
+
+flu_truth_plot<-flu_truth_current%>%filter(location=='US')%>%dplyr::rename(target_end_date=date, median=value)%>%
+  dplyr::select(median,target_end_date)%>%mutate(model_id='Truth',target_end_date=as.Date(target_end_date) )
+# 
+# flu_truth_plot2<-flu_truth_all%>%filter(location=='US')%>%dplyr::select(model,value,target_end_date)%>%
+#   dplyr::rename(median=value)%>%mutate(model_id='Truth')
+
+
+# plotting_value2<-plotting_value%>%left_join(flu_truth_plot)
+
+plotting_value_edit<-plotting_value%>%filter(model_id=='Weighted Median ensemble US6' |model_id=='FluSight-ensemble' )
+plotting_value_edit$model_id<-factor(plotting_value_edit$model_id,
+                                  levels = c('flu-truth','FluSight-ensemble',
+                                            'Weighted Median ensemble US6'),
+                                  labels=c('Truth', 'Median', 'W Median (6 wk)')  )
+plotting_value_edit$reference_date<-as.Date(plotting_value_edit$reference_date)
+
+
+plotting_value1<-plotting_value_edit%>%
+  filter(reference_date=='2024-11-23')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value2<-plotting_value_edit%>%
+  filter(reference_date=='2024-11-30')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value3<-plotting_value_edit%>%
+  filter(reference_date=='2024-12-07')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value4<-plotting_value_edit%>%
+  filter(reference_date=='2024-12-14')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value5<-plotting_value_edit%>%
+  filter(reference_date=='2024-12-21')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value6<-plotting_value_edit%>%
+  filter(reference_date=='2024-12-28')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value7<-plotting_value_edit%>%
+  filter(reference_date=='2025-01-04')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value8<-plotting_value_edit%>%
+  filter(reference_date=='2025-01-11')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value9<-plotting_value_edit%>%
+  filter(reference_date=='2025-01-18')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value10<-plotting_value_edit%>%
+  filter(reference_date=='2025-02-01')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value11<-plotting_value_edit%>%
+  filter(reference_date=='2025-02-08')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value12<-plotting_value_edit%>%
+  filter(reference_date=='2025-02-15')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value13<-plotting_value_edit%>%
+  filter(reference_date=='2025-02-22')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value14<-plotting_value_edit%>%
+  filter(reference_date=='2025-03-01')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value15<-plotting_value_edit%>%
+  filter(reference_date=='2025-03-08')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value16<-plotting_value_edit%>%
+  filter(reference_date=='2025-03-15')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value17<-plotting_value_edit%>%
+  filter(reference_date=='2025-03-22')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value18<-plotting_value_edit%>%
+  filter(reference_date=='2025-03-29')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value19<-plotting_value_edit%>%
+  filter(reference_date=='2024-03-30')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id,levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value20<-plotting_value_edit%>%
+  filter(reference_date=='2025-04-05')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value21<-plotting_value_edit%>%
+  filter(reference_date=='2025-04-12')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value22<-plotting_value_edit%>%
+  filter(reference_date=='2025-04-19')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+plotting_value23<-plotting_value_edit%>%
+  filter(reference_date=='2025-04-26')%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Median', 'W Median (6 wk)')))
+
+
+
+
+plot_forecast1 <-plotting_value1%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2024-11-18'),as.Date('2025-05-01')))+ggtitle("11-23-2024")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast2 <-plotting_value2%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2024-11-18'),as.Date('2025-05-01')))+ggtitle("11-30-2024")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast3 <-plotting_value3%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+ xlim(c(as.Date('2024-11-18'),as.Date('2025-05-01')))+ggtitle("12-07-2024")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast4 <-plotting_value4%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2024-11-18'),as.Date('2025-05-01')))+ggtitle("12-14-2024")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast5 <-plotting_value5%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2024-11-18'),as.Date('2025-05-01')))+ggtitle("12-21-2024")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast6 <-plotting_value6%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2024-11-18'),as.Date('2025-05-01')))+ggtitle("12-28-2024")+
+ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast7 <-plotting_value7%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2024-11-18'),as.Date('2025-05-01')))+ggtitle("01-04-2025")+
+  ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast8 <-plotting_value8%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2)+geom_point()+
+  geom_line()+scale_color_manual(values=c('black','darkred',"dodgerblue3"))+
+  scale_fill_manual(values=c('black','darkred',"dodgerblue3"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5)+
+  xlim(c(as.Date('2024-11-18'),as.Date('2025-05-01')))+ggtitle("01-11-2025")+
+  ylab("Hospitalizations")+ylim(c(0,42000))
+
+plot_forecast1/plot_forecast2
+plot_forecast3/plot_forecast4
+plot_forecast5/plot_forecast6
+plot_forecast7/plot_forecast8
+
+```
+
+
+## 2022-23 Model Weights
+#Note if a model had a weight less than 10%, it is shaded grey regardless if it has an assigned color.
+
+
+```{r pressure, echo=FALSE, message=F, warning=F}
+
+#Looking at weights over time`
+library(viridis)
+
+names(weighted_US_weights22)[4]<-"ensemble_type"
+weighted_US_weights22$weight<-as.numeric(weighted_US_weights22$weight)
+
+weighted_US_weights_edit<-weighted_US_weights22
+weighted_US_weights_edit<-weighted_US_weights_edit%>% mutate(model_edit=ifelse(weight<.1,"Models with < 10% weight",model_id))
+
+viridris_11<-viridis(11)
+viridris_11<-append(viridris_11,"grey",after=0)
+
+lastlevel = function (f, last, ...) {
+    if (!is.factor(f)) stop("f must be a factor")
+    lev <- levels(f)
+    if (length(last) != 1L) 
+        stop("'last' must be of length one")
+    if (is.character(last)) 
+        last <- match(last, lev)
+    if (is.na(last)) 
+        stop("'last' must be an existing level")
+    nlev <- length(lev)
+    if (last < 1 || last > nlev) 
+        stop(gettextf("last = %d must be in 1L:%d", last, nlev), 
+            domain = NA)
+    factor(f, levels = lev[c(last, seq_along(lev)[-last])])
+}
+weighted_US_weights_edit$model_edit<-lastlevel(as.factor(weighted_US_weights_edit$model_edit),"Models with < 10% weight" )
+
+
+weighted_US_weights_edit%>% filter(ensemble_type=='Weighted Median ensemble US6')%>% ggplot(aes(x = forecast_date_current, y = weight, fill = model_edit)) +
+  geom_col(position = "fill")+scale_fill_manual(values=viridris_11)+xlab("")+ guides(fill=guide_legend(title="Model"))
+
+
+```
+
+
+## 2023-24 Model Weights
+#Note if a model had a weight less than 10%, it is shaded grey regardless if it has an assigned color.
+
+
+
+```{r pressure2, echo=FALSE, message=F, warning=F}
+
+#Looking at weights over time`
+names(weighted_US_weights23)[4]<-"ensemble_type"
+weighted_US_weights23$weight<-as.numeric(weighted_US_weights23$weight)
+
+weighted_US_weights_edit<-weighted_US_weights23
+weighted_US_weights_edit<-weighted_US_weights_edit%>% mutate(model_edit=ifelse(weight<.1,"Models with < 10% weight",model_id))
+
+
+viridris_12<-viridis(19)
+viridris_12<-append(viridris_12,"grey",after=0)
+
+weighted_US_weights_edit$model_edit<-lastlevel(as.factor(weighted_US_weights_edit$model_edit),"Models with < 10% weight" )
+
+
+weighted_US_weights_edit%>% filter(ensemble_type=='Weighted Median ensemble US6')%>% ggplot(aes(x = current_ref_date, y = weight, fill = model_edit)) +
+  geom_col(position = "fill")+scale_fill_manual(values = viridris_12)+xlab("")+ guides(fill=guide_legend(title="Model"))
+
+
+
+```
+
+
+MODEL DETAILS
+
+To be included in the weighted ensemble, groups must have submitted a forecast for each of the weeks of the training period as well as the forecast date.
+
+Weights are calculated using the relative WIS score as follows:
+
+1 / (1 + exp(-rwis*theta))
+
+Theta is a scaling parameter. The larger the value, the more weight better performing forecasts receive. 
