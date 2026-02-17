@@ -1,0 +1,677 @@
+---
+title: "Untitled"
+author: "Annabella Hines"
+date: "2026-02-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Loading
+
+```{r cars}
+
+#Evaluate the models
+library(gridExtra)
+library(plyr)
+library(dplyr)
+library(tidyverse)
+library(zoltr)
+library(lubridate)
+library(readr)
+library(tidyr)
+library(stringr)
+library(hubUtils)
+library(hubEnsembles)
+library(gt)
+library(viridis)
+library(patchwork)
+
+
+#2223 Results
+
+load("data/rds/2223/weighted US weights revis.rds")
+load("data/rds/2223/weighted state weights revis.rds")
+load("data/rds/2223/weighted state forecasts  new weight revis.rds")
+load("data/rds/2223/weighted US forecasts  new weight revis.rds")
+load("data/rds/2223/wis_model_us_2223.rds")
+load("data/rds/2223/wis_model_states_2223.rds")
+
+load("data/rds/2223/all_forecasts_us_compl2323.rds")
+
+weighted_US_forecasts_all_2223<-weighted_US_forecasts_all%>%rbind.fill(all_forecasts_us_compl2323)%>% dplyr::select(-model, -type,-quantile,-abbreviation, -full_location_name,-population)
+weighted_state_forecasts_all_2223<-weighted_state_forecasts_all
+
+weighted_US_weights22<-weighted_US_weights
+weighted_state_weights22<-weighted_state_weights
+
+
+
+#2324 Results
+
+load("data/rds/2324/weighted US weights 2324.rds")
+load("data/rds/2324/weighted state weights 2324.rds")
+load("data/rds/2324/weighted state forecasts 2324.rds")
+load("data/rds/2324/weighted US forecasts 2324.rds")
+load("data/rds/2324/wis_model_us_2324.rds")
+load("data/rds/2324/wis_model_states_2324.rds")
+
+load("data/rds/2324/all_forecasts_us_compl2324.rds")
+weighted_US_weights23<-weighted_US_weights
+weighted_state_weights23<-weighted_state_weights
+
+
+
+weighted_US_forecasts_all_2324<-weighted_US_forecasts_all%>%rbind.fill(all_forecasts_us_compl2324)%>%select(-model)
+
+weighted_state_forecasts_all_2324<-weighted_state_forecasts_all
+
+#2425 Results
+
+load("data/rds/2425/weighted US weights 2425.rds")
+load("data/rds/2425/weighted state weights 2425.rds")
+load("data/rds/2425/weighted state forecasts 2425.rds")
+load("data/rds/2425/weighted US forecasts 2425.rds")
+load("data/rds/2425/wis_model_us_2425.rds")
+load("data/rds/2425/wis_model_states_2425.rds")
+
+load("data/rds/2425/all_forecasts_us_compl2425.rds")
+weighted_US_weights24<-weighted_US_weights
+weighted_state_weights24<-weighted_state_weights
+
+
+source("functions/list_as_of_data2425.R")
+
+
+weighted_US_forecasts_all_2425<-weighted_US_forecasts_all%>%rbind.fill(all_forecasts_us_compl2425)%>%select(-model)
+weighted_state_forecasts_all_2425<-weighted_state_forecasts_all
+
+setwd(dir = "../../")
+```
+
+## Season Scores by Model
+
+```{r}
+
+wis_model_us_2223$model<-factor(wis_model_us_2223$model,
+                                  levels = c('flu-truth','Flusight-ensemble', 'Flusight-baseline',
+                                             'Weighted Median ensemble US2', 'Weighted Median ensemble US4','Weighted Median ensemble US6', "Weighted mean ensemble US6","Weighted mean ensemble US4","Weighted mean ensemble US2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_states_2223$model<-factor(wis_model_states_2223$model,
+                                  levels = c('flu-truth','Flusight-ensemble', 'Flusight-baseline',
+                                             'Weighted Median ensemble state2', 'Weighted Median ensemble state4','Weighted Median ensemble state6', "Weighted mean ensemble state6","Weighted mean ensemble state4","Weighted mean ensemble state2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_us_2324$model<-factor(wis_model_us_2324$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble US2', 'Weighted Median ensemble US4','Weighted Median ensemble US6', "Weighted mean ensemble US6","Weighted mean ensemble US4","Weighted mean ensemble US2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_states_2324$model<-factor(wis_model_states_2324$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble state2', 'Weighted Median ensemble state4','Weighted Median ensemble state6', "Weighted mean ensemble state6","Weighted mean ensemble state4","Weighted mean ensemble state2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+####### 2024/25 additions
+wis_model_us_2425$model<-factor(wis_model_us_2425$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble US2', 'Weighted Median ensemble US4','Weighted Median ensemble US6', "Weighted mean ensemble US6","Weighted mean ensemble US4","Weighted mean ensemble US2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+wis_model_states_2425$model<-factor(wis_model_states_2425$model,
+                                  levels = c('flu-truth','FluSight-ensemble', 'FluSight-baseline',
+                                             'Weighted Median ensemble state2', 'Weighted Median ensemble state4','Weighted Median ensemble state6', "Weighted mean ensemble state6","Weighted mean ensemble state4","Weighted mean ensemble state2"),
+                                  labels=c('Truth', 'Flusight-ensemble',  'Baseline', 'W Median (2 wk)', 'W Median (4 wk)', 'W Median (6 wk)', "W Mean (6 wk)","W Mean (4 wk)","W Mean (2 wk)")  )
+
+
+
+
+wis_model_us_2223%>%gt()%>%
+tab_header(
+  title = md("**US Overall Ensemble Performance 22-23**"),
+  subtitle = md("10/17/2022–2/27/2023"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_states_2223%>%gt()%>%
+tab_header(
+  title = md("**State Ensemble Performance 22-23**"),
+  subtitle = md("10/17/2022–2/27/2023"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_us_2324%>%gt()%>%
+tab_header(
+  title = md("**US Overall Ensemble Performance 23-24**"),
+  subtitle = md("10/14/2023–4/27/2024"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_states_2324%>%gt()%>%
+tab_header(
+  title = md("**State Ensemble Performance 23-24**"),
+  subtitle = md("10/14/2023–4/27/2024"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+######## 2024/25 additions
+wis_model_us_2425%>%gt()%>%
+tab_header(
+  title = md("**US Overall Ensemble Performance 24-25**"),
+  subtitle = md("11/22/2024–5/31/2025"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+wis_model_states_2425%>%gt()%>%
+tab_header(
+  title = md("**State Ensemble Performance 24-25**"),
+  subtitle = md("11/22/2024–5/31/2025"))%>%
+  fmt_number(columns = c(cov_50,cov_95,rel_wis),decimals = 2) %>%
+  fmt_number(columns = c(wis,mae),decimals = 0)
+
+```
+
+
+```{r}
+names(weighted_US_weights22)[4]<-"ensemble_type"
+names(weighted_US_weights23)[4]<-"ensemble_type"
+names(weighted_US_weights24)[4]<-"ensemble_type"
+names(weighted_state_weights22)[4]<-"ensemble_type"
+names(weighted_state_weights)[4]<-"ensemble_type"
+names(weighted_state_weights24)[4] <- "ensemble_type"
+```
+
+
+## Figure 1
+
+```{r}
+#2022-2023
+
+median_value<-weighted_US_forecasts_all_2223%>%filter(output_type_id==.5)%>%  dplyr::rename(median=value)%>%dplyr::select(!output_type_id)
+ucl95_value<-weighted_US_forecasts_all_2223%>%filter(output_type_id==.95)%>%  dplyr::rename(ucl95=value)%>%dplyr::select(!output_type_id)
+lcl95_value<-weighted_US_forecasts_all_2223%>%filter(output_type_id==.05)%>%  dplyr::rename(lcl95=value)%>%dplyr::select(!output_type_id)
+ucl50_value<-weighted_US_forecasts_all_2223%>%filter(output_type_id==.75)%>%  dplyr::rename(ucl50=value)%>%dplyr::select(!output_type_id)
+lcl50_value<-weighted_US_forecasts_all_2223%>%filter(output_type_id==.25)%>%  dplyr::rename(lcl50=value)%>%dplyr::select(!output_type_id)
+
+
+plotting_value<-median_value%>%left_join(ucl95_value, by=c("model_id", "forecast_date", "target_end_date"))%>%left_join(lcl95_value, by=c("model_id", "forecast_date","target_end_date"))%>%
+  left_join(ucl50_value, by=c("model_id", "forecast_date", "target_end_date"))%>%left_join(lcl50_value, by=c("model_id", "forecast_date","target_end_date"))%>%unique()
+
+
+plotting_value_edit<-plotting_value%>%filter(model_id=='Weighted Median ensemble US4' |model_id=='Flusight-ensemble' )
+plotting_value_edit$model_id<-factor(plotting_value_edit$model_id,
+                                     levels = c('flu-truth','Flusight-ensemble',
+                                                'Weighted Median ensemble US4'),
+                                     labels=c('Truth', 'Untrained median', 'Median (4 week)')  )
+plotting_value_edit$forecast_date<-as.Date(plotting_value_edit$forecast_date)
+
+flu_truth_plot<-flu_truth_current%>%filter(location=='US')%>%dplyr::rename(target_end_date=date, median=value)%>%
+  dplyr::select(median,target_end_date)%>%mutate(model_id='Truth',target_end_date=as.Date(target_end_date) )
+
+plotting_value_mult<-plotting_value_edit%>%
+  rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Untrained median', 'Median (4 week)')))
+
+
+#Plot without training period
+plot_forecast1_pre <-plotting_value_mult%>%
+  filter(forecast_date=="2022-11-28"|forecast_date=="2022-12-26" |forecast_date=="2023-01-23"|model_id=='Truth')%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id,group = interaction(model_id, forecast_date)))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2,colour = NA, show.legend = FALSE,linewidth=1)+
+  scale_color_manual(values=c('black','dodgerblue3',"chocolate2"))+
+  scale_fill_manual(values=c(NA,'dodgerblue3',"chocolate2"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5, colour = NA, show.legend = FALSE,linewidth=1)+geom_line(aes(linetype = model_id))+
+  geom_point(size=2.5)+
+  scale_linetype_manual(values=c("solid", "solid", "solid"))+scale_shape_manual(values = c(1,2,2))+
+  ylab("Hospital admissions")+ylim(c(0,35500))+theme_bw()+
+  theme(legend.key = element_blank(), legend.title = element_blank(),
+        panel.border = element_blank(),axis.line = element_line(color = 'black'), legend.position = c(0.85, 0.9),)+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %y",limits = c(as.Date('2022-10-17'),as.Date('2023-02-15'))) 
+
+plot_forecast1_pre
+
+#Plot with training period
+plot_forecast1 <- plotting_value_mult %>%
+  filter(forecast_date %in% as.Date(c("2022-11-28","2022-12-26","2023-01-23")) | model_id == "Truth") %>%
+  ggplot(aes(y = median, x = target_end_date, col = model_id, fill = model_id,
+             group = interaction(model_id, forecast_date))) +
+  # training-period shading + label
+  annotate("rect",
+           xmin = as.Date("2022-10-22"), xmax = as.Date("2022-11-26"),
+           ymin = -Inf, ymax = Inf,
+           alpha = 0.08, fill = "grey50") +
+  annotate("text",
+           x = as.Date("2022-10-26"), y = 25500,
+           label = "Initial Training Period",
+           hjust = 0, size = 3, color = "black") +
+  geom_ribbon(aes(ymin = lcl95, ymax = ucl95), alpha = 0.2, colour = NA, show.legend = FALSE, linewidth = 1) +
+  geom_ribbon(aes(ymin = lcl50, ymax = ucl50), alpha = 0.5, colour = NA, show.legend = FALSE, linewidth = 1) +
+  geom_line(aes(linetype = model_id)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = c("black", "dodgerblue3", "chocolate2")) +
+  scale_fill_manual(values = c(NA, "dodgerblue3", "chocolate2")) +
+  scale_linetype_manual(values = c("solid", "solid", "solid")) +
+  xlab("Date") +
+  ylab("Hospital admissions") +
+  ylim(c(0, 35500)) +
+  theme_bw() +
+  theme(
+    legend.key = element_blank(), legend.title = element_blank(),
+    panel.border = element_blank(), axis.line = element_line(color = "black"),
+    legend.position = c(0.85, 0.9)
+  ) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %y",
+               limits = c(as.Date("2022-10-17"), as.Date("2023-02-15")))
+
+plot_forecast1
+
+
+```
+
+## Figure 2
+
+```{r}
+median_value<-weighted_US_forecasts_all_2324%>%filter(output_type_id==.5)%>%  dplyr::rename(median=value)%>%dplyr::select(!output_type_id)
+ucl95_value<-weighted_US_forecasts_all_2324%>%filter(output_type_id==.95)%>%  dplyr::rename(ucl95=value)%>%dplyr::select(!output_type_id)
+lcl95_value<-weighted_US_forecasts_all_2324%>%filter(output_type_id==.05)%>%  dplyr::rename(lcl95=value)%>%dplyr::select(!output_type_id)
+ucl50_value<-weighted_US_forecasts_all_2324%>%filter(output_type_id==.75)%>%  dplyr::rename(ucl50=value)%>%dplyr::select(!output_type_id)
+lcl50_value<-weighted_US_forecasts_all_2324%>%filter(output_type_id==.25)%>%  dplyr::rename(lcl50=value)%>%dplyr::select(!output_type_id)
+
+
+
+plotting_value<-median_value%>%left_join(ucl95_value, by=c("model_id", "reference_date", "target_end_date"))%>%left_join(lcl95_value, by=c("model_id", "reference_date","target_end_date"))%>%
+  left_join(ucl50_value, by=c("model_id", "reference_date", "target_end_date"))%>%left_join(lcl50_value, by=c("model_id", "reference_date","target_end_date"))%>%unique()
+
+flu_truth_plot<-flu_truth_current%>%filter(location=='US')%>%dplyr::rename(target_end_date=date, median=value)%>%
+  dplyr::select(median,target_end_date)%>%mutate(model_id='Truth',target_end_date=as.Date(target_end_date) )
+
+plotting_value_edit<-plotting_value%>%filter(model_id=='Weighted Median ensemble US6' |model_id=='FluSight-ensemble' )
+plotting_value_edit$model_id<-factor(plotting_value_edit$model_id,
+                                     levels = c('flu-truth','FluSight-ensemble',
+                                                'Weighted Median ensemble US6'),
+                                     labels=c('Truth', 'Untrained median', 'Median (6 week)')  )
+plotting_value_edit$reference_date<-as.Date(plotting_value_edit$reference_date)
+
+
+plotting_value_mult<-plotting_value_edit%>%rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Untrained median', 'Median (6 week)')))
+
+
+
+plot_forecast2_pre <-plotting_value_mult%>%
+  filter(reference_date=="2023-11-25"|reference_date=="2023-12-23" |reference_date=="2024-01-20"|reference_date=="2024-02-17"|
+           reference_date=="2024-03-16"|reference_date=="2024-04-13"| model_id=='Truth')%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id,group = interaction(model_id, reference_date)))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2, colour = NA, show.legend = FALSE,linewidth=1)+
+  scale_color_manual(values=c('black','dodgerblue3',"firebrick2"))+
+  scale_fill_manual(values=c(NA,'dodgerblue3',"firebrick2"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5, colour = NA, show.legend = FALSE,linewidth=1)+geom_line(aes(linetype = model_id))+
+  geom_point(size=2.5)+
+  scale_linetype_manual(values=c("solid", "solid", "solid"))+scale_shape_manual(values = c(1,2,2))+
+  ylab("Hospital admissions")+ylim(c(0,30000))+theme_bw()+
+  theme(legend.key = element_blank(), legend.title = element_blank(),
+        panel.border = element_blank(),axis.line = element_line(color = 'black'), legend.position = c(0.85, 0.9),)+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %y",limits = c(as.Date('2023-10-10'),as.Date('2024-04-30'))) 
+
+plot_forecast2_pre
+
+plot_forecast2 <- plotting_value_mult %>%
+  filter(reference_date %in% as.Date(c("2023-11-25","2023-12-23","2024-01-20","2024-02-17","2024-03-16","2024-04-13")) |
+           model_id == "Truth") %>%
+  ggplot(aes(y = median, x = target_end_date, col = model_id, fill = model_id,
+             group = interaction(model_id, reference_date))) +
+  # training-period shading + label
+  annotate("rect",
+           xmin = as.Date("2023-10-10"), xmax = as.Date("2023-11-18"),
+           ymin = -Inf, ymax = Inf,
+           alpha = 0.08, fill = "grey50") +
+  annotate("text",
+           x = as.Date("2023-10-15"), y = 20000,
+           label = "Initial Training \n   Period",
+           hjust = 0, size = 3, color = "black") +
+  geom_ribbon(aes(ymin = lcl95, ymax = ucl95), alpha = 0.2, colour = NA, show.legend = FALSE, linewidth = 1) +
+  geom_ribbon(aes(ymin = lcl50, ymax = ucl50), alpha = 0.5, colour = NA, show.legend = FALSE, linewidth = 1) +
+  geom_line(aes(linetype = model_id)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = c("black", "dodgerblue3", "firebrick2")) +
+  scale_fill_manual(values = c(NA, "dodgerblue3", "firebrick2")) +
+  scale_linetype_manual(values = c("solid", "solid", "solid")) +
+  xlab("Date") +
+  ylab("Hospital admissions") +
+  ylim(c(0, 30000)) +
+  theme_bw() +
+  theme(
+    legend.key = element_blank(), legend.title = element_blank(),
+    panel.border = element_blank(), axis.line = element_line(color = "black"),
+    legend.position = c(0.85, 0.9)
+  ) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %y",
+               limits = c(as.Date("2023-10-10"), as.Date("2024-04-30")))
+
+plot_forecast2
+```
+
+## Figure 3
+
+```{r}
+#2024-2025
+
+median_value<-weighted_US_forecasts_all_2425%>%filter(output_type_id==.5)%>%  dplyr::rename(median=value, forecast_date=reference_date)%>%dplyr::select(!output_type_id)
+ucl95_value<-weighted_US_forecasts_all_2425%>%filter(output_type_id==.95)%>%  dplyr::rename(ucl95=value, forecast_date=reference_date)%>%dplyr::select(!output_type_id)
+lcl95_value<-weighted_US_forecasts_all_2425%>%filter(output_type_id==.05)%>%  dplyr::rename(lcl95=value, forecast_date=reference_date)%>%dplyr::select(!output_type_id)
+ucl50_value<-weighted_US_forecasts_all_2425%>%filter(output_type_id==.75)%>%  dplyr::rename(ucl50=value, forecast_date=reference_date)%>%dplyr::select(!output_type_id)
+lcl50_value<-weighted_US_forecasts_all_2425%>%filter(output_type_id==.25)%>%  dplyr::rename(lcl50=value, forecast_date=reference_date)%>%dplyr::select(!output_type_id)
+
+
+plotting_value<-median_value%>%left_join(ucl95_value, by=c("model_id", "forecast_date", "target_end_date"))%>%left_join(lcl95_value, by=c("model_id", "forecast_date","target_end_date"))%>%
+  left_join(ucl50_value, by=c("model_id", "forecast_date", "target_end_date"))%>%left_join(lcl50_value, by=c("model_id", "forecast_date","target_end_date"))%>%unique()
+
+
+plotting_value_edit<-plotting_value%>%filter(model_id=='Weighted mean ensemble US2' |model_id=='FluSight-ensemble' )
+plotting_value_edit$model_id<-factor(plotting_value_edit$model_id,
+                                     levels = c('flu-truth','FluSight-ensemble',
+                                                'Weighted mean ensemble US2'),
+                                     labels=c('Truth', 'Untrained median', 'Mean (2 week)')  )
+plotting_value_edit$forecast_date<-as.Date(plotting_value_edit$forecast_date)
+
+
+plotting_value_mult<-plotting_value_edit%>%
+  rbind.fill(flu_truth_plot)%>%
+  mutate(model_id=factor(model_id, levels=c('Truth', 'Untrained median', 'Mean (2 week)'))) %>% filter(target_end_date<as.Date("2025-06-15"))
+
+## figure 3 without the training period stated
+plot_forecast3_pre <-plotting_value_mult%>%
+  filter(forecast_date=="2025-01-04"|forecast_date=="2025-02-01" |forecast_date=="2025-03-01"| 
+           forecast_date=="2025-03-29"|forecast_date=="2025-04-26"|forecast_date=="2025-05-24"|
+           model_id=='Truth')%>%
+  ggplot(aes(y =median,x=target_end_date, col=model_id,fill=model_id,group = interaction(model_id, forecast_date)))+
+  geom_ribbon(aes(ymin=lcl95,ymax=ucl95),alpha=0.2,colour = NA, show.legend = FALSE,linewidth=1)+
+  scale_color_manual(values=c('black','dodgerblue3',"darkgoldenrod"))+
+  scale_fill_manual(values=c(NA,'dodgerblue3',"darkgoldenrod"))+
+  xlab("Date") +geom_ribbon(aes(ymin=lcl50,ymax=ucl50),alpha=0.5, colour = NA, show.legend = FALSE,linewidth=1)+geom_line(aes(linetype = model_id))+
+  geom_point(size=2.5)+
+  scale_linetype_manual(values=c("solid", "solid", "solid"))+scale_shape_manual(values = c(1,2,2))+
+  ylab("Hospital admissions")+ylim(c(0,82000))+theme_bw()+
+  theme(legend.key = element_blank(), legend.title = element_blank(),
+        panel.border = element_blank(),axis.line = element_line(color = 'black'), legend.position = c(0.85, 0.9),)+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %y",limits = c(as.Date('2024-11-22'),as.Date('2025-06-25'))) 
+
+plot_forecast3_pre
+
+#figure 3 with training period
+plot_forecast3 <- plotting_value_mult %>%
+  filter(forecast_date %in% as.Date(c("2025-01-04","2025-02-01","2025-03-01","2025-03-29","2025-04-26","2025-05-24")) |model_id == "Truth") %>%
+  ggplot(aes(y = median, x = target_end_date, col = model_id, fill = model_id,group = interaction(model_id, forecast_date))) +
+  annotate("rect",xmin = as.Date("2024-11-22"), xmax = as.Date("2024-12-28"),ymin = -Inf, ymax = Inf,alpha = 0.08, fill = "grey50") +
+  annotate("text",x = as.Date("2024-11-26"), y = 60000,label = "Initial Training \n    Period", hjust = 0, size = 3, color = "grey30") +
+  geom_ribbon(aes(ymin = lcl95, ymax = ucl95), alpha = 0.2, colour = NA, show.legend = FALSE, linewidth = 1) +
+  geom_ribbon(aes(ymin = lcl50, ymax = ucl50), alpha = 0.5, colour = NA, show.legend = FALSE, linewidth = 1) +
+  geom_line(aes(linetype = model_id)) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = c("black", "dodgerblue3", "darkgoldenrod")) +
+  scale_fill_manual(values = c(NA, "dodgerblue3", "darkgoldenrod")) +
+  scale_linetype_manual(values = c("solid", "solid", "solid")) +
+  xlab("Date") +ylab("Hospital admissions") +
+  ylim(c(0, 82000)) +
+  theme_bw() +
+  theme(legend.key = element_blank(), legend.title = element_blank(), panel.border = element_blank(), axis.line = element_line(color = "black"), legend.position = c(0.85, 0.9)) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %y", limits = c(as.Date("2024-11-22"), as.Date("2025-06-25")))
+
+
+
+plot_forecast3
+
+```
+
+
+
+## Saving Main Figures
+
+```{r}
+tiff("./Figures/Figure 1 2223.tiff",units="in", width=6, height=4, res=300)
+plot_forecast1
+dev.off()
+
+tiff("./Figures/Figure 2 2324.tiff",units="in", width=6, height=4, res=300)
+plot_forecast2
+dev.off()
+
+tiff("./Figures/Figure 3 2425.tiff",units="in", width=6, height=4, res=300)
+plot_forecast3
+dev.off()
+```
+
+
+## Supplemental Figures
+
+### Supplemental Figure 1
+
+```{r}
+
+#US overall
+names(weighted_US_weights22)[4]<-"ensemble_type"
+weighted_US_weights22$weight<-as.numeric(weighted_US_weights22$weight)
+
+weighted_US_weights_edit<-weighted_US_weights22
+weighted_US_weights_edit<-weighted_US_weights_edit%>% mutate(model_edit=ifelse(weight<.1,"Models with < 10% weight",model_id))
+
+viridris_17<-viridis(16)
+viridris_17<-append(viridris_17,"grey",after=0)
+
+lastlevel = function (f, last, ...) {
+  if (!is.factor(f)) stop("f must be a factor")
+  lev <- levels(f)
+  if (length(last) != 1L) 
+    stop("'last' must be of length one")
+  if (is.character(last)) 
+    last <- match(last, lev)
+  if (is.na(last)) 
+    stop("'last' must be an existing level")
+  nlev <- length(lev)
+  if (last < 1 || last > nlev) 
+    stop(gettextf("last = %d must be in 1L:%d", last, nlev), 
+         domain = NA)
+  factor(f, levels = lev[c(last, seq_along(lev)[-last])])
+}
+weighted_US_weights_edit$model_edit<-lastlevel(as.factor(weighted_US_weights_edit$model_edit),"Models with < 10% weight" )
+weighted_US_weights_edit2223<-weighted_US_weights_edit%>% filter(ensemble_type=='Weighted Median ensemble US4')
+
+weighted_US_weights_edit2223$model_edit2<-weighted_US_weights_edit2223$model_edit
+weighted_US_weights_edit2223$model_edit2<-factor(weighted_US_weights_edit2223$model_edit2)
+levels(weighted_US_weights_edit2223$model_edit2) <- c('', LETTERS[1:22])
+
+
+panelA<-weighted_US_weights_edit2223%>% 
+  ggplot(aes(x = forecast_date_current, y = weight, fill = model_edit,label = model_edit2)) +
+  geom_col(position = "fill")+scale_fill_manual(values = viridris_17)+xlab("")+ guides(fill=guide_legend(title="Model"))+theme_classic()+
+  theme(legend.key.size = unit(.05, 'in'),legend.position = "none")+geom_text(position = position_stack(vjust = 0.5),fontface = "bold")+
+  ggtitle('Median (4 Week) National Ensemble, 22—23')
+
+#State
+
+
+names(weighted_state_weights22)[4]<-"ensemble_type"
+weighted_state_weights22$weight<-as.numeric(weighted_state_weights22$weight)
+
+weighted_state_weights_edit<-weighted_state_weights22
+weighted_state_weights_edit<-weighted_state_weights_edit%>% mutate(model_edit=ifelse(weight<.1,"Models with < 10% weight",model_id))
+
+viridris_11<-viridis(11)
+viridris_11<-append(viridris_11,"grey",after=0)
+
+weighted_state_weights_edit$model_edit<-lastlevel(as.factor(weighted_state_weights_edit$model_edit),"Models with < 10% weight" )
+weighted_state_weights_edit2223<-weighted_state_weights_edit%>% filter(ensemble_type=='Weighted Median ensemble state2')
+
+
+weighted_state_weights_edit2223$model_edit2<-weighted_state_weights_edit2223$model_edit
+weighted_state_weights_edit2223$model_edit2<-factor(weighted_state_weights_edit2223$model_edit2)
+levels(weighted_state_weights_edit2223$model_edit2) <- c('', LETTERS[1:22])
+
+panelC<-weighted_state_weights_edit2223%>% 
+  ggplot(aes(x = forecast_date_current, y = weight, fill = model_edit,label = model_edit2)) +
+  geom_col(position = "fill")+scale_fill_manual(values = viridris_11)+xlab("")+ guides(fill=guide_legend(title="Model"))+theme_classic()+
+  theme(legend.key.size = unit(.05, 'in'),legend.position = "none")+geom_text(position = position_stack(vjust = 0.5),fontface = "bold")+
+  ggtitle('Median (2 Week) State/Territory Ensemble, 22—23')
+
+panelA/panelC
+
+```
+
+### Supplemental Figure 2
+
+```{r}
+#US Overall
+
+names(weighted_US_weights23)[4]<-"ensemble_type"
+weighted_US_weights23$weight<-as.numeric(weighted_US_weights23$weight)
+
+weighted_US_weights_edit<-weighted_US_weights23
+weighted_US_weights_edit<-weighted_US_weights_edit%>% mutate(model_edit=ifelse(weight<.1,"Models with < 10% weight",model_id))
+
+
+viridris_12<-viridis(19)
+viridris_12<-append(viridris_12,"grey",after=0)
+
+weighted_US_weights_edit$model_edit<-lastlevel(as.factor(weighted_US_weights_edit$model_edit),"Models with < 10% weight" )
+
+weighted_US_weights_edit2324<-weighted_US_weights_edit%>% filter(ensemble_type=='Weighted Median ensemble US6')
+
+weighted_US_weights_edit2324$model_edit2<-weighted_US_weights_edit2324$model_edit
+weighted_US_weights_edit2324$model_edit2<-factor(weighted_US_weights_edit2324$model_edit2)
+levels(weighted_US_weights_edit2324$model_edit2) <- c('', LETTERS[1:22])
+
+
+panelB<-weighted_US_weights_edit2324%>% ggplot(aes(x = current_ref_date, y = weight, fill = model_edit,label=model_edit2)) +
+  geom_col(position = "fill")+scale_fill_manual(values = viridris_12)+xlab("")+ guides(fill=guide_legend(title="Model"))+theme_classic()+
+  theme(legend.key.size = unit(.05, 'in'),legend.position = "none")+geom_text(position = position_stack(vjust = 0.5),fontface = "bold")+
+  ggtitle('Median (6 Week) National Ensemble, 23—24')
+
+#State
+
+
+names(weighted_state_weights23)[4]<-"ensemble_type"
+weighted_state_weights23$weight<-as.numeric(weighted_state_weights23$weight)
+
+weighted_state_weights_edit<-weighted_state_weights23
+
+viridris_13<-viridis(13)
+viridris_13<-append(viridris_13,"grey",after=0)
+
+
+weighted_state_weights_edit<-weighted_state_weights_edit%>% mutate(model_edit=ifelse(weight<.1,"Models with < 10% weight",model_id))
+weighted_state_weights_edit$model_edit<-lastlevel(as.factor(weighted_state_weights_edit$model_edit),"Models with < 10% weight" )
+
+weighted_state_weights_edit2324<-weighted_state_weights_edit%>% filter(ensemble_type=='Weighted mean ensemble state6')
+
+weighted_state_weights_edit2324$model_edit2<-weighted_state_weights_edit2324$model_edit
+weighted_state_weights_edit2324$model_edit2<-factor(weighted_state_weights_edit2324$model_edit2)
+levels(weighted_state_weights_edit2324$model_edit2) <- c('', LETTERS[1:22])
+
+
+
+panelD<-weighted_state_weights_edit2324%>% ggplot(aes(x = current_ref_date, y = weight, fill = model_edit, label=model_edit2)) +
+  geom_col(position = "fill")+scale_fill_manual(values = viridris_13)+xlab("")+ guides(fill=guide_legend(title="Model"))+theme_classic()+
+  theme(legend.key.size = unit(.05, 'in'),legend.position = "none")+geom_text(position = position_stack(vjust = 0.5),fontface = "bold")+
+  ggtitle('Mean (6 Week) State/Territory Ensemble, 23—24')
+
+panelB/panelD
+
+```
+### Supplemental Figure 3
+```{r}
+#US overall
+names(weighted_US_weights24)[4]<-"ensemble_type"
+weighted_US_weights24$weight<-as.numeric(weighted_US_weights24$weight)
+
+weighted_US_weights_edit<-weighted_US_weights24
+weighted_US_weights_edit<-weighted_US_weights_edit%>% mutate(model_edit=ifelse(weight<.1,"Models with < 10% weight",model_id))
+
+viridris_19<-viridis(19)
+viridris_19<-append(viridris_19,"grey",after=0)
+
+lastlevel = function (f, last, ...) {
+  if (!is.factor(f)) stop("f must be a factor")
+  lev <- levels(f)
+  if (length(last) != 1L) 
+    stop("'last' must be of length one")
+  if (is.character(last)) 
+    last <- match(last, lev)
+  if (is.na(last)) 
+    stop("'last' must be an existing level")
+  nlev <- length(lev)
+  if (last < 1 || last > nlev) 
+    stop(gettextf("last = %d must be in 1L:%d", last, nlev), 
+         domain = NA)
+  factor(f, levels = lev[c(last, seq_along(lev)[-last])])
+}
+weighted_US_weights_edit$model_edit<-lastlevel(as.factor(weighted_US_weights_edit$model_edit),"Models with < 10% weight" )
+weighted_US_weights_edit2425<-weighted_US_weights_edit%>% filter(ensemble_type=='Weighted mean ensemble US2')
+
+weighted_US_weights_edit2425$model_edit2<-weighted_US_weights_edit2425$model_edit
+weighted_US_weights_edit2425$model_edit2<-factor(weighted_US_weights_edit2425$model_edit2)
+levels(weighted_US_weights_edit2425$model_edit2) <- c('', LETTERS[1:22])
+
+
+panelE<-weighted_US_weights_edit2425%>% 
+  ggplot(aes(x = current_ref_date, y = weight, fill = model_edit,label = model_edit2)) +
+  geom_col(position = "fill")+scale_fill_manual(values = viridris_19)+xlab("")+ guides(fill=guide_legend(title="Model"))+theme_classic()+
+  theme(legend.key.size = unit(.05, 'in'),legend.position = "none")+geom_text(position = position_stack(vjust = 0.5),fontface = "bold")+
+  ggtitle('Mean (2 Week) National Ensemble, 24—25')
+
+
+
+#State
+
+
+names(weighted_state_weights24)[4]<-"ensemble_type"
+weighted_state_weights24$weight<-as.numeric(weighted_state_weights24$weight)
+
+weighted_state_weights_edit<-weighted_state_weights24
+weighted_state_weights_edit<-weighted_state_weights_edit%>% mutate(model_edit=ifelse(weight<.1,"Models with < 10% weight",model_id))
+
+viridris_16<-viridis(16)
+viridris_16<-append(viridris_16,"grey",after=0)
+
+weighted_state_weights_edit$model_edit<-lastlevel(as.factor(weighted_state_weights_edit$model_edit),"Models with < 10% weight" )
+weighted_state_weights_edit2425<-weighted_state_weights_edit%>% filter(ensemble_type=='Weighted Median ensemble state2')
+
+
+weighted_state_weights_edit2425$model_edit2<-weighted_state_weights_edit2425$model_edit
+weighted_state_weights_edit2425$model_edit2<-factor(weighted_state_weights_edit2425$model_edit2)
+levels(weighted_state_weights_edit2425$model_edit2) <- c('', LETTERS[1:22])
+
+panelF<-weighted_state_weights_edit2425%>% 
+  ggplot(aes(x = current_ref_date, y = weight, fill = model_edit,label = model_edit2)) +
+  geom_col(position = "fill")+scale_fill_manual(values = viridris_16)+xlab("")+ guides(fill=guide_legend(title="Model"))+theme_classic()+
+  theme(legend.key.size = unit(.05, 'in'),legend.position = "none")+geom_text(position = position_stack(vjust = 0.5),fontface = "bold")+
+  ggtitle('Median (2 Week) State/Territory Ensemble, 24—25')
+
+
+panelE/panelF
+
+
+```
+
+### Saving Supplemental Figures
+
+```{r}
+
+
+tiff("./Supplement/Supplemental Figure 1 Weights 2022.tiff",units="in", width=10, height=8, res=300)
+(panelA/panelC)
+dev.off()
+
+
+tiff("./Supplement/Supplemental Figure 2 Weights 2023.tiff",units="in", width=10, height=8, res=300)
+(panelB/panelD)
+dev.off()
+
+tiff("./Supplement/Supplemental Figure 3 Weights 2024.tiff",units="in", width=10, height=8, res=300)
+(panelE/panelF)
+dev.off()
+
+```
+

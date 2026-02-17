@@ -1,0 +1,39 @@
+"Model","Relative WIS","50% Coverage (%)","95% Coverage (%)","% of Forecasts Submitted"
+"FluSight-ensemble (ENS,  STAT)",0.62,52.9,82.92,100
+"FluSight-lop_norm (ENS,  STAT)",0.62,61.03,94.23,100
+"PSI-PROF_beta (MECH, STAT)",0.62,58.28,89.73,93
+"CU-ensemble (ENS,  MECH, AI/ML, STAT)",0.63,51.83,85.1,96
+"NEU_ISI-AdaptiveEnsemble (ENS,  STAT)",0.63,29.49,68.38,90
+"CMU-TimeSeries (ENS,  STAT)",0.64,56.76,91.72,100
+"UMass-flusion (ENS,  STAT)",0.64,40.31,83.23,96
+"ISU_NiemiLab-GPE (STAT)",0.65,45.81,77.81,79
+"PSI-PROF (MECH, STAT)",0.65,54.22,90.55,100
+"UGA_flucast-Scenariocast (STAT)",0.65,47.54,89.55,85
+"CEPH-Rtrend_fluH (MECH)",0.66,44.85,80.64,100
+"OHT_JHU-nbxd (ENS,  AI/ML)",0.66,39.72,80.53,89
+"UGA_flucast-INFLAenza (STAT)",0.68,41.43,84.46,100
+"NEU_ISI-FluBcast (MECH)",0.72,26.61,56.57,84
+"NIH-Flu_ARIMA (MECH, STAT)",0.73,25.42,69.03,100
+"UGA_flucast-Copycat (STAT)",0.73,38.11,82.96,89
+"MIGHTE-Joint (ENS,  AI/ML, STAT)",0.75,37.7,68.67,85
+"fjordhest-ensemble (ENS,  MECH, STAT)",0.77,44.3,78.31,97
+"UNC_IDD-InfluPaint (AI/ML)",0.78,13.77,50.63,81
+"MIGHTE-Nsemble (ENS,  AI/ML, STAT)",0.79,37.75,69.39,93
+"JHU_CSSE-CSSE_Ensemble (ENS,  AI/ML, STAT)",0.81,51.05,80.61,81
+"UMass-AR2 (STAT)",0.82,40.43,79.1,96
+"VTSanghani-PRIME (AI/ML)",0.82,58.07,76.86,98
+"MOBS-GLEAM_FLUH (MECH)",0.84,20.6,58.07,89
+"UMass-trends_ensemble (ENS,  STAT)",0.87,42.35,67.77,100
+"LUcompUncertLab-chimera (MECH)",0.89,35.48,70.34,80
+"Gatech-ensemble_point (ENS,  AI/ML, STAT)",0.9,33.69,73.43,98
+"UVAFluX-Ensemble (ENS,  AI/ML, STAT)",0.93,54.12,76.69,100
+"SigSci-TSENS (ENS,  STAT)",0.97,45.45,68.36,94
+"FluSight-baseline (STAT)",1,31.5,72.56,100
+"JHUAPL-DMD (STAT)",1.04,51.94,85.94,89
+"UVAFluX-CESGCN (AI/ML)",1.05,15.42,39.81,76
+"CMU-climate_baseline (ENS,  STAT)",1.12,51.66,90.42,96
+"Gatech-ensemble_prob (ENS,  STAT)",1.14,36.42,69.26,98
+"UGA_CEID-Walk (STAT)",1.17,47.17,73.15,93
+"UI_CompEpi-EpiGen (ENS,  AI/ML, STAT)",1.19,54.71,71.81,82
+"UM-DeepOutbreak (AI/ML)",1.23,57,73.24,96
+"Stevens-ILIForecast (ENS,  STAT)",1.59,6.88,15.33,82
