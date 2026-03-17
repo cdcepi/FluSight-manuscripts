@@ -1572,11 +1572,11 @@ weighted_US_weights2<-weighted_US_weights
 
 rm(weighted_US_weights,weighted_state_weights)
 
-save(weighted_state_forecasts_all,file="Test/weighted state forecasts 2324.rds")
-save(weighted_US_forecasts_all,file="Test/weighted US forecasts 2324.rds")
+save(weighted_state_forecasts_all,file="Data/rds/2324/weighted state forecasts 2324.rds")
+save(weighted_US_forecasts_all,file="Data/rds/2324/weighted US forecasts 2324.rds")
 
-save(weighted_state_weights,file="Test/weighted state weights 2324.rds")
-save(weighted_US_weights,file="Test/weighted US weights 2324.rds")
+save(weighted_state_weights,file="Data/rds/2324/weighted state weights 2324.rds")
+save(weighted_US_weights,file="Data/rds/2324/weighted US weights 2324.rds")
 
 
 load(file="Data/rds/2324/weighted state forecasts 2324.rds")

@@ -17,24 +17,26 @@ library(tidyr)
 library(stringr)
 library(hubUtils)
 library(hubEnsembles)
-#library(CombineDistributions)
 library(scoringutils)
 
 #This is the date of the forecast of interest. Will use the prior 6 weeks of forecast to evaluate the best
 #performing teams
 
 #Load functions needed below
-source("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/evaluation_functions.R")
-source("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/as_covid_hub_forecasts.R")
-ensemble_code_path = paste0("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble")
+source("functions/evaluation_functions.R")
+source("functions/as_covid_hub_forecasts.R")
+#ensemble_code_path = paste0("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble")
+ensemble_code_path = paste0("Data/rds/2223/data-forecasts/Flusight-ensemble")
 
-flu_baseline_all<-readRDS("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/flu_baseline_all.rds")
-flu_truth_all<-readRDS("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/flu_truth_all.rds")
+flu_baseline_all<-readRDS("Data/rds/2223/flu_baseline_all.rds")
+#flu_truth_all<-readRDS("Data/rds/2223/flu_truth_all.rds")
+flu_truth_all <-  test_truth
 #Load in the truth data as of each forecast date for the burn-in period evaluation
-source("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/list_as_of_data.R")
+source("functions/list_as_of_data.R")
 #Connecting to old Flusight data
-flusight_path = paste0("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/Flusight-forecast-data-master") 
-setwd(flusight_path)
+#flusight_path = paste0("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/Flusight-forecast-data-master") 
+flusight_path = ("Data/rds/2223") 
+#setwd(flusight_path)
 
 #Create dates of interest
 flu_dates_22_23 <- as.Date("2022-10-17") + weeks(6:19) #Starting 6 weeks later than the start of forecast (burn period)
@@ -1673,20 +1675,21 @@ weighted_state_weights<-rbind(weighted_state_weights,
 
 
 
-save(weighted_state_forecasts_all,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/weighted state forecasts  new weight revis.rds")
-save(weighted_US_forecasts_all,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/weighted US forecasts  new weight revis.rds")
+save(weighted_US_forecasts_all,file="Data/rds/2223/weighted US forecasts  new weight revis.rds")
 
-save(weighted_state_weights,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/weighted state weights revis.rds")
-save(weighted_US_weights,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/weighted US weights revis.rds")
+save(weighted_state_weights,file="Data/rds/2223/weighted state weights revis.rds")
+save(weighted_US_weights,file="Data/rds/2223/weighted US weights revis.rds")
+
+prac_weighted_US_forecasts_all <- weighted_US_forecasts_all
+prac_weighted_state_weights<- weighted_state_weights
+prac_weighted_US_weights <- weighted_US_weights
 
 table(weighted_state_forecasts_all$forecast_date)
 table(weighted_US_weights$forecast_date)
 
-#load("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/weighted scores revis.rds")
-#load("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/weighted forecasts revis.rds")
 
-load("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/weighted US forecasts  new weight revis.rds")
-load("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/weighted state forecasts  new weight revis.rds")
+load("Data/rds/2223/weighted US forecasts  new weight revis.rds")
+load("Data/rds/2223/weighted state forecasts  new weight revis.rds")
 
 
 
@@ -1773,15 +1776,13 @@ table(weighted_US_forecasts_all$forecast_date)
 table(all_forecasts_us$forecast_date, all_forecasts_us$model)
 library(plyr)
 
-#save(weighted_US_weights,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/weighted US weights.rds")
-
 
 all_forecasts_us_compl2323<-all_forecasts_us_compl
 all_forecasts_state_compl2323<-all_forecasts_state_compl
 
-save(all_forecasts_us_compl2323,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/all_forecasts_us_compl2323.rds")
+save(all_forecasts_us_compl2323,file="Data/rds/2223/all_forecasts_us_compl2323.rds")
 
-save(all_forecasts_us_compl2323,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/all_forecasts_state_compl2323.rds")
+save(all_forecasts_us_compl2323,file="Data/rds/2223/all_forecasts_state_compl2323.rds")
 
 #Score baseline and ensembles
 
@@ -1854,12 +1855,12 @@ wis_model_states_2223_trunc <- weighted_state_forecasts_all2 %>%select(c(true_va
 
 
 
-save(wis_model_states_2223,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/wis_model_states_2223.rds")
-save(wis_model_us_2223,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/wis_model_us_2223.rds")
+save(wis_model_states_2223,file="Data/rds/2223/wis_model_states_2223.rds")
+save(wis_model_us_2223,file="Data/rds/2223/wis_model_us_2223.rds")
 
 
-save(wis_model_states_2223_trunc,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/wis_model_states_2223_trunc.rds")
-save(wis_model_us_2223_trunc,file="//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/wis_model_us_2223_trunc.rds")
+save(wis_model_states_2223_trunc,file="Supplement/wis_model_states_2223_trunc.rds")
+save(wis_model_us_2223_trunc,file="Supplement/wis_model_us_2223_trunc.rds")
  
 
 

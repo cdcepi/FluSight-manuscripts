@@ -1551,11 +1551,34 @@ median_weight_state6$temporal_resolution<-'week'
 median_weight_us6$temporal_resolution<-'week'
 
 
+# 
+# 
+# flu_baseline_current<-flu_baseline_all%>%filter(forecast_date==forecast_date_current &location=='US')%>%
+#   dplyr::rename(model_id=model, output_type=type, output_type_id=quantile)
+# 
+# flu_baseline_current_state<-flu_baseline_all%>%filter(forecast_date==forecast_date_current &location!='US')%>%
+#   dplyr::rename(model_id=model, output_type=type, output_type_id=quantile)
+
 weighted_US_forecasts_all<-rbind(weighted_US_forecasts_all,median_weight_us6,median_weight_us4,median_weight_us2,
                    mean_weight_us6,mean_weight_us4,mean_weight_us2)
+# weighted_US2<-as_covid_hub_forecasts(weighted_US)
+# weighted_US_score<-covidHubUtils::score_forecasts(weighted_US2,flu_truth_all,use_median_as_point = T,return_format="wide")
+# 
+
+# 
+# #Scored forecasts
+# weighted_US_score_all<-rbind(weighted_US_score_all,weighted_US_score)
+# #Forecasts
+# weighted_US_forecasts_all<-rbind(weighted_US_forecasts_all,weighted_US2)
 
 weighted_state_forecasts_all<-rbind(weighted_state_forecasts_all,median_weight_state6,median_weight_state4,median_weight_state2,
                       mean_weight_state6,mean_weight_state4,mean_weight_state2)
+# weighted_state2<-as_covid_hub_forecasts(weighted_state)
+# weighted_state_score<-covidHubUtils::score_forecasts(weighted_state2,flu_truth_all,use_median_as_point = T,return_format="wide")
+# #Scored forecasts
+# weighted_state_score_all<-rbind(weighted_state_score_all,weighted_state_score)
+#Forecasts
+# weighted_state_forecasts_all<-rbind(weighted_state_forecasts_all,weighted_state2)
 
 #Weights
 weighted_US_weights<-rbind(weighted_US_weights,
