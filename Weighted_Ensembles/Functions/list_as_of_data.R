@@ -1,5 +1,5 @@
-nm <- list.files(path="../../Data/as of data/")
-setwd("../../Data/as of data/")
+nm <- list.files(path="Data/as of data/")
+setwd("Data/as of data/")
 test_truth_all<-data.frame()
 library(cdlTools)
 list_as_of<-list()

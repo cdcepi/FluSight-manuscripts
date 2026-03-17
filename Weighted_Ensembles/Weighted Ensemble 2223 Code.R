@@ -29,14 +29,13 @@ source("functions/as_covid_hub_forecasts.R")
 ensemble_code_path = paste0("Data/rds/2223/data-forecasts/Flusight-ensemble")
 
 flu_baseline_all<-readRDS("Data/rds/2223/flu_baseline_all.rds")
-#flu_truth_all<-readRDS("Data/rds/2223/flu_truth_all.rds")
-flu_truth_all <-  test_truth
+flu_truth_all<-readRDS("Data/rds/2223/flu_truth_all.rds")
 #Load in the truth data as of each forecast date for the burn-in period evaluation
 source("functions/list_as_of_data.R")
+flu_truth_all <-  test_truth
 #Connecting to old Flusight data
-#flusight_path = paste0("//cdc.gov/project/NCIRD_ID_EPI_Branch/Frutos/FluSight Ensemble/Flusight-forecast-data-master") 
 flusight_path = ("Data/rds/2223") 
-#setwd(flusight_path)
+
 
 #Create dates of interest
 flu_dates_22_23 <- as.Date("2022-10-17") + weeks(6:19) #Starting 6 weeks later than the start of forecast (burn period)
@@ -187,9 +186,9 @@ forecasts_6week$temporal_resolution<-'week'
 #Unable to effectively score the models if they are missing a week
 #Will do this separately for each burn period and separately for US vs states
   count_us6<-forecasts_6week_us%>%group_by( model)%>%
-    summarise(n=n())%>%filter(n==max(n)|model=="FluSight-baseline")
+    dplyr::summarise(n=n())%>%filter(n==max(n)|model=="FluSight-baseline")
   count_state6<-forecasts_6week_state%>%group_by( model)%>%
-    summarise(n=n())%>%filter(n==max(n)|model=="FluSight-baseline")
+    summarise(n=n())%>%filter(n==max(n)|model=="Flusight-baseline")
   
   count_us4<-forecasts_4week_us%>%group_by( model)%>%
     summarise(n=n())%>%filter(n==max(n)|model=="FluSight-baseline")
@@ -807,7 +806,7 @@ for(q in 1:length(theta)){
   #Need to select a theta that minimizes the WIS over the training window.
   
   #Forecasts to include
-  check_WIS<-forecasts_4week_state%>%filter(model!="Flstateight-baseline")%>%mutate(model_id=model, output_type_id=quantile, value=prediction)%>%
+  check_WIS<-forecasts_4week_state%>%filter(model!="Flusight-baseline")%>%mutate(model_id=model, output_type_id=quantile, value=prediction)%>%
     mutate(output_type=type)%>%mutate(output_type_id=quantile)
   #Keep only those with weights
   check_WIS<-check_WIS%>%right_join(weights_state4)%>%select(!weight)
@@ -910,7 +909,7 @@ for(q in 1:length(theta)){
   #Need to select a theta that minimizes the WIS over the training window.
   
   #Forecasts to include
-  check_WIS<-forecasts_2week_state%>%filter(model!="Flstateight-baseline")%>%mutate(model_id=model, output_type_id=quantile, value=prediction)%>%
+  check_WIS<-forecasts_2week_state%>%filter(model!="Flusight-baseline")%>%mutate(model_id=model, output_type_id=quantile, value=prediction)%>%
     mutate(output_type=type)%>%mutate(output_type_id=quantile)
   #Keep only those with weights
   check_WIS<-check_WIS%>%right_join(weights_state2)%>%select(!weight)
@@ -1329,7 +1328,7 @@ for(q in 1:length(theta)){
   #Need to select a theta that minimizes the WIS over the training window.
   
   #Forecasts to include
-  check_WIS<-forecasts_6week_state%>%filter(model!="Flstateight-baseline")%>%mutate(model_id=model, output_type_id=quantile, value=prediction)%>%
+  check_WIS<-forecasts_6week_state%>%filter(model!="Flusight-baseline")%>%mutate(model_id=model, output_type_id=quantile, value=prediction)%>%
     mutate(output_type=type)%>%mutate(output_type_id=quantile)
   #Keep only those with weights
   check_WIS<-check_WIS%>%right_join(weights_state6)%>%select(!weight)
@@ -1431,7 +1430,7 @@ for(q in 1:length(theta)){
   #Need to select a theta that minimizes the WIS over the training window.
   
   #Forecasts to include
-  check_WIS<-forecasts_4week_state%>%filter(model!="Flstateight-baseline")%>%mutate(model_id=model, output_type_id=quantile, value=prediction)%>%
+  check_WIS<-forecasts_4week_state%>%filter(model!="Flusight-baseline")%>%mutate(model_id=model, output_type_id=quantile, value=prediction)%>%
     mutate(output_type=type)%>%mutate(output_type_id=quantile)
   #Keep only those with weights
   check_WIS<-check_WIS%>%right_join(weights_state4)%>%select(!weight)
@@ -1535,7 +1534,7 @@ for(q in 1:length(theta)){
   #Need to select a theta that minimizes the WIS over the training window.
   
   #Forecasts to include
-  check_WIS<-forecasts_2week_state%>%filter(model!="Flstateight-baseline")%>%mutate(model_id=model, output_type_id=quantile, value=prediction)%>%
+  check_WIS<-forecasts_2week_state%>%filter(model!="Flusight-baseline")%>%mutate(model_id=model, output_type_id=quantile, value=prediction)%>%
     mutate(output_type=type)
   #Keep only those with weights
   check_WIS<-check_WIS%>%right_join(weights_state2)%>%select(!weight)
@@ -1680,13 +1679,9 @@ save(weighted_US_forecasts_all,file="Data/rds/2223/weighted US forecasts  new we
 save(weighted_state_weights,file="Data/rds/2223/weighted state weights revis.rds")
 save(weighted_US_weights,file="Data/rds/2223/weighted US weights revis.rds")
 
-prac_weighted_US_forecasts_all <- weighted_US_forecasts_all
-prac_weighted_state_weights<- weighted_state_weights
-prac_weighted_US_weights <- weighted_US_weights
 
 table(weighted_state_forecasts_all$forecast_date)
 table(weighted_US_weights$forecast_date)
-
 
 load("Data/rds/2223/weighted US forecasts  new weight revis.rds")
 load("Data/rds/2223/weighted state forecasts  new weight revis.rds")
