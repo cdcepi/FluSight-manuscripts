@@ -15,7 +15,10 @@ for (i in 1:length(nm)) {
   test_truth$model<-'flu-truth'
   
   
-list_as_of[[i]]<-test_truth%>%dplyr::rename(target_end_date=wk_end_date)%>%select(location,value,target_end_date,model,target_variable)
+list_as_of[[i]]<-test_truth%>%dplyr::rename(target_end_date=wk_end_date)%>%dplyr::select(location,value,target_end_date,model,target_variable)
 
 }
+
+test_truth <- test_truth %>% mutate(target_end_date = wk_end_date) %>% 
+  dplyr::select(model, target_variable, target_end_date, location, value)
 #View(list_as_of[[1]])
