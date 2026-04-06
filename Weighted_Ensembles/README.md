@@ -33,7 +33,7 @@ The weighted ensembles for  each season can be produced through their respective
 
 `figures_manuscript.Rmd`
 
-This file can be used to generate all relevant data comparisons and figures. The figures are output to the Figures folder and the data used can be found in the Data folder.  All necessary libraries, file paths, and objects are listed at the beginning of this file in the "Setup" section below. Each subsequent section contains the data manipulation code related to the figure of the same name.
+This file can be used to generate all relevant data comparisons and figures. The figures are output to the Figures folder and the data used can be found in the Data folder.  All necessary libraries, file paths, and objects are listed at the beginning of the file. Each subsequent section contains the data manipulation code related to the figure of the same name.
 
 
 
